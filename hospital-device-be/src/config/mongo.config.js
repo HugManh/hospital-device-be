@@ -1,8 +1,12 @@
 const mongoose = require('mongoose');
 
-const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
+const clientOptions = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+};
 
 const connectDB = async () => {
+    console.log('Connecting to MongoDB', process.env.MONGO_URI);
     try {
         await mongoose.connect(process.env.MONGO_URI, clientOptions);
         await mongoose.connection.db.admin().command({ ping: 1 });

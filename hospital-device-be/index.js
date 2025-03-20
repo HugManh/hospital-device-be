@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const connectDB = require('./src/config/mongo.config');
 const authRoutes = require('./src/routes/auth.route');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swagger.config');
 
 const app = express();
 
@@ -14,8 +16,12 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // Khởi động server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    console.log(`API docs available at http://localhost:${PORT}/api-docs`);
 });
