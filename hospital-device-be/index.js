@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const connectDB = require('./src/config/mongo.config');
 const authRoutes = require('./src/routes/auth.route');
 const swaggerUi = require('swagger-ui-express');
@@ -21,6 +22,7 @@ app.use(cors({
 
 // Middleware
 app.use(express.json());
+app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);

@@ -1,20 +1,23 @@
 const jwt = require('jsonwebtoken');
+const secretKey = process.env.JWT_SECRET;
 
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Expecting "Bearer TOKEN"
+const authenticate = (req, res, next) => {
+    const accessToken = req.cookies['accessToken'];
 
-    if (!token) {
-        return res.status(401).json({ message: 'Access denied' });
+    if (!accessToken) {
+        return res.status(401).send('Unauthorized');
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: 'Invalid token' });
-        }
-        req.user = user;
+    // Validate access token
+    try {
+        const decoded = jwt.verify(accessToken, secretKey);
+        req.user = decoded.user;
         next();
-    });
+    } catch (error) {
+        console.log('Access token invalid, need to get a new one');
+        res.clearCookie('accessToken');
+        return res.status(401).send('Unauthorized');
+    }
 };
 
-module.exports = authenticateToken;
+module.exports = { authenticate };

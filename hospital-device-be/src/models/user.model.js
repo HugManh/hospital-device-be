@@ -7,7 +7,12 @@ const UserSchema = new Schema({
     email: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['user', 'approver', 'admin'], default: 'user' }
+    role: {
+        type: String,
+        enum: ['user', 'approver', 'admin'],
+        default: 'user',
+    },
+    refreshToken: { type: String },
 });
 
 // Áp dụng BaseSchema vào UserSchema

@@ -6,9 +6,9 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'Hospital Device',
+            title: 'Hospital Device API',
             version: '1.0.0',
-            description: 'A Node.js API with JWT authentication and MongoDB',
+            description: 'Hospital Device API',
         },
         servers: [
             {
@@ -18,20 +18,16 @@ const options = {
         ],
         components: {
             securitySchemes: {
-                bearerAuth: {
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT',
+                cookieAuth: {
+                    type: 'apiKey',
+                    in: 'cookie',
+                    name: 'accessToken',
+                    description: 'JWT Access Token stored in HttpOnly cookie',
                 },
             },
         },
-        security: [
-            {
-                bearerAuth: [],
-            },
-        ],
     },
-    apis: ['./src/routes/*.js'], // Đường dẫn đến các file chứa comment JSDoc
+    apis: ['./src/routes/*.js'], // Đường dẫn đến các file chứa Swagger annotations
 };
 
 const swaggerSpec = swaggerJsdoc(options);
