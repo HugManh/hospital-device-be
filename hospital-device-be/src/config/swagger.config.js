@@ -6,7 +6,7 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'JWT Auth API',
+            title: 'Hospital Device',
             version: '1.0.0',
             description: 'A Node.js API with JWT authentication and MongoDB',
         },

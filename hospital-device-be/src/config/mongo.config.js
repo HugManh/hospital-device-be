@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 
-const clientOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-};
+const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
 
 const connectDB = async () => {
     console.log('Connecting to MongoDB', process.env.MONGO_URI);
@@ -13,6 +10,7 @@ const connectDB = async () => {
         console.log('Pinged your deployment. You successfully connected to MongoDB!');
     } catch (error) {
         console.error('MongoDB connection error:', error);
+        await mongoose.disconnect();
         process.exit(1);
     }
 };
