@@ -4,18 +4,18 @@ const User = require('../models/user.model');
 
 // Đăng ký
 const register = async (req, res) => {
-    const { username, password } = req.body;
+    const { email, name, password } = req.body;
 
     try {
         // Kiểm tra user đã tồn tại chưa
-        const existingUser = await User.findOne({ username });
+        const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: 'Username already exists' });
+            return res.status(400).json({ message: 'Email already exists!' });
         }
 
         // Mã hóa mật khẩu
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ username, password: hashedPassword });
+        const user = new User({ email, name, password: hashedPassword });
         await user.save();
 
         res.status(201).json({ message: 'User registered successfully' });
@@ -26,11 +26,11 @@ const register = async (req, res) => {
 
 // Đăng nhập
 const login = async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     try {
         // Tìm user
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
@@ -43,7 +43,7 @@ const login = async (req, res) => {
 
         // Tạo JWT token
         const token = jwt.sign(
-            { username: user.username },
+            { email: user.email },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );

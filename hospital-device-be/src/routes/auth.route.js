@@ -16,12 +16,16 @@ const authenticateToken = require('../middleware/auth.middleware');
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
+ *               - name
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 example: user1
+ *                 example: test123@gmail.com
+ *               name:
+ *                 type: string
+ *                 example: test123
  *               password:
  *                 type: string
  *                 example: pass123
@@ -29,7 +33,7 @@ const authenticateToken = require('../middleware/auth.middleware');
  *       201:
  *         description: User registered successfully
  *       400:
- *         description: Username already exists
+ *         description: Email already exists
  *       500:
  *         description: Server error
  */
@@ -48,12 +52,12 @@ router.post('/register', authController.register);
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - email
  *               - password
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 example: user1
+ *                 example: test123@gmail.com
  *               password:
  *                 type: string
  *                 example: pass123
@@ -97,9 +101,9 @@ router.post('/login', authController.login);
  *                 user:
  *                   type: object
  *                   properties:
- *                     username:
+ *                     email:
  *                       type: string
- *                       example: user1
+ *                       example: test123@gmail.com
  *       401:
  *         description: Access denied (no token)
  *       403:
