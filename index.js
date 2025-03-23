@@ -3,9 +3,12 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const connectDB = require('./src/config/mongo.config');
-const authRoutes = require('./src/routes/auth.route');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./src/config/swagger.config');
+
+// Routes
+const authRoute = require('./src/routes/auth.route');
+const userRoute = require('./src/routes/user.route');
 
 const app = express();
 
@@ -13,19 +16,22 @@ const app = express();
 connectDB();
 
 // Cấu hình CORS
-app.use(cors({
-    origin: ['*'], // Các domain được phép truy cập
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Các method được phép sử dụng
-    allowedHeaders: ['Content-Type', 'Authorization'], // Các header được phép sử dụng
-    credentials: true // Cho phép gửi cookie nếu cần
-}));
+app.use(
+    cors({
+        origin: ['*'], // Các domain được phép truy cập
+        methods: ['GET', 'POST', 'PUT', 'DELETE'], // Các method được phép sử dụng
+        allowedHeaders: ['Content-Type', 'Authorization'], // Các header được phép sử dụng
+        credentials: true, // Cho phép gửi cookie nếu cần
+    })
+);
 
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoute);
+app.use('/api/users', userRoute);
 
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
