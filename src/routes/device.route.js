@@ -52,7 +52,7 @@ router.get('/', getDevices);
 
 /**
  * @swagger
- * /api/devices/{code}:
+ * /api/devices/{id}:
  *   get:
  *     summary: Get a device by ID
  *     tags: [Device]
