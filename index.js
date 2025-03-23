@@ -9,6 +9,7 @@ const swaggerSpec = require('./src/config/swagger.config');
 // Routes
 const authRoute = require('./src/routes/auth.route');
 const userRoute = require('./src/routes/user.route');
+const deviceRoute = require('./src/routes/device.route');
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use(cookieParser());
 // Routes
 app.use('/api/auth', authRoute);
 app.use('/api/users', userRoute);
+app.use('/api/devices', deviceRoute);
 
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
