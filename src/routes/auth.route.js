@@ -6,7 +6,6 @@ const {
     logout,
     refreshToken,
 } = require('../controllers/auth.controller');
-const { authenticate } = require('../middleware/auth.middleware');
 
 /**
  * @swagger
@@ -131,59 +130,6 @@ router.post('/register', register);
  *                   example: Server error
  */
 router.post('/login', login);
-
-/**
- * @swagger
- * /api/auth/protected:
- *   get:
- *     summary: Access a protected route using access token
- *     tags: [Auth]
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Access granted to protected route
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Protected route accessed
- *                 user:
- *                   type: object
- *                   properties:
- *                     email:
- *                       type: string
- *                       example: test123@gmail.com
- *                     id:
- *                       type: string
- *                       example: 507f1f77bcf86cd799439011
- *       401:
- *         description: No access token provided or invalid token
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: No access token provided
- *       403:
- *         description: Invalid or expired token (handled by refresh)
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Invalid access token
- */
-router.get('/protected', authenticate, (req, res) => {
-    res.json({ message: 'Protected route accessed', user: req.user });
-});
 
 /**
  * @swagger

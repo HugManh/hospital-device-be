@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const morgan = require('morgan');
+
 const connectDB = require('./src/config/mongo.config');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./src/config/swagger.config');
@@ -10,6 +12,9 @@ const swaggerSpec = require('./src/config/swagger.config');
 const authRoute = require('./src/routes/auth.route');
 const userRoute = require('./src/routes/user.route');
 const deviceRoute = require('./src/routes/device.route');
+const {
+    errorHandlerMiddleware,
+} = require('./src/middleware/handle.middleware');
 
 const app = express();
 
@@ -27,8 +32,12 @@ app.use(
 );
 
 // Middleware
-app.use(express.json());
+app.use(express.json()); // For parsing JSON data
+app.use(express.urlencoded({ extended: true })); // For parsing URL-encoded form data
 app.use(cookieParser());
+app.use(morgan(':method :url :status :response-time ms'));
+
+app.use(errorHandlerMiddleware);
 
 // Routes
 app.use('/api/auth', authRoute);

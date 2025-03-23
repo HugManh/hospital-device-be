@@ -1,23 +1,38 @@
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET;
 
+// Middleware kiểm tra authentication
 const authenticate = (req, res, next) => {
-    const accessToken = req.cookies['accessToken'];
-
-    if (!accessToken) {
-        return res.status(401).send('Unauthorized');
+    const token = req.cookies.token;
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: 'Vui lòng đăng nhập để tiếp tục',
+        });
     }
 
-    // Validate access token
     try {
-        const decoded = jwt.verify(accessToken, secretKey);
-        req.user = decoded.user;
+        const decoded = jwt.verify(token, secretKey);
+        req.user = decoded;
         next();
     } catch (error) {
-        console.log('Access token invalid, need to get a new one');
-        res.clearCookie('accessToken');
-        return res.status(401).send('Unauthorized');
+        return res.status(401).json({
+            success: false,
+            message: 'Token không hợp lệ hoặc đã hết hạn',
+            error: error.message,
+        });
     }
 };
 
-module.exports = { authenticate };
+// Middleware kiểm tra quyền admin
+const authorizeAdmin = (req, res, next) => {
+    if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({
+            success: false,
+            message: 'Bạn không có quyền truy cập (yêu cầu quyền admin)',
+        });
+    }
+    next();
+};
+
+module.exports = { authenticate, authorizeAdmin };

@@ -7,6 +7,10 @@ const {
     updateDevice,
     deleteDevice,
 } = require('../controllers/device.controller');
+const {
+    authenticate,
+    authorizeAdmin,
+} = require('../middleware/auth.middleware');
 
 /**
  * @swagger
@@ -36,7 +40,7 @@ const {
  *       400:
  *         description: Invalid data
  */
-router.post('/', createDevice);
+router.post('/', authenticate, authorizeAdmin, createDevice);
 
 /**
  * @swagger
@@ -48,7 +52,7 @@ router.post('/', createDevice);
  *       200:
  *         description: List of devices
  */
-router.get('/', getDevices);
+router.get('/', authenticate, getDevices);
 
 /**
  * @swagger
@@ -69,7 +73,7 @@ router.get('/', getDevices);
  *       404:
  *         description: Device not found
  */
-router.get('/:code', getDeviceById);
+router.get('/:id', authenticate, getDeviceById);
 
 /**
  * @swagger
@@ -101,7 +105,7 @@ router.get('/:code', getDeviceById);
  *       404:
  *         description: Device not found
  */
-router.put('/:id', updateDevice);
+router.put('/:id', authenticate, authorizeAdmin, updateDevice);
 
 /**
  * @swagger
@@ -122,6 +126,6 @@ router.put('/:id', updateDevice);
  *       404:
  *         description: Device not found
  */
-router.delete('/:id', deleteDevice);
+router.delete('/:id', authenticate, authorizeAdmin, deleteDevice);
 
 module.exports = router;
