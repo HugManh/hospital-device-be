@@ -18,11 +18,13 @@ const options = {
         ],
         components: {
             securitySchemes: {
-                cookieAuth: {
-                    type: 'apiKey',
-                    in: 'cookie',
-                    name: 'accessToken',
-                    description: 'JWT Access Token stored in HttpOnly cookie',
+                bearerAuth: {
+                    // Đổi từ cookieAuth sang bearerAuth
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                    description:
+                        'JWT Access Token sent in Authorization header as Bearer token',
                 },
             },
         },

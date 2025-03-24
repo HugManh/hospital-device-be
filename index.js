@@ -12,9 +12,6 @@ const swaggerSpec = require('./src/config/swagger.config');
 const authRoute = require('./src/routes/auth.route');
 const userRoute = require('./src/routes/user.route');
 const deviceRoute = require('./src/routes/device.route');
-const {
-    errorHandlerMiddleware,
-} = require('./src/middleware/handle.middleware');
 
 const app = express();
 
@@ -24,10 +21,10 @@ connectDB();
 // Cấu hình CORS
 app.use(
     cors({
-        origin: ['*'], // Các domain được phép truy cập
+        origin: '*', // Các domain được phép truy cập
         methods: ['GET', 'POST', 'PUT', 'DELETE'], // Các method được phép sử dụng
         allowedHeaders: ['Content-Type', 'Authorization'], // Các header được phép sử dụng
-        credentials: true, // Cho phép gửi cookie nếu cần
+        // credentials: true, // Cho phép gửi cookie nếu cần
     })
 );
 
@@ -37,7 +34,6 @@ app.use(express.urlencoded({ extended: true })); // For parsing URL-encoded form
 app.use(cookieParser());
 app.use(morgan(':method :url :status :response-time ms'));
 
-app.use(errorHandlerMiddleware);
 
 // Routes
 app.use('/api/auth', authRoute);
