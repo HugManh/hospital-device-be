@@ -44,7 +44,10 @@ const secretKey = process.env.JWT_SECRET;
 const authenticate = (req, res, next) => {
     // Lấy token từ header Authorization
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Tách "Bearer" và token
+    const token =
+        authHeader && authHeader.startsWith('Bearer ')
+            ? authHeader.split(' ')[1]
+            : null;
 
     if (!token) {
         return res.status(401).json({

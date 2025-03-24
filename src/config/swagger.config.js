@@ -19,7 +19,6 @@ const options = {
         components: {
             securitySchemes: {
                 bearerAuth: {
-                    // Đổi từ cookieAuth sang bearerAuth
                     type: 'http',
                     scheme: 'bearer',
                     bearerFormat: 'JWT',
@@ -29,7 +28,7 @@ const options = {
             },
         },
     },
-    apis: ['./src/routes/*.js'], // Đường dẫn đến các file chứa Swagger annotations
+    apis: ['./src/routes/*.js'],
 };
 
 const swaggerSpec = swaggerJsdoc(options);

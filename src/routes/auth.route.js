@@ -5,7 +5,9 @@ const {
     login,
     logout,
     refreshToken,
+    getProfile,
 } = require('../controllers/auth.controller');
+const { authenticate } = require('../middleware/auth.middleware');
 
 /**
  * @swagger
@@ -168,6 +170,41 @@ router.post('/login', login);
  *                   example: No refresh token provided
  */
 router.get('/refresh-token', refreshToken);
+
+/**
+ * @swagger
+ * /api/auth/profile:
+ *   get:
+ *     summary: Get user profile
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Profile retrieved successfully
+ *                 profile:
+ *                   type: object
+ *                   properties:
+ *                     email:
+ *                       type: string
+ *                       example: test123@gmail.com
+ *                     name:
+ *                       type: string
+ *                       example: test123
+ *       401:
+ *         description: No access token provided or invalid token
+ *       500:
+ *         description: Server error
+ */
+router.get('/profile', authenticate, getProfile);
 
 /**
  * @swagger

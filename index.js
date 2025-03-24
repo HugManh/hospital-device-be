@@ -32,8 +32,8 @@ app.use(
 app.use(express.json()); // For parsing JSON data
 app.use(express.urlencoded({ extended: true })); // For parsing URL-encoded form data
 app.use(cookieParser());
-app.use(morgan(':method :url :status :response-time ms'));
-
+if (process.env.NODE_ENV === 'development')
+    app.use(morgan(':method :url :status :response-time ms'));
 
 // Routes
 app.use('/api/auth', authRoute);
@@ -41,7 +41,8 @@ app.use('/api/users', userRoute);
 app.use('/api/devices', deviceRoute);
 
 // Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+if (process.env.NODE_ENV === 'development')
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Khởi động server
 const PORT = process.env.PORT || 3000;

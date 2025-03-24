@@ -44,14 +44,14 @@
 
 //         // Create access token
 //         const accessToken = jwt.sign(
-//             { email: user.email, id: user._id },
+//             { sub: user._id, email: user.email, role: user.role },
 //             process.env.JWT_SECRET,
 //             { expiresIn: '1h' }
 //         );
 
 //         // Create refresh token
 //         const refreshToken = jwt.sign(
-//             { email: user.email, id: user._id },
+//             { sub: user._id, email: user.email, role: user.role },
 //             process.env.JWT_SECRET,
 //             { expiresIn: '2d' }
 //         );
@@ -139,7 +139,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const secretKey = process.env.JWT_SECRET;
 
-// Đăng ký (giữ nguyên vì không liên quan đến token)
+// Đăng ký
 const register = async (req, res) => {
     const { email, name, password } = req.body;
 
@@ -176,14 +176,24 @@ const login = async (req, res) => {
 
         // Tạo access token
         const accessToken = jwt.sign(
-            { email: user.email, id: user._id },
+            {
+                sub: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
         // Tạo refresh token
         const refreshToken = jwt.sign(
-            { email: user.email, id: user._id },
+            {
+                sub: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
             process.env.JWT_SECRET,
             { expiresIn: '2d' }
         );
@@ -197,12 +207,6 @@ const login = async (req, res) => {
             message: 'Login successful',
             accessToken,
             refreshToken,
-            user: {
-                email: user.email,
-                name: user.name,
-                role: user.role,
-                id: user._id,
-            },
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
@@ -256,4 +260,30 @@ const refreshToken = (req, res) => {
     }
 };
 
-module.exports = { register, login, logout, refreshToken };
+// Lấy thông tin profile
+const getProfile = async (req, res) => {
+    try {
+        // Lấy ID người dùng từ token (sub)
+        const userId = req.user.sub;
+        const user = await User.findById(userId).select(
+            '-password -refreshToken'
+        ); // Loại bỏ mật khẩu và refreshToken
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({
+            message: 'Profile retrieved successfully',
+            profile: {
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+module.exports = { register, login, logout, refreshToken, getProfile };
