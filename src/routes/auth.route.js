@@ -32,6 +32,9 @@ const { authenticate } = require('../middleware/auth.middleware');
  *               name:
  *                 type: string
  *                 example: test123
+ *               role:
+ *                 type: string
+ *                 example: user
  *               password:
  *                 type: string
  *                 example: pass123

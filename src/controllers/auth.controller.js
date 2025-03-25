@@ -141,7 +141,7 @@ const secretKey = process.env.JWT_SECRET;
 
 // Đăng ký
 const register = async (req, res) => {
-    const { email, name, password } = req.body;
+    const { email, name, password, role } = req.body;
 
     try {
         const existingUser = await User.findOne({ email });
@@ -150,7 +150,7 @@ const register = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ email, name, password: hashedPassword });
+        const user = new User({ email, name, password: hashedPassword, role });
         await user.save();
 
         res.status(201).json({ message: 'User registered successfully' });
