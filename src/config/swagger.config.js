@@ -1,6 +1,7 @@
 const swaggerJsdoc = require('swagger-jsdoc');
 
 const PORT = process.env.PORT || 3000;
+const DOMAIN_API = process.env.DOMAIN_API;
 
 const options = {
     definition: {
@@ -13,7 +14,11 @@ const options = {
         servers: [
             {
                 url: `http://localhost:${PORT}`,
-                description: 'Development server',
+                description: 'Development server1',
+            },
+            {
+                url: DOMAIN_API,
+                description: 'Development server2',
             },
         ],
         components: {
