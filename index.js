@@ -36,6 +36,9 @@ if (process.env.NODE_ENV === 'development')
     app.use(morgan(':method :url :status :response-time ms'));
 
 // Routes
+app.use('/', (req, res) => {
+    res.json({ message: 'I am robot' });
+});
 app.use('/api/auth', authRoute);
 app.use('/api/users', userRoute);
 app.use('/api/devices', deviceRoute);
