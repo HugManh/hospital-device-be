@@ -4,14 +4,14 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 
-const connectDB = require('./src/config/mongo.config');
+const connectDB = require('./config/mongo.config');
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./src/config/swagger.config');
+const swaggerSpec = require('./config/swagger.config');
 
 // Routes
-const authRoute = require('./src/routes/auth.route');
-const userRoute = require('./src/routes/user.route');
-const deviceRoute = require('./src/routes/device.route');
+const authRoute = require('./routes/auth.route');
+const userRoute = require('./routes/user.route');
+const deviceRoute = require('./routes/device.route');
 
 const app = express();
 

@@ -2,10 +2,10 @@
     "name": "hospital-device-be",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "src/index.js",
     "scripts": {
-        "start": "node index.js",
-        "dev": "nodemon index.js",
+        "start": "node src/index.js",
+        "dev": "nodemon src/index.js",
         "test": "mocha src/tests --exit",
         "lint": "eslint .",
         "format": "prettier --write ."
