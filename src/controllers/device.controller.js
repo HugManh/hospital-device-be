@@ -1,18 +1,18 @@
 const Device = require('../models/device.model');
 
 // Tạo mới device
-const createDevice = async (req, res) => {
-    const { code, name } = req.body;
+const addDevice = async (req, res) => {
+    const { location, name } = req.body;
 
     try {
-        const existingDevice = await Device.findOne({ code });
-        if (existingDevice) {
-            return res
-                .status(400)
-                .json({ message: 'Device code already exists!' });
-        }
+        // const existingDevice = await Device.findOne({ code });
+        // if (existingDevice) {
+        //     return res
+        //         .status(400)
+        //         .json({ message: 'Device code already exists!' });
+        // }
 
-        const device = new Device({ code, name });
+        const device = new Device({ name, location });
         await device.save();
 
         res.status(201).json({
@@ -50,10 +50,10 @@ const getDeviceById = async (req, res) => {
 // Cập nhật device
 const updateDevice = async (req, res) => {
     try {
-        const { code, name } = req.body;
+        const { name, location } = req.body;
         const device = await Device.findByIdAndUpdate(
             req.params.id,
-            { code, name },
+            { name, location },
             { new: true }
         );
 
@@ -85,7 +85,7 @@ const deleteDevice = async (req, res) => {
 };
 
 module.exports = {
-    createDevice,
+    addDevice,
     getDevices,
     getDeviceById,
     updateDevice,

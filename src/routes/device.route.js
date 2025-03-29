@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {
-    createDevice,
+    addDevice,
     getDevices,
     getDeviceById,
     updateDevice,
@@ -16,7 +16,7 @@ const {
  * @swagger
  * /api/devices:
  *   post:
- *     summary: Create a new device
+ *     summary: Add a new device
  *     tags: [Device]
  *     requestBody:
  *       required: true
@@ -25,22 +25,22 @@ const {
  *           schema:
  *             type: object
  *             required:
- *               - code
  *               - name
+ *               - location
  *             properties:
- *               code:
- *                 type: string
- *                 example: MRI-123
  *               name:
  *                 type: string
- *                 example: Máy chụp cộng hưởng từ
+ *                 example: Máy chụp MRI
+ *               location:
+ *                 type: string
+ *                 example: Khoa CDHA
  *     responses:
  *       201:
- *         description: Device created successfully
+ *         description: Device added successfully
  *       400:
  *         description: Invalid data
  */
-router.post('/', authenticate, authorizeAdmin, createDevice);
+router.post('/', authenticate, authorizeAdmin, addDevice);
 
 /**
  * @swagger
@@ -95,9 +95,9 @@ router.get('/:id', authenticate, getDeviceById);
  *           schema:
  *             type: object
  *             properties:
- *               code:
- *                 type: string
  *               name:
+ *                 type: string
+ *               location:
  *                 type: string
  *     responses:
  *       200:

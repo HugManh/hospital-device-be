@@ -12,12 +12,16 @@ const {
     authenticate,
 } = require('../middleware/auth.middleware');
 
+router.use(authenticate);
+
 /**
  * @swagger
  * /api/users:
  *   post:
  *     summary: Create a new user
  *     tags: [User]
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -27,24 +31,41 @@ const {
  *             required:
  *               - email
  *               - name
- *               - password
+ *               - group
  *             properties:
  *               email:
  *                 type: string
- *                 example: test123@gmail.com
+ *                 format: email
+ *                 example: user@gmail.com
  *               name:
  *                 type: string
  *                 example: test123
- *               password:
+ *               group:
  *                 type: string
  *                 example: pass123
  *     responses:
  *       201:
  *         description: User created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     group:
+ *                       type: string
+ *                     password:
+ *                       type: string
  *       400:
- *         description: Invalid data
+ *         description: Email already exists
  */
-router.post('/', authenticate, authorizeAdmin, createUser);
+router.post('/', authorizeAdmin, createUser);
 
 /**
  * @swagger
@@ -52,9 +73,17 @@ router.post('/', authenticate, authorizeAdmin, createUser);
  *   get:
  *     summary: Get all users
  *     tags: [User]
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: List of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
  */
 router.get('/', authenticate, authorizeAdmin, getUsers);
 
@@ -64,6 +93,8 @@ router.get('/', authenticate, authorizeAdmin, getUsers);
  *   get:
  *     summary: Get a user by ID
  *     tags: [User]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -74,10 +105,14 @@ router.get('/', authenticate, authorizeAdmin, getUsers);
  *     responses:
  *       200:
  *         description: User retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  *       404:
  *         description: User not found
  */
-router.get('/:id', authenticate, getUserById);
+router.get('/:id', authenticate, authorizeAdmin, getUserById);
 
 /**
  * @swagger
@@ -85,6 +120,8 @@ router.get('/:id', authenticate, getUserById);
  *   put:
  *     summary: Update a user by ID
  *     tags: [User]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -99,10 +136,12 @@ router.get('/:id', authenticate, getUserById);
  *           schema:
  *             type: object
  *             properties:
- *               email:
- *                 type: string
  *               name:
  *                 type: string
+ *                 example: John Doe
+ *               password:
+ *                 type: string
+ *                 example: newpassword123
  *     responses:
  *       200:
  *         description: User updated successfully
@@ -117,6 +156,8 @@ router.put('/:id', authenticate, authorizeAdmin, updateUser);
  *   delete:
  *     summary: Delete a user by ID
  *     tags: [User]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
