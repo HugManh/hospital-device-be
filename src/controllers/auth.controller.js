@@ -2,6 +2,16 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const secretKey = process.env.JWT_SECRET;
 
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+// Helper để xử lý lỗi với thông báo chuyên nghiệp hơn
+const handleError = (res, error) => {
+    return res.status(500).json({
+        message: 'Unexpected error occurred. Please try again later.',
+        ...(isDevelopment && error ? { error: error.message } : {}),
+    });
+};
+
 // Đăng ký
 const register = async (req, res) => {
     const { email, name, password, role } = req.body;
@@ -17,7 +27,7 @@ const register = async (req, res) => {
 
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return handleError(res, error);
     }
 };
 
@@ -31,7 +41,7 @@ const login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
-        const isMatch = User.comparePassword(password);
+        const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
@@ -76,7 +86,7 @@ const login = async (req, res) => {
             },
         });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return handleError(res, error);
     }
 };
 
@@ -149,7 +159,7 @@ const getProfile = async (req, res) => {
             },
         });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return handleError(res, error);
     }
 };
 
