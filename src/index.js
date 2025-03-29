@@ -12,6 +12,7 @@ const swaggerSpec = require('./config/swagger.config');
 const authRoute = require('./routes/auth.route');
 const userRoute = require('./routes/user.route');
 const deviceRoute = require('./routes/device.route');
+const deviceBookingRoute = require('./routes/deviceBooking.route');
 
 const app = express();
 
@@ -39,6 +40,7 @@ if (process.env.NODE_ENV === 'development')
 app.use('/api/auth', authRoute);
 app.use('/api/users', userRoute);
 app.use('/api/devices', deviceRoute);
+app.use('/api/device-booking', deviceBookingRoute);
 
 // Swagger UI
 if (process.env.NODE_ENV === 'development')

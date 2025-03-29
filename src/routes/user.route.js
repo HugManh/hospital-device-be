@@ -6,11 +6,13 @@ const {
     getUserById,
     updateUser,
     deleteUser,
+    resetPassword,
 } = require('../controllers/user.controller');
 const {
-    authorizeAdmin,
     authenticate,
+    authorizeRoles,
 } = require('../middleware/auth.middleware');
+const { ROLES } = require('../config/contants');
 
 router.use(authenticate);
 
@@ -65,7 +67,7 @@ router.use(authenticate);
  *       400:
  *         description: Email already exists
  */
-router.post('/', authorizeAdmin, createUser);
+router.post('/', authorizeRoles([ROLES.ADMIN]), createUser);
 
 /**
  * @swagger
@@ -85,7 +87,7 @@ router.post('/', authorizeAdmin, createUser);
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get('/', authenticate, authorizeAdmin, getUsers);
+router.get('/', authenticate, authorizeRoles([ROLES.ADMIN]), getUsers);
 
 /**
  * @swagger
@@ -112,7 +114,7 @@ router.get('/', authenticate, authorizeAdmin, getUsers);
  *       404:
  *         description: User not found
  */
-router.get('/:id', authenticate, authorizeAdmin, getUserById);
+router.get('/:id', authenticate, authorizeRoles([ROLES.ADMIN]), getUserById);
 
 /**
  * @swagger
@@ -148,7 +150,7 @@ router.get('/:id', authenticate, authorizeAdmin, getUserById);
  *       404:
  *         description: User not found
  */
-router.put('/:id', authenticate, authorizeAdmin, updateUser);
+router.put('/:id', authenticate, authorizeRoles([ROLES.ADMIN]), updateUser);
 
 /**
  * @swagger
@@ -171,6 +173,13 @@ router.put('/:id', authenticate, authorizeAdmin, updateUser);
  *       404:
  *         description: User not found
  */
-router.delete('/:id', authenticate, authorizeAdmin, deleteUser);
+router.delete('/:id', authenticate, authorizeRoles([ROLES.ADMIN]), deleteUser);
+
+router.put(
+    '/:id/reset-password',
+    authenticate,
+    authorizeRoles([ROLES.ADMIN]),
+    resetPassword
+);
 
 module.exports = router;

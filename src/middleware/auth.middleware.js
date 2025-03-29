@@ -30,15 +30,15 @@ const authenticate = (req, res, next) => {
     }
 };
 
-// Middleware kiểm tra quyền admin
-const authorizeAdmin = (req, res, next) => {
-    if (!req.user || req.user.role !== 'admin') {
+// Middleware để kiểm tra quyền
+const authorizeRoles = (allowedRoles) => (req, res, next) => {
+    if (!req.user || !allowedRoles.includes(req.user.role)) {
         return res.status(403).json({
             success: false,
-            message: 'Bạn không có quyền truy cập (yêu cầu quyền admin)',
+            message: `Bạn không có quyền hạn (yêu cầu một trong các quyền: ${allowedRoles.join(', ')})`,
         });
     }
     next();
 };
 
-module.exports = { authenticate, authorizeAdmin };
+module.exports = { authenticate, authorizeRoles };

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const BaseSchema = require('./base.model');
 const bcrypt = require('bcrypt');
 const { hashPassword } = require('../utils/crypto');
+const { ROLES } = require('../config/contants');
 
 const UserSchema = new BaseSchema({
     email: { type: String, required: true },
@@ -9,8 +10,8 @@ const UserSchema = new BaseSchema({
     password: { type: String, required: true },
     role: {
         type: String,
-        enum: ['user', 'approver', 'admin'],
-        default: 'user',
+        enum: Object.values(ROLES),
+        default: ROLES.USER,
     },
     group: { type: String, required: true, default: 'Thiếu thông tin' },
     isActive: { type: Boolean, default: true },

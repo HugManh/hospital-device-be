@@ -9,8 +9,9 @@ const {
 } = require('../controllers/device.controller');
 const {
     authenticate,
-    authorizeAdmin,
+    authorizeRoles,
 } = require('../middleware/auth.middleware');
+const { ROLES } = require('../config/contants');
 
 /**
  * @swagger
@@ -40,7 +41,7 @@ const {
  *       400:
  *         description: Invalid data
  */
-router.post('/', authenticate, authorizeAdmin, addDevice);
+router.post('/', authenticate, authorizeRoles([ROLES.ADMIN]), addDevice);
 
 /**
  * @swagger
@@ -105,7 +106,7 @@ router.get('/:id', authenticate, getDeviceById);
  *       404:
  *         description: Device not found
  */
-router.put('/:id', authenticate, authorizeAdmin, updateDevice);
+router.put('/:id', authenticate, authorizeRoles([ROLES.ADMIN]), updateDevice);
 
 /**
  * @swagger
@@ -126,6 +127,11 @@ router.put('/:id', authenticate, authorizeAdmin, updateDevice);
  *       404:
  *         description: Device not found
  */
-router.delete('/:id', authenticate, authorizeAdmin, deleteDevice);
+router.delete(
+    '/:id',
+    authenticate,
+    authorizeRoles([ROLES.ADMIN]),
+    deleteDevice
+);
 
 module.exports = router;

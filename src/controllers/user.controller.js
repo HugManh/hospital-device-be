@@ -60,17 +60,21 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, password } = req.body;
+        const { name, email, group } = req.body;
 
         const user = await User.findById(id);
         if (!user) return res.status(404).json({ message: 'User not found' });
 
         user.name = name;
-        if (password) user.password = password;
+        user.email = email;
+        user.group = group;
 
         await user.save();
 
-        res.status(200).json({ message: 'User updated successfully', user });
+        res.status(200).json({
+            message: 'User updated successfully',
+            user: { name, email, group },
+        });
     } catch (error) {
         return handleError(res, error);
     }
@@ -91,4 +95,36 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { createUser, getUsers, getUserById, updateUser, deleteUser };
+// Đặt lại mật khẩu
+const resetPassword = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { password } = req.body;
+
+        if (!password) {
+            return res.status(400).json({ message: 'Password is required' });
+        }
+
+        const user = await User.findById(id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        user.user = password;
+        await user.save();
+
+        res.status(200).json({
+            message: 'Password reset successfully',
+            user: { password },
+        });
+    } catch (error) {
+        return handleError(res, error);
+    }
+};
+
+module.exports = {
+    createUser,
+    getUsers,
+    getUserById,
+    updateUser,
+    deleteUser,
+    resetPassword,
+};
