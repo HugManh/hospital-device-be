@@ -10,12 +10,13 @@ const UserSchema = new BaseSchema({
         enum: ['user', 'approver', 'admin'],
         default: 'user',
     },
+    group: { type: String, required: true, default: 'Thiếu thông tin' },
     isActive: { type: Boolean, default: true },
     refreshToken: { type: String },
 });
 
 UserSchema.statics.getAll = function () {
-    return this.find().select('-password -refreshToken -__v');
+    return this.find().select('-password -refreshToken');
 };
 
 // Tạo model từ schema
