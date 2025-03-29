@@ -1,14 +1,16 @@
-const { Schema } = require('mongoose');
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-const BaseSchema = new Schema({
-    created_at: { type: Date, default: Date.now },
-    updated_at: { type: Date, default: Date.now }
-});
+class BaseSchema extends Schema {
+    constructor(definition, options) {
+        super(definition, { timestamps: true, ...options });
 
-// Middleware cập nhật `updated_at` mỗi khi lưu (save)
-BaseSchema.pre('save', function (next) {
-    this.updated_at = new Date();
-    next();
-});
+        // Middleware cập nhật `updatedAt` trước khi lưu
+        this.pre('save', function (next) {
+            this.updatedAt = new Date();
+            next();
+        });
+    }
+}
 
 module.exports = BaseSchema;

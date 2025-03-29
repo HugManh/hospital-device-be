@@ -1,34 +1,44 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user.model');
+// const { generatePassword } = require('../utils/crypto');
+
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+// Helper để xử lý lỗi với thông báo chuyên nghiệp hơn
+const handleError = (res, error) => {
+    return res.status(500).json({
+        message: 'Unexpected error occurred. Please try again later.',
+        ...(isDevelopment && error ? { error: error.message } : {}),
+    });
+};
 
 // Tạo mới user
 const createUser = async (req, res) => {
-    const { email, name, password } = req.body;
-    console.log(email, name, password);
-
     try {
+        const { email, name, password } = req.body;
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: 'Email already exists!' });
         }
 
+        // const password = generatePassword(8);
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({ email, name, password: hashedPassword });
         await user.save();
 
         res.status(201).json({ message: 'User created successfully', user });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return handleError(res, error);
     }
 };
 
 // Lấy danh sách user
 const getUsers = async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.getAll();
         res.status(200).json(users);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return handleError(res, error);
     }
 };
 
@@ -41,7 +51,7 @@ const getUserById = async (req, res) => {
         }
         res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return handleError(res, error);
     }
 };
 
@@ -65,7 +75,7 @@ const updateUser = async (req, res) => {
 
         res.status(200).json({ message: 'User updated successfully', user });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return handleError(res, error);
     }
 };
 
@@ -79,7 +89,7 @@ const deleteUser = async (req, res) => {
 
         res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return handleError(res, error);
     }
 };
 

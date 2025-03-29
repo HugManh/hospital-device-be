@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
 const BaseSchema = require('./base.model');
-const { Schema } = mongoose;
 
-// Tạo schema cho User và kế thừa từ BaseSchema
-const UserSchema = new Schema({
+const UserSchema = new BaseSchema({
     email: { type: String, required: true },
     name: { type: String, required: true },
     password: { type: String, required: true },
@@ -12,11 +10,13 @@ const UserSchema = new Schema({
         enum: ['user', 'approver', 'admin'],
         default: 'user',
     },
+    isActive: { type: Boolean, default: true },
     refreshToken: { type: String },
 });
 
-// Áp dụng BaseSchema vào UserSchema
-UserSchema.add(BaseSchema);
+UserSchema.statics.getAll = function () {
+    return this.find().select('-password -refreshToken -__v');
+};
 
 // Tạo model từ schema
 const User = mongoose.model('User', UserSchema);

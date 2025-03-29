@@ -43,13 +43,27 @@ app.use('/api/devices', deviceRoute);
 // Swagger UI
 if (process.env.NODE_ENV === 'development')
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use('/', (req, res) => {
-    res.json({ message: 'I am robot' });
+
+// Route mặc định
+app.get('/', (req, res) => {
+    res.json({ message: 'Who are you?' });
+});
+
+// Xử lý lỗi 404
+app.use((req, res, next) => {
+    res.status(404).json({ error: 'Endpoint not found' });
+});
+
+// Xử lý lỗi toàn cục
+app.use((err, req, res, next) => {
+    console.error('Server Error:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
 });
 
 // Khởi động server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`API docs available at http://localhost:${PORT}/api-docs`);
+    if (process.env.NODE_ENV === 'development')
+        console.log(`API docs available at http://localhost:${PORT}/api-docs`);
 });
