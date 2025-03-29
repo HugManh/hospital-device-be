@@ -1,6 +1,5 @@
-const bcrypt = require('bcryptjs');
 const User = require('../models/user.model');
-// const { generatePassword } = require('../utils/crypto');
+const { generatePassword } = require('../utils/crypto');
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -15,18 +14,20 @@ const handleError = (res, error) => {
 // Tạo mới user
 const createUser = async (req, res) => {
     try {
-        const { email, name, password } = req.body;
+        const { email, name, group } = req.body;
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: 'Email already exists!' });
         }
 
-        // const password = generatePassword(8);
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ email, name, password: hashedPassword });
+        const password = generatePassword(8);
+        const user = new User({ email, name, group, password });
         await user.save();
 
-        res.status(201).json({ message: 'User created successfully', user });
+        res.status(201).json({
+            message: 'User created successfully',
+            user: { name, group, password },
+        });
     } catch (error) {
         return handleError(res, error);
     }
@@ -58,20 +59,16 @@ const getUserById = async (req, res) => {
 // Cập nhật user
 const updateUser = async (req, res) => {
     try {
+        const { id } = req.params;
         const { name, password } = req.body;
-        const hashedPassword = password
-            ? await bcrypt.hash(password, 10)
-            : undefined;
 
-        const user = await User.findByIdAndUpdate(
-            req.params.id,
-            { name, ...(hashedPassword && { password: hashedPassword }) },
-            { new: true }
-        );
+        const user = await User.findById(id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+        user.name = name;
+        if (password) user.password = password;
+
+        await user.save();
 
         res.status(200).json({ message: 'User updated successfully', user });
     } catch (error) {
@@ -82,7 +79,8 @@ const updateUser = async (req, res) => {
 // Xóa user
 const deleteUser = async (req, res) => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id);
+        const { id } = req.params;
+        const user = await User.findByIdAndDelete(id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
