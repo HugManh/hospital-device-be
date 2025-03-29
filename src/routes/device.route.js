@@ -13,6 +13,8 @@ const {
 } = require('../middleware/auth.middleware');
 const { ROLES } = require('../config/contants');
 
+router.use(authenticate);
+
 /**
  * @swagger
  * /api/devices:
@@ -41,7 +43,7 @@ const { ROLES } = require('../config/contants');
  *       400:
  *         description: Invalid data
  */
-router.post('/', authenticate, authorizeRoles([ROLES.ADMIN]), addDevice);
+router.post('/', authorizeRoles([ROLES.ADMIN]), addDevice);
 
 /**
  * @swagger
@@ -53,7 +55,7 @@ router.post('/', authenticate, authorizeRoles([ROLES.ADMIN]), addDevice);
  *       200:
  *         description: List of devices
  */
-router.get('/', authenticate, getDevices);
+router.get('/', authorizeRoles([ROLES.ADMIN]), getDevices);
 
 /**
  * @swagger
@@ -74,7 +76,7 @@ router.get('/', authenticate, getDevices);
  *       404:
  *         description: Device not found
  */
-router.get('/:id', authenticate, getDeviceById);
+router.get('/:id', authorizeRoles([ROLES.ADMIN]), getDeviceById);
 
 /**
  * @swagger
@@ -106,7 +108,7 @@ router.get('/:id', authenticate, getDeviceById);
  *       404:
  *         description: Device not found
  */
-router.put('/:id', authenticate, authorizeRoles([ROLES.ADMIN]), updateDevice);
+router.put('/:id', authorizeRoles([ROLES.ADMIN]), updateDevice);
 
 /**
  * @swagger
@@ -127,11 +129,6 @@ router.put('/:id', authenticate, authorizeRoles([ROLES.ADMIN]), updateDevice);
  *       404:
  *         description: Device not found
  */
-router.delete(
-    '/:id',
-    authenticate,
-    authorizeRoles([ROLES.ADMIN]),
-    deleteDevice
-);
+router.delete('/:id', authorizeRoles([ROLES.ADMIN]), deleteDevice);
 
 module.exports = router;

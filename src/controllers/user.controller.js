@@ -60,7 +60,7 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, email, group } = req.body;
+        const { name, email, group, role, isActive } = req.body;
 
         const user = await User.findById(id);
         if (!user) return res.status(404).json({ message: 'User not found' });
@@ -68,12 +68,14 @@ const updateUser = async (req, res) => {
         user.name = name;
         user.email = email;
         user.group = group;
+        user.role = role;
+        user.isActive = isActive;
 
         await user.save();
 
         res.status(200).json({
             message: 'User updated successfully',
-            user: { name, email, group },
+            user: { name, email, group, role, isActive },
         });
     } catch (error) {
         return handleError(res, error);

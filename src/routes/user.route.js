@@ -87,7 +87,7 @@ router.post('/', authorizeRoles([ROLES.ADMIN]), createUser);
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get('/', authenticate, authorizeRoles([ROLES.ADMIN]), getUsers);
+router.get('/', authorizeRoles([ROLES.ADMIN]), getUsers);
 
 /**
  * @swagger
@@ -114,7 +114,7 @@ router.get('/', authenticate, authorizeRoles([ROLES.ADMIN]), getUsers);
  *       404:
  *         description: User not found
  */
-router.get('/:id', authenticate, authorizeRoles([ROLES.ADMIN]), getUserById);
+router.get('/:id', authorizeRoles([ROLES.ADMIN]), getUserById);
 
 /**
  * @swagger
@@ -150,7 +150,7 @@ router.get('/:id', authenticate, authorizeRoles([ROLES.ADMIN]), getUserById);
  *       404:
  *         description: User not found
  */
-router.put('/:id', authenticate, authorizeRoles([ROLES.ADMIN]), updateUser);
+router.put('/:id', authorizeRoles([ROLES.ADMIN]), updateUser);
 
 /**
  * @swagger
@@ -173,13 +173,8 @@ router.put('/:id', authenticate, authorizeRoles([ROLES.ADMIN]), updateUser);
  *       404:
  *         description: User not found
  */
-router.delete('/:id', authenticate, authorizeRoles([ROLES.ADMIN]), deleteUser);
+router.delete('/:id', authorizeRoles([ROLES.ADMIN]), deleteUser);
 
-router.put(
-    '/:id/reset-password',
-    authenticate,
-    authorizeRoles([ROLES.ADMIN]),
-    resetPassword
-);
+router.put('/:id/reset-password', authorizeRoles([ROLES.ADMIN]), resetPassword);
 
 module.exports = router;
