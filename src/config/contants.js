@@ -10,3 +10,8 @@ export const STATUS_BOOKING = {
     REJECTED: 'Từ chối',
     COMPLETED: 'Hoàn thành',
 };
+
+export const PRIORITY_BOOKING = {
+    HIGH: 'Ưu tiên',
+    NORMAL: 'Bình thường',
+};

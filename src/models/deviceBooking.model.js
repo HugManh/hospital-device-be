@@ -13,6 +13,16 @@ const DeviceBookingSchema = new BaseSchema({
         ref: 'User',
         required: true,
     },
+    codeBA: {
+        type: String,
+        required: true,
+        description: 'Mã bệnh án',
+    },
+    nameBA: {
+        type: String,
+        required: true,
+        description: 'Tên bệnh án',
+    },
     usageTime: {
         type: String,
         required: true,
@@ -22,6 +32,11 @@ const DeviceBookingSchema = new BaseSchema({
         type: Date,
         required: true,
         description: 'Ngày đăng ký sử dụng',
+    },
+    priority: {
+        type: String,
+        required: true,
+        description: 'Mức độ ưu tiên',
     },
     purpose: {
         type: String,

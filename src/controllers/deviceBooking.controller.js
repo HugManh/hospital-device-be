@@ -1,22 +1,24 @@
 const Device = require('../models/device.model');
 const User = require('../models/user.model');
 const DeviceBooking = require('../models/deviceBooking.model');
-const { STATUS_BOOKING } = require('../config/contants');
 const Response = require('../utils/response');
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-// Tạo đăng ký thiết bị mới
+// Đăng ký thiết bị cho người dùng
 const createDeviceBooking = async (req, res) => {
     try {
-        const { deviceID, userID } = req.params;
-        const { usageTime, usageDay, purpose } = req.body;
+        const {
+            deviceID,
+            codeBA,
+            nameBA,
+            usageTime,
+            usageDay,
+            priority,
+            purpose,
+        } = req.body;
 
-        // Kiểm tra thiết bị tồn tại
-        const device = await Device.findById(deviceID);
-        if (!device) {
-            return Response.notFound(res, 'Device not found');
-        }
+        const userID = req.user.id;
 
         // Kiểm tra user tồn tại
         const user = await User.findById(userID);
@@ -24,12 +26,22 @@ const createDeviceBooking = async (req, res) => {
             return Response.notFound(res, 'User not found');
         }
 
+        // Kiểm tra thiết bị tồn tại
+        const device = await Device.findById(deviceID);
+        if (!device) {
+            return Response.notFound(res, 'Device not found');
+        }
+
         // Tạo đăng ký mới
         const booking = new DeviceBooking({
             device: deviceID,
             user: userID,
+            group: user.group,
+            codeBA,
+            nameBA,
             usageTime,
             usageDay,
+            priority,
             purpose,
         });
 
@@ -51,12 +63,12 @@ const createDeviceBooking = async (req, res) => {
     }
 };
 
-// Lấy danh sách tất cả đăng ký thiết bị
+// Danh sách tất cả các đăng ký thiết bị
 const getAllBookings = async (req, res) => {
     try {
         const bookings = await DeviceBooking.find()
             .populate('device', 'name location')
-            .populate('user', 'name email')
+            .populate('user', 'name email group')
             .sort({ createdAt: -1 });
         return Response.success(
             res,
@@ -73,27 +85,18 @@ const getAllBookings = async (req, res) => {
     }
 };
 
-// Duyệt đăng ký sử dụng thiết bị
+// Duyệt đơn đăng ký thiết bị
 const approveUsage = async (req, res) => {
     try {
-        const { deviceID, userID } = req.params;
-        const { status, note } = req.body;
+        const { bookingID } = req.params;
+        const { status } = req.body;
 
-        const booking = await DeviceBooking.findOne({
-            device: deviceID,
-            user: userID,
-            status: STATUS_BOOKING.PENDING,
-        });
-
+        const booking = await DeviceBooking.findById(bookingID);
         if (!booking) {
-            return Response.notFound(
-                res,
-                'Booking not found or already processed'
-            );
+            return Response.notFound(res, 'Booking not found ');
         }
 
         booking.status = status;
-        booking.note = note;
         await booking.save();
 
         return Response.success(
@@ -111,37 +114,17 @@ const approveUsage = async (req, res) => {
     }
 };
 
-// Duyệt chỉnh sửa đăng ký thiết bị
+// Duyệt đề xuất chỉnh sửa đơn đăng ký
 const approveEdit = async (req, res) => {
     try {
-        const { deviceID, userID } = req.params;
-        const { usageTime, usageDay, purpose, status, note } = req.body;
+        const { bookingID } = req.params;
 
-        const booking = await DeviceBooking.findOne({
-            device: deviceID,
-            user: userID,
-            status: 'pending',
-        });
-
+        const booking = await DeviceBooking.findById(bookingID);
         if (!booking) {
-            return Response.notFound(
-                res,
-                'Booking not found or already processed'
-            );
+            return Response.notFound(res, 'Booking not found ');
         }
 
-        booking.usageTime = usageTime;
-        booking.usageDay = usageDay;
-        booking.purpose = purpose;
-        booking.status = status;
-        booking.note = note;
-        await booking.save();
-
-        return Response.success(
-            res,
-            { booking },
-            'Booking edit processed successfully'
-        );
+        return Response.success(res, 'Booking edit processed successfully');
     } catch (error) {
         return Response.error(
             res,
@@ -152,19 +135,19 @@ const approveEdit = async (req, res) => {
     }
 };
 
-// Lấy thông tin chi tiết của thiết bị
+// Thông tin các đơn đăng ký của 1 thiết bị
 const getDeviceInfo = async (req, res) => {
     try {
         const { deviceID } = req.params;
-        const device = await Device.findById(deviceID);
 
+        const device = await Device.findById(deviceID);
         if (!device) {
             return Response.notFound(res, 'Device not found');
         }
 
         // Lấy lịch sử đăng ký của thiết bị
         const bookings = await DeviceBooking.find({ device: deviceID })
-            .populate('user', 'name email')
+            .populate('user', 'name email group')
             .sort({ createdAt: -1 });
 
         return Response.success(
@@ -182,7 +165,7 @@ const getDeviceInfo = async (req, res) => {
     }
 };
 
-// Lấy lịch sử đăng ký thiết bị của người dùng
+// Lịch sử đăng ký thiết bị của người dùng
 const getUserBookings = async (req, res) => {
     try {
         const { userID } = req.params;

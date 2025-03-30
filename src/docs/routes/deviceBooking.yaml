@@ -1,21 +1,10 @@
-/api/device-booking/{deviceID}/{userID}:
+/api/device-booking:
     post:
         tags:
-            - Device Bookings
-        summary: Create a new device booking
+            - Quản Lý Đặt Thiết Bị
+        summary: Tạo yêu cầu đặt thiết bị mới
         security:
             - bearerAuth: []
-        parameters:
-            - in: path
-              name: deviceID
-              required: true
-              schema:
-                  type: string
-            - in: path
-              name: userID
-              required: true
-              schema:
-                  type: string
         requestBody:
             required: true
             content:
@@ -23,56 +12,156 @@
                     schema:
                         type: object
                         required:
+                            - deviceID
+                            - userID
+                            - codeBA
+                            - nameBA
                             - usageTime
                             - usageDay
+                            - priority
                             - purpose
                         properties:
+                            deviceID:
+                                type: string
+                                description: ID thiết bị
+                            userID:
+                                type: string
+                                description: ID người dùng
+                            codeBA:
+                                type: string
+                                description: Mã bệnh án
+                            nameBA:
+                                type: string
+                                description: Tên bệnh án
                             usageTime:
                                 type: string
+                                description: Thời gian sử dụng
                             usageDay:
                                 type: string
                                 format: date
+                                description: Ngày sử dụng
+                            priority:
+                                type: string
+                                enum: ['Ưu tiên', 'Bình thường']
+                                description: Mức độ ưu tiên
                             purpose:
                                 type: string
+                                description: Mục đích sử dụng
+                            note:
+                                type: string
+                                description: Ghi chú (không bắt buộc)
         responses:
             '201':
-                description: Device booking created successfully
+                description: Tạo yêu cầu thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: object
+                                    properties:
+                                        booking:
+                                            type: object
+                                            properties:
+                                                device:
+                                                    type: string
+                                                user:
+                                                    type: string
+                                                codeBA:
+                                                    type: string
+                                                nameBA:
+                                                    type: string
+                                                usageTime:
+                                                    type: string
+                                                usageDay:
+                                                    type: string
+                                                priority:
+                                                    type: string
+                                                purpose:
+                                                    type: string
+                                                status:
+                                                    type: string
+                                                note:
+                                                    type: string
             '404':
-                description: Device or user not found
+                description: Không tìm thấy thiết bị hoặc người dùng
             '500':
-                description: Server error
-
-/api/device-booking:
+                description: Lỗi máy chủ
     get:
         tags:
-            - Device Bookings
-        summary: Get all device bookings
+            - Quản Lý Đặt Thiết Bị
+        summary: Lấy danh sách đặt thiết bị
         security:
             - bearerAuth: []
         responses:
             '200':
-                description: Bookings retrieved successfully
+                description: Lấy danh sách thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties:
+                                            device:
+                                                type: object
+                                                properties:
+                                                    name:
+                                                        type: string
+                                                    location:
+                                                        type: string
+                                            user:
+                                                type: object
+                                                properties:
+                                                    name:
+                                                        type: string
+                                                    email:
+                                                        type: string
+                                            codeBA:
+                                                type: string
+                                            nameBA:
+                                                type: string
+                                            usageTime:
+                                                type: string
+                                            usageDay:
+                                                type: string
+                                            priority:
+                                                type: string
+                                            purpose:
+                                                type: string
+                                            status:
+                                                type: string
+                                            note:
+                                                type: string
             '500':
-                description: Server error
+                description: Lỗi máy chủ
 
-/api/device-booking/{deviceID}/{userID}/approve:
-    post:
+/api/device-booking/{bookingID}/change-status:
+    put:
         tags:
-            - Device Bookings
-        summary: Approve device booking
+            - Quản Lý Đặt Thiết Bị
+        summary: Duyệt yêu cầu đặt thiết bị
         security:
             - bearerAuth: []
         parameters:
             - in: path
-              name: deviceID
+              name: bookingID
               required: true
               schema:
                   type: string
-            - in: path
-              name: userID
-              required: true
-              schema:
-                  type: string
+              description: ID yêu cầu đặt thiết bị
         requestBody:
             required: true
             content:
@@ -84,35 +173,33 @@
                         properties:
                             status:
                                 type: string
-                                enum: [approved, rejected]
+                                enum: ['Ưu tiên', 'Bình thường']
+                                description: Trạng thái duyệt
                             note:
                                 type: string
+                                description: Ghi chú
         responses:
             '200':
-                description: Booking processed successfully
+                description: Duyệt yêu cầu thành công
             '404':
-                description: Booking not found or already processed
+                description: Không tìm thấy yêu cầu hoặc đã được xử lý
             '500':
-                description: Server error
+                description: Lỗi máy chủ
 
-/api/device-booking/{deviceID}/{userID}/edit:
+/api/device-booking/{bookingID}/accept-edit:
     post:
         tags:
-            - Device Bookings
-        summary: Approve device booking edit
+            - Quản Lý Đặt Thiết Bị
+        summary: Duyệt chỉnh sửa yêu cầu đặt thiết bị
         security:
             - bearerAuth: []
         parameters:
             - in: path
-              name: deviceID
+              name: bookingID
               required: true
               schema:
                   type: string
-            - in: path
-              name: userID
-              required: true
-              schema:
-                  type: string
+              description: ID yêu cầu đặt thiết bị
         requestBody:
             required: true
             content:
@@ -122,31 +209,46 @@
                         required:
                             - status
                         properties:
+                            codeBA:
+                                type: string
+                                description: Mã bệnh án
+                            nameBA:
+                                type: string
+                                description: Tên bệnh án
                             usageTime:
                                 type: string
+                                description: Thời gian sử dụng
                             usageDay:
                                 type: string
                                 format: date
+                                description: Ngày sử dụng
+                            priority:
+                                type: string
+                                enum: ['Ưu tiên', 'Bình thường']
+                                description: Mức độ ưu tiên
                             purpose:
                                 type: string
+                                description: Mục đích sử dụng
                             status:
                                 type: string
-                                enum: [approved, rejected]
+                                enum: ['Ưu tiên', 'Bình thường']
+                                description: Trạng thái duyệt
                             note:
                                 type: string
+                                description: Ghi chú
         responses:
             '200':
-                description: Booking edit processed successfully
+                description: Duyệt chỉnh sửa thành công
             '404':
-                description: Booking not found or already processed
+                description: Không tìm thấy yêu cầu hoặc đã được xử lý
             '500':
-                description: Server error
+                description: Lỗi máy chủ
 
-/api/device-booking/device/{deviceID}:
+/api/device-booking/devices/{deviceID}:
     get:
         tags:
-            - Device Bookings
-        summary: Get device information and booking history
+            - Quản Lý Đặt Thiết Bị
+        summary: Lấy thông tin thiết bị và lịch sử đặt
         security:
             - bearerAuth: []
         parameters:
@@ -155,19 +257,67 @@
               required: true
               schema:
                   type: string
+              description: ID thiết bị
         responses:
             '200':
-                description: Device information retrieved successfully
+                description: Lấy thông tin thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: object
+                                    properties:
+                                        device:
+                                            type: object
+                                            properties:
+                                                name:
+                                                    type: string
+                                                location:
+                                                    type: string
+                                        bookings:
+                                            type: array
+                                            items:
+                                                type: object
+                                                properties:
+                                                    user:
+                                                        type: object
+                                                        properties:
+                                                            name:
+                                                                type: string
+                                                            email:
+                                                                type: string
+                                                    codeBA:
+                                                        type: string
+                                                    nameBA:
+                                                        type: string
+                                                    usageTime:
+                                                        type: string
+                                                    usageDay:
+                                                        type: string
+                                                    priority:
+                                                        type: string
+                                                    purpose:
+                                                        type: string
+                                                    status:
+                                                        type: string
+                                                    note:
+                                                        type: string
             '404':
-                description: Device not found
+                description: Không tìm thấy thiết bị
             '500':
-                description: Server error
+                description: Lỗi máy chủ
 
-/api/device-booking/user/{userID}:
+/api/device-booking/users/{userID}:
     get:
         tags:
-            - Device Bookings
-        summary: Get user's device booking history
+            - Quản Lý Đặt Thiết Bị
+        summary: Lấy lịch sử đặt thiết bị của người dùng
         security:
             - bearerAuth: []
         parameters:
@@ -176,8 +326,46 @@
               required: true
               schema:
                   type: string
+              description: ID người dùng
         responses:
             '200':
-                description: User bookings retrieved successfully
+                description: Lấy lịch sử thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties:
+                                            device:
+                                                type: object
+                                                properties:
+                                                    name:
+                                                        type: string
+                                                    location:
+                                                        type: string
+                                            codeBA:
+                                                type: string
+                                            nameBA:
+                                                type: string
+                                            usageTime:
+                                                type: string
+                                            usageDay:
+                                                type: string
+                                            priority:
+                                                type: string
+                                            purpose:
+                                                type: string
+                                            status:
+                                                type: string
+                                            note:
+                                                type: string
             '500':
                 description: Server error
