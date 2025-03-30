@@ -9,7 +9,7 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 const createDeviceBooking = async (req, res) => {
     try {
         const {
-            deviceID,
+            deviceId,
             codeBA,
             nameBA,
             usageTime,
@@ -18,24 +18,24 @@ const createDeviceBooking = async (req, res) => {
             purpose,
         } = req.body;
 
-        const userID = req.user.id;
+        const userId = req.user.sub;
 
         // Kiểm tra user tồn tại
-        const user = await User.findById(userID);
+        const user = await User.findById(userId);
         if (!user) {
             return Response.notFound(res, 'User not found');
         }
 
         // Kiểm tra thiết bị tồn tại
-        const device = await Device.findById(deviceID);
+        const device = await Device.findById(deviceId);
         if (!device) {
             return Response.notFound(res, 'Device not found');
         }
 
         // Tạo đăng ký mới
         const booking = new DeviceBooking({
-            device: deviceID,
-            user: userID,
+            deviceId,
+            userId,
             group: user.group,
             codeBA,
             nameBA,
@@ -67,8 +67,8 @@ const createDeviceBooking = async (req, res) => {
 const getAllBookings = async (req, res) => {
     try {
         const bookings = await DeviceBooking.find()
-            .populate('device', 'name location')
-            .populate('user', 'name email group')
+            .populate('deviceId', 'name location')
+            .populate('userId', 'name email group')
             .sort({ createdAt: -1 });
         return Response.success(
             res,
@@ -138,16 +138,16 @@ const approveEdit = async (req, res) => {
 // Danh sách các đơn đăng ký của thiết bị
 const getDeviceInfo = async (req, res) => {
     try {
-        const { deviceID } = req.params;
+        const { deviceId } = req.params;
 
-        const device = await Device.findById(deviceID);
+        const device = await Device.findById(deviceId);
         if (!device) {
             return Response.notFound(res, 'Device not found');
         }
 
         // Lấy lịch sử đăng ký của thiết bị
-        const bookings = await DeviceBooking.find({ device: deviceID })
-            .populate('user', 'name email group')
+        const bookings = await DeviceBooking.find({ device: deviceId })
+            .populate('userId', 'name email group')
             .sort({ createdAt: -1 });
 
         return Response.success(
@@ -168,9 +168,9 @@ const getDeviceInfo = async (req, res) => {
 // Lịch sử đăng ký thiết bị của người dùng
 const getUserBookings = async (req, res) => {
     try {
-        const { userID } = req.params;
-        const bookings = await DeviceBooking.find({ user: userID })
-            .populate('device', 'name location')
+        const { userId } = req.params;
+        const bookings = await DeviceBooking.find({ user: userId })
+            .populate('deviceId', 'name location')
             .sort({ createdAt: -1 });
 
         return Response.success(

@@ -1,14 +1,13 @@
 const mongoose = require('mongoose');
 const BaseSchema = require('./base.model');
-const { STATUS_BOOKING } = require('../config/contants');
 
 const DeviceBookingSchema = new BaseSchema({
-    device: {
+    deviceId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Device',
         required: true,
     },
-    user: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
@@ -40,13 +39,11 @@ const DeviceBookingSchema = new BaseSchema({
     },
     purpose: {
         type: String,
-        required: true,
         description: 'Mục đích sử dụng',
     },
     status: {
         type: String,
-        enum: Object.values(STATUS_BOOKING),
-        default: STATUS_BOOKING.PENDING,
+        required: true,
         description: 'Trạng thái đăng ký',
     },
     note: {

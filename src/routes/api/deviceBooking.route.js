@@ -33,12 +33,12 @@ router.post(
     approveEdit
 );
 router.get(
-    '/devices/:deviceID',
+    '/devices/:deviceId',
     authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
     getDeviceInfo
 );
 router.get(
-    '/users/:userID',
+    '/users/:userId',
     authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
     getUserBookings
 );

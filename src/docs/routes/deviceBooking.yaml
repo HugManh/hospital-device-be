@@ -12,8 +12,7 @@
                     schema:
                         type: object
                         required:
-                            - deviceID
-                            - userID
+                            - deviceId
                             - codeBA
                             - nameBA
                             - usageTime
@@ -21,12 +20,9 @@
                             - priority
                             - purpose
                         properties:
-                            deviceID:
+                            deviceId:
                                 type: string
                                 description: ID thiết bị
-                            userID:
-                                type: string
-                                description: ID người dùng
                             codeBA:
                                 type: string
                                 description: Mã bệnh án
@@ -47,9 +43,6 @@
                             purpose:
                                 type: string
                                 description: Mục đích sử dụng
-                            note:
-                                type: string
-                                description: Ghi chú (không bắt buộc)
         responses:
             '201':
                 description: Tạo yêu cầu thành công
@@ -244,7 +237,7 @@
             '500':
                 description: Unexpected error occurred
 
-/api/device-booking/devices/{deviceID}:
+/api/device-booking/devices/{deviceId}:
     get:
         tags:
             - Quản Lý Đặt Thiết Bị
@@ -253,7 +246,7 @@
             - bearerAuth: []
         parameters:
             - in: path
-              name: deviceID
+              name: deviceId
               required: true
               schema:
                   type: string
@@ -313,7 +306,7 @@
             '500':
                 description: Unexpected error occurred
 
-/api/device-booking/users/{userID}:
+/api/device-booking/users/{userId}:
     get:
         tags:
             - Quản Lý Đặt Thiết Bị
@@ -322,7 +315,7 @@
             - bearerAuth: []
         parameters:
             - in: path
-              name: userID
+              name: userId
               required: true
               schema:
                   type: string
