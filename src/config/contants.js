@@ -3,3 +3,10 @@ export const ROLES = {
     APPROVER: 'approver',
     USER: 'user',
 };
+
+export const STATUS_BOOKING = {
+    APPROVED: 'Duyệt',
+    PENDING: 'Chờ duyệt',
+    REJECTED: 'Từ chối',
+    COMPLETED: 'Hoàn thành',
+};

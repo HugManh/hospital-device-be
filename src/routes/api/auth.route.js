@@ -6,8 +6,8 @@ const {
     logout,
     refreshToken,
     getProfile,
-} = require('../controllers/auth.controller');
-const { authenticate } = require('../middleware/auth.middleware');
+} = require('../../controllers/auth.controller');
+const { authenticate } = require('../../middleware/auth.middleware');
 
 /**
  * @swagger

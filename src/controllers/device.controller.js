@@ -27,7 +27,7 @@ const addDevice = async (req, res) => {
 // Lấy danh sách device
 const getDevices = async (req, res) => {
     try {
-        const devices = await Device.find();
+        const devices = await Device.find().sort({ createdAt: -1 });
         res.status(200).json(devices);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });

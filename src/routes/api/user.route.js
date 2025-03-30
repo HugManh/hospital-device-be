@@ -7,12 +7,12 @@ const {
     updateUser,
     deleteUser,
     resetPassword,
-} = require('../controllers/user.controller');
+} = require('../../controllers/user.controller');
 const {
     authenticate,
     authorizeRoles,
-} = require('../middleware/auth.middleware');
-const { ROLES } = require('../config/contants');
+} = require('../../middleware/auth.middleware');
+const { ROLES } = require('../../config/contants');
 
 router.use(authenticate);
 
@@ -22,8 +22,6 @@ router.use(authenticate);
  *   post:
  *     summary: Create a new user
  *     tags: [User]
- *     security:
- *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -75,8 +73,6 @@ router.post('/', authorizeRoles([ROLES.ADMIN]), createUser);
  *   get:
  *     summary: Get all users
  *     tags: [User]
- *     security:
- *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: List of users
@@ -95,8 +91,6 @@ router.get('/', authorizeRoles([ROLES.ADMIN]), getUsers);
  *   get:
  *     summary: Get a user by ID
  *     tags: [User]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -122,8 +116,6 @@ router.get('/:id', authorizeRoles([ROLES.ADMIN]), getUserById);
  *   put:
  *     summary: Update a user by ID
  *     tags: [User]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -158,8 +150,6 @@ router.put('/:id', authorizeRoles([ROLES.ADMIN]), updateUser);
  *   delete:
  *     summary: Delete a user by ID
  *     tags: [User]
- *     security:
- *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

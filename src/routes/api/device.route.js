@@ -6,12 +6,12 @@ const {
     getDeviceById,
     updateDevice,
     deleteDevice,
-} = require('../controllers/device.controller');
+} = require('../../controllers/device.controller');
 const {
     authenticate,
     authorizeRoles,
-} = require('../middleware/auth.middleware');
-const { ROLES } = require('../config/contants');
+} = require('../../middleware/auth.middleware');
+const { ROLES } = require('../../config/contants');
 
 router.use(authenticate);
 

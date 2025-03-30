@@ -9,10 +9,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger.config');
 
 // Routes
-const authRoute = require('./routes/auth.route');
-const userRoute = require('./routes/user.route');
-const deviceRoute = require('./routes/device.route');
-const deviceBookingRoute = require('./routes/deviceBooking.route');
+const api = require('./routes/api');
 
 const app = express();
 
@@ -37,11 +34,7 @@ if (process.env.NODE_ENV === 'development')
     app.use(morgan(':method :url :status :response-time ms'));
 
 // Routes
-app.use('/api/auth', authRoute);
-app.use('/api/users', userRoute);
-app.use('/api/devices', deviceRoute);
-app.use('/api/device-booking', deviceBookingRoute);
-
+app.use('/api', api);
 // Swagger UI
 if (process.env.NODE_ENV === 'development')
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -52,12 +45,12 @@ app.get('/', (req, res) => {
 });
 
 // Xử lý lỗi 404
-app.use((req, res, next) => {
+app.use((req, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
 });
 
 // Xử lý lỗi toàn cục
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
     console.error('Server Error:', err);
     res.status(500).json({ error: 'Internal Server Error' });
 });

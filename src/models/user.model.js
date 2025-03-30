@@ -41,7 +41,9 @@ UserSchema.methods.comparePassword = async function (plainPassword) {
 };
 
 UserSchema.statics.getAll = function () {
-    return this.find().select('-password -refreshToken');
+    return this.find()
+        .select('-password -refreshToken')
+        .sort({ createdAt: -1 });
 };
 
 // Tạo model từ schema

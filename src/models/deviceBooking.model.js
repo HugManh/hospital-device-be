@@ -1,15 +1,46 @@
 const mongoose = require('mongoose');
 const BaseSchema = require('./base.model');
+const { STATUS_BOOKING } = require('../config/contants');
 
-const DeviceSchema = new BaseSchema({
-    usageTime: { type: Date, required: true, unique: true },
-    usageDay: { type: Date, required: true },
-    status: { type: String, required: true },
-    priority: { type: Number, required: true },
-    department: { type: String, required: true },
+const DeviceBookingSchema = new BaseSchema({
+    device: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Device',
+        required: true,
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
+    usageTime: {
+        type: String,
+        required: true,
+        description: 'Thời gian đăng ký sử dụng',
+    },
+    usageDay: {
+        type: Date,
+        required: true,
+        description: 'Ngày đăng ký sử dụng',
+    },
+    purpose: {
+        type: String,
+        required: true,
+        description: 'Mục đích sử dụng',
+    },
+    status: {
+        type: String,
+        enum: Object.values(STATUS_BOOKING),
+        default: STATUS_BOOKING.PENDING,
+        description: 'Trạng thái đăng ký',
+    },
+    note: {
+        type: String,
+        description: 'Ghi chú',
+    },
 });
 
 // Tạo model từ schema
-const Device = mongoose.model('Device', DeviceSchema);
+const DeviceBooking = mongoose.model('DeviceBooking', DeviceBookingSchema);
 
-module.exports = Device;
+module.exports = DeviceBooking;
