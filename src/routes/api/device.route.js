@@ -15,8 +15,16 @@ const { ROLES } = require('../../config/contants');
 
 router.use(authenticate);
 router.post('/', authorizeRoles([ROLES.ADMIN]), addDevice);
-router.get('/', authorizeRoles([ROLES.ADMIN]), getDevices);
-router.get('/:id', authorizeRoles([ROLES.ADMIN]), getDeviceById);
+router.get(
+    '/',
+    authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
+    getDevices
+);
+router.get(
+    '/:id',
+    authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
+    getDeviceById
+);
 router.put('/:id', authorizeRoles([ROLES.ADMIN]), updateDevice);
 router.delete('/:id', authorizeRoles([ROLES.ADMIN]), deleteDevice);
 
