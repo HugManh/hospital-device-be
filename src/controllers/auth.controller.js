@@ -1,16 +1,9 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
+const Response = require('../utils/response');
 const secretKey = process.env.JWT_SECRET;
 
 const isDevelopment = process.env.NODE_ENV === 'development';
-
-// Helper để xử lý lỗi với thông báo chuyên nghiệp hơn
-const handleError = (res, error) => {
-    return res.status(500).json({
-        message: 'Unexpected error occurred. Please try again later.',
-        ...(isDevelopment && error ? { error: error.message } : {}),
-    });
-};
 
 // Đăng ký
 const register = async (req, res) => {
@@ -19,15 +12,20 @@ const register = async (req, res) => {
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: 'Email already exists!' });
+            return Response.error(res, 'Email already exists!', 400);
         }
 
         const user = new User({ email, name, password, role });
         await user.save();
 
-        res.status(201).json({ message: 'User registered successfully' });
+        return Response.success(res, null, 'User registered successfully', 201);
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -38,12 +36,12 @@ const login = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+            return Response.error(res, 'Invalid credentials', 400);
         }
 
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials' });
+            return Response.error(res, 'Invalid credentials', 400);
         }
 
         // Tạo access token
@@ -74,92 +72,110 @@ const login = async (req, res) => {
         user.refreshToken = refreshToken;
         await user.save();
 
-        // Trả accessToken và refreshToken trong response body
-        res.json({
-            message: 'Login successful',
-            accessToken,
-            refreshToken,
-            user: {
-                name: user.name,
-                email: user.email,
-                role: user.role,
+        return Response.success(
+            res,
+            {
+                accessToken,
+                refreshToken,
+                user: {
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                },
             },
-        });
+            'Login successful'
+        );
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
 // Đăng xuất
 const logout = async (req, res) => {
-    // Lấy refreshToken từ body (do không dùng cookie nữa)
     const { refreshToken } = req.body;
 
-    if (refreshToken) {
-        // Xóa refresh token khỏi database
-        await User.updateOne({ refreshToken }, { $unset: { refreshToken: 1 } });
+    try {
+        if (refreshToken) {
+            await User.updateOne(
+                { refreshToken },
+                { $unset: { refreshToken: 1 } }
+            );
+        }
+        return Response.success(res, null, 'Logout successful');
+    } catch (error) {
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
-
-    // Không cần clearCookie nữa, chỉ thông báo đăng xuất thành công
-    res.json({ message: 'Logout successful' });
 };
 
 // Làm mới token
 const refreshToken = (req, res) => {
-    // Lấy refreshToken từ body (do không dùng cookie)
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-        return res
-            .status(401)
-            .json({ message: 'Access Denied. No refresh token provided.' });
+        return Response.unauthorized(
+            res,
+            'Access Denied. No refresh token provided.'
+        );
     }
 
     try {
-        // Xác minh refresh token
         const decoded = jwt.verify(refreshToken, secretKey);
-
-        // Tạo access token mới
         const accessToken = jwt.sign(
             { email: decoded.email, id: decoded.id },
             secretKey,
             { expiresIn: '1h' }
         );
 
-        // Trả accessToken trong response body
-        res.json({
-            message: 'Token refreshed successfully',
-            accessToken,
-        });
+        return Response.success(
+            res,
+            { accessToken },
+            'Token refreshed successfully'
+        );
     } catch (error) {
-        console.log('Invalid refresh token');
-        return res.status(400).json({ message: 'Invalid refresh token.' });
+        return Response.error(res, 'Invalid refresh token', 400);
     }
 };
 
 // Lấy thông tin profile
 const getProfile = async (req, res) => {
     try {
-        // Lấy ID người dùng từ token (sub)
         const userId = req.user.sub;
         const user = await User.findById(userId).select(
             '-password -refreshToken'
-        ); // Loại bỏ mật khẩu và refreshToken
+        );
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return Response.notFound(res, 'User not found');
         }
 
-        res.json({
-            message: 'Profile retrieved successfully',
-            profile: {
-                name: user.name,
-                email: user.email,
-                role: user.role,
+        return Response.success(
+            res,
+            {
+                profile: {
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                },
             },
-        });
+            'Profile retrieved successfully'
+        );
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 

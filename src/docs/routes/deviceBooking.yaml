@@ -1,0 +1,183 @@
+/api/device-booking/{deviceID}/{userID}:
+    post:
+        tags:
+            - Device Bookings
+        summary: Create a new device booking
+        security:
+            - bearerAuth: []
+        parameters:
+            - in: path
+              name: deviceID
+              required: true
+              schema:
+                  type: string
+            - in: path
+              name: userID
+              required: true
+              schema:
+                  type: string
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required:
+                            - usageTime
+                            - usageDay
+                            - purpose
+                        properties:
+                            usageTime:
+                                type: string
+                            usageDay:
+                                type: string
+                                format: date
+                            purpose:
+                                type: string
+        responses:
+            '201':
+                description: Device booking created successfully
+            '404':
+                description: Device or user not found
+            '500':
+                description: Server error
+
+/api/device-booking:
+    get:
+        tags:
+            - Device Bookings
+        summary: Get all device bookings
+        security:
+            - bearerAuth: []
+        responses:
+            '200':
+                description: Bookings retrieved successfully
+            '500':
+                description: Server error
+
+/api/device-booking/{deviceID}/{userID}/approve:
+    post:
+        tags:
+            - Device Bookings
+        summary: Approve device booking
+        security:
+            - bearerAuth: []
+        parameters:
+            - in: path
+              name: deviceID
+              required: true
+              schema:
+                  type: string
+            - in: path
+              name: userID
+              required: true
+              schema:
+                  type: string
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required:
+                            - status
+                        properties:
+                            status:
+                                type: string
+                                enum: [approved, rejected]
+                            note:
+                                type: string
+        responses:
+            '200':
+                description: Booking processed successfully
+            '404':
+                description: Booking not found or already processed
+            '500':
+                description: Server error
+
+/api/device-booking/{deviceID}/{userID}/edit:
+    post:
+        tags:
+            - Device Bookings
+        summary: Approve device booking edit
+        security:
+            - bearerAuth: []
+        parameters:
+            - in: path
+              name: deviceID
+              required: true
+              schema:
+                  type: string
+            - in: path
+              name: userID
+              required: true
+              schema:
+                  type: string
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required:
+                            - status
+                        properties:
+                            usageTime:
+                                type: string
+                            usageDay:
+                                type: string
+                                format: date
+                            purpose:
+                                type: string
+                            status:
+                                type: string
+                                enum: [approved, rejected]
+                            note:
+                                type: string
+        responses:
+            '200':
+                description: Booking edit processed successfully
+            '404':
+                description: Booking not found or already processed
+            '500':
+                description: Server error
+
+/api/device-booking/device/{deviceID}:
+    get:
+        tags:
+            - Device Bookings
+        summary: Get device information and booking history
+        security:
+            - bearerAuth: []
+        parameters:
+            - in: path
+              name: deviceID
+              required: true
+              schema:
+                  type: string
+        responses:
+            '200':
+                description: Device information retrieved successfully
+            '404':
+                description: Device not found
+            '500':
+                description: Server error
+
+/api/device-booking/user/{userID}:
+    get:
+        tags:
+            - Device Bookings
+        summary: Get user's device booking history
+        security:
+            - bearerAuth: []
+        parameters:
+            - in: path
+              name: userID
+              required: true
+              schema:
+                  type: string
+        responses:
+            '200':
+                description: User bookings retrieved successfully
+            '500':
+                description: Server error

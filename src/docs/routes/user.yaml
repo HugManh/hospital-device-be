@@ -1,0 +1,159 @@
+/api/users:
+  post:
+    tags:
+      - Users
+    summary: Create a new user
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - email
+              - name
+              - group
+            properties:
+              email:
+                type: string
+                format: email
+              name:
+                type: string
+              group:
+                type: string
+    responses:
+      '201':
+        description: User created successfully
+      '400':
+        description: Email already exists or invalid input
+      '500':
+        description: Server error
+
+  get:
+    tags:
+      - Users
+    summary: Get all users
+    security:
+      - bearerAuth: []
+    responses:
+      '200':
+        description: Users retrieved successfully
+      '500':
+        description: Server error
+
+/api/users/{id}:
+  get:
+    tags:
+      - Users
+    summary: Get user by ID
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: User retrieved successfully
+      '404':
+        description: User not found
+      '500':
+        description: Server error
+
+  put:
+    tags:
+      - Users
+    summary: Update user
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+                format: email
+              group:
+                type: string
+              role:
+                type: string
+                enum: [admin, user]
+              isActive:
+                type: boolean
+    responses:
+      '200':
+        description: User updated successfully
+      '404':
+        description: User not found
+      '500':
+        description: Server error
+
+  delete:
+    tags:
+      - Users
+    summary: Delete user
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: User deleted successfully
+      '404':
+        description: User not found
+      '500':
+        description: Server error
+
+/api/users/{id}/reset-password:
+  post:
+    tags:
+      - Users
+    summary: Reset user password
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - password
+            properties:
+              password:
+                type: string
+                format: password
+    responses:
+      '200':
+        description: Password reset successfully
+      '400':
+        description: Password is required
+      '404':
+        description: User not found
+      '500':
+        description: Server error

@@ -2,16 +2,9 @@ const Device = require('../models/device.model');
 const User = require('../models/user.model');
 const DeviceBooking = require('../models/deviceBooking.model');
 const { STATUS_BOOKING } = require('../config/contants');
+const Response = require('../utils/response');
 
 const isDevelopment = process.env.NODE_ENV === 'development';
-
-// Helper để xử lý lỗi với thông báo chuyên nghiệp hơn
-const handleError = (res, error) => {
-    return res.status(500).json({
-        message: 'Unexpected error occurred. Please try again later.',
-        ...(isDevelopment && error ? { error: error.message } : {}),
-    });
-};
 
 // Tạo đăng ký thiết bị mới
 const createDeviceBooking = async (req, res) => {
@@ -22,13 +15,13 @@ const createDeviceBooking = async (req, res) => {
         // Kiểm tra thiết bị tồn tại
         const device = await Device.findById(deviceID);
         if (!device) {
-            return res.status(404).json({ message: 'Device not found' });
+            return Response.notFound(res, 'Device not found');
         }
 
         // Kiểm tra user tồn tại
         const user = await User.findById(userID);
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return Response.notFound(res, 'User not found');
         }
 
         // Tạo đăng ký mới
@@ -42,12 +35,19 @@ const createDeviceBooking = async (req, res) => {
 
         await booking.save();
 
-        res.status(201).json({
-            message: 'Device booking created successfully',
-            booking,
-        });
+        return Response.success(
+            res,
+            { booking },
+            'Device booking created successfully',
+            201
+        );
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -58,9 +58,18 @@ const getAllBookings = async (req, res) => {
             .populate('device', 'name location')
             .populate('user', 'name email')
             .sort({ createdAt: -1 });
-        res.status(200).json(bookings);
+        return Response.success(
+            res,
+            bookings,
+            'Bookings retrieved successfully'
+        );
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -77,21 +86,28 @@ const approveUsage = async (req, res) => {
         });
 
         if (!booking) {
-            return res.status(404).json({
-                message: 'Booking not found or already processed',
-            });
+            return Response.notFound(
+                res,
+                'Booking not found or already processed'
+            );
         }
 
         booking.status = status;
         booking.note = note;
         await booking.save();
 
-        res.status(200).json({
-            message: 'Booking processed successfully',
-            booking,
-        });
+        return Response.success(
+            res,
+            { booking },
+            'Booking processed successfully'
+        );
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -108,9 +124,10 @@ const approveEdit = async (req, res) => {
         });
 
         if (!booking) {
-            return res.status(404).json({
-                message: 'Booking not found or already processed',
-            });
+            return Response.notFound(
+                res,
+                'Booking not found or already processed'
+            );
         }
 
         booking.usageTime = usageTime;
@@ -120,12 +137,18 @@ const approveEdit = async (req, res) => {
         booking.note = note;
         await booking.save();
 
-        res.status(200).json({
-            message: 'Booking edit processed successfully',
-            booking,
-        });
+        return Response.success(
+            res,
+            { booking },
+            'Booking edit processed successfully'
+        );
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -136,7 +159,7 @@ const getDeviceInfo = async (req, res) => {
         const device = await Device.findById(deviceID);
 
         if (!device) {
-            return res.status(404).json({ message: 'Device not found' });
+            return Response.notFound(res, 'Device not found');
         }
 
         // Lấy lịch sử đăng ký của thiết bị
@@ -144,12 +167,18 @@ const getDeviceInfo = async (req, res) => {
             .populate('user', 'name email')
             .sort({ createdAt: -1 });
 
-        res.status(200).json({
-            device,
-            bookings,
-        });
+        return Response.success(
+            res,
+            { device, bookings },
+            'Device information retrieved successfully'
+        );
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -161,9 +190,18 @@ const getUserBookings = async (req, res) => {
             .populate('device', 'name location')
             .sort({ createdAt: -1 });
 
-        res.status(200).json(bookings);
+        return Response.success(
+            res,
+            bookings,
+            'User bookings retrieved successfully'
+        );
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 

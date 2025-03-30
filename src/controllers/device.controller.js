@@ -1,4 +1,7 @@
 const Device = require('../models/device.model');
+const Response = require('../utils/response');
+
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Tạo mới device
 const addDevice = async (req, res) => {
@@ -7,20 +10,25 @@ const addDevice = async (req, res) => {
     try {
         // const existingDevice = await Device.findOne({ code });
         // if (existingDevice) {
-        //     return res
-        //         .status(400)
-        //         .json({ message: 'Device code already exists!' });
+        //     return Response.error(res, 'Device code already exists!', 400);
         // }
 
         const device = new Device({ name, location });
         await device.save();
 
-        res.status(201).json({
-            message: 'Device created successfully',
-            device,
-        });
+        return Response.success(
+            res,
+            { device },
+            'Device created successfully',
+            201
+        );
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return Response.error(
+            res,
+            'Server error',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -28,9 +36,14 @@ const addDevice = async (req, res) => {
 const getDevices = async (req, res) => {
     try {
         const devices = await Device.find().sort({ createdAt: -1 });
-        res.status(200).json(devices);
+        return Response.success(res, devices, 'Devices retrieved successfully');
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return Response.error(
+            res,
+            'Server error',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -39,11 +52,16 @@ const getDeviceById = async (req, res) => {
     try {
         const device = await Device.findById(req.params.id);
         if (!device) {
-            return res.status(404).json({ message: 'Device not found' });
+            return Response.notFound(res, 'Device not found');
         }
-        res.status(200).json(device);
+        return Response.success(res, device, 'Device retrieved successfully');
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return Response.error(
+            res,
+            'Server error',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -58,15 +76,17 @@ const updateDevice = async (req, res) => {
         );
 
         if (!device) {
-            return res.status(404).json({ message: 'Device not found' });
+            return Response.notFound(res, 'Device not found');
         }
 
-        res.status(200).json({
-            message: 'Device updated successfully',
-            device,
-        });
+        return Response.success(res, { device }, 'Device updated successfully');
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return Response.error(
+            res,
+            'Server error',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -75,12 +95,17 @@ const deleteDevice = async (req, res) => {
     try {
         const device = await Device.findByIdAndDelete(req.params.id);
         if (!device) {
-            return res.status(404).json({ message: 'Device not found' });
+            return Response.notFound(res, 'Device not found');
         }
 
-        res.status(200).json({ message: 'Device deleted successfully' });
+        return Response.success(res, null, 'Device deleted successfully');
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return Response.error(
+            res,
+            'Server error',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 

@@ -5,8 +5,7 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 
 const connectDB = require('./config/mongo.config');
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./config/swagger.config');
+const swaggerUi = require('./docs/swagger-ui');
 
 // Routes
 const api = require('./routes/api');
@@ -36,8 +35,7 @@ if (process.env.NODE_ENV === 'development')
 // Routes
 app.use('/api', api);
 // Swagger UI
-if (process.env.NODE_ENV === 'development')
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+if (process.env.NODE_ENV === 'development') swaggerUi(app);
 
 // Route mặc định
 app.get('/', (req, res) => {

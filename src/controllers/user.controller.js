@@ -1,15 +1,8 @@
 const User = require('../models/user.model');
 const { generatePassword } = require('../utils/crypto');
+const Response = require('../utils/response');
 
 const isDevelopment = process.env.NODE_ENV === 'development';
-
-// Helper để xử lý lỗi với thông báo chuyên nghiệp hơn
-const handleError = (res, error) => {
-    return res.status(500).json({
-        message: 'Unexpected error occurred. Please try again later.',
-        ...(isDevelopment && error ? { error: error.message } : {}),
-    });
-};
 
 // Tạo mới user
 const createUser = async (req, res) => {
@@ -17,19 +10,26 @@ const createUser = async (req, res) => {
         const { email, name, group } = req.body;
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: 'Email already exists!' });
+            return Response.error(res, 'Email already exists!', 400);
         }
 
         const password = generatePassword(8);
         const user = new User({ email, name, group, password });
         await user.save();
 
-        res.status(201).json({
-            message: 'User created successfully',
-            user: { name, group, password },
-        });
+        return Response.success(
+            res,
+            { name, group, password },
+            'User created successfully',
+            201
+        );
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -37,9 +37,14 @@ const createUser = async (req, res) => {
 const getUsers = async (req, res) => {
     try {
         const users = await User.getAll();
-        res.status(200).json(users);
+        return Response.success(res, users, 'Users retrieved successfully');
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -48,11 +53,16 @@ const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return Response.notFound(res, 'User not found');
         }
-        res.status(200).json(user);
+        return Response.success(res, user, 'User retrieved successfully');
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -63,7 +73,9 @@ const updateUser = async (req, res) => {
         const { name, email, group, role, isActive } = req.body;
 
         const user = await User.findById(id);
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (!user) {
+            return Response.notFound(res, 'User not found');
+        }
 
         user.name = name;
         user.email = email;
@@ -73,12 +85,18 @@ const updateUser = async (req, res) => {
 
         await user.save();
 
-        res.status(200).json({
-            message: 'User updated successfully',
-            user: { name, email, group, role, isActive },
-        });
+        return Response.success(
+            res,
+            { name, email, group, role, isActive },
+            'User updated successfully'
+        );
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -88,12 +106,17 @@ const deleteUser = async (req, res) => {
         const { id } = req.params;
         const user = await User.findByIdAndDelete(id);
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return Response.notFound(res, 'User not found');
         }
 
-        res.status(200).json({ message: 'User deleted successfully' });
+        return Response.success(res, null, 'User deleted successfully');
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -104,21 +127,29 @@ const resetPassword = async (req, res) => {
         const { password } = req.body;
 
         if (!password) {
-            return res.status(400).json({ message: 'Password is required' });
+            return Response.error(res, 'Password is required', 400);
         }
 
         const user = await User.findById(id);
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (!user) {
+            return Response.notFound(res, 'User not found');
+        }
 
-        user.user = password;
+        user.password = password;
         await user.save();
 
-        res.status(200).json({
-            message: 'Password reset successfully',
-            user: { password },
-        });
+        return Response.success(
+            res,
+            { password },
+            'Password reset successfully'
+        );
     } catch (error) {
-        return handleError(res, error);
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
