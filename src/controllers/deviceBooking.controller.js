@@ -14,6 +14,7 @@ const createDeviceBooking = async (req, res) => {
             nameBA,
             usageTime,
             usageDay,
+            status,
             priority,
             purpose,
         } = req.body;
@@ -43,6 +44,7 @@ const createDeviceBooking = async (req, res) => {
             usageDay,
             priority,
             purpose,
+            status,
         });
 
         await booking.save();
