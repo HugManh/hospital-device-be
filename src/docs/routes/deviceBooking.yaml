@@ -2,7 +2,7 @@
     post:
         tags:
             - Quản Lý Đặt Thiết Bị
-        summary: Tạo yêu cầu đặt thiết bị mới
+        summary: Tạo yêu cầu đăng ký thiết bị
         security:
             - bearerAuth: []
         requestBody:
@@ -89,18 +89,18 @@
                                                 note:
                                                     type: string
             '404':
-                description: Không tìm thấy thiết bị hoặc người dùng
+                description: User or Device not found
             '500':
-                description: Lỗi máy chủ
+                description: Unexpected error occurred
     get:
         tags:
             - Quản Lý Đặt Thiết Bị
-        summary: Lấy danh sách đặt thiết bị
+        summary: Lấy danh sách đơn đăng ký thiết bị
         security:
             - bearerAuth: []
         responses:
             '200':
-                description: Lấy danh sách thành công
+                description: Bookings retrieved successfully
                 content:
                     application/json:
                         schema:
@@ -146,13 +146,13 @@
                                             note:
                                                 type: string
             '500':
-                description: Lỗi máy chủ
+                description: Unexpected error occurred
 
 /api/device-booking/{bookingID}/change-status:
     put:
         tags:
             - Quản Lý Đặt Thiết Bị
-        summary: Duyệt yêu cầu đặt thiết bị
+        summary: Duyệt yêu cầu đăng ký thiết bị
         security:
             - bearerAuth: []
         parameters:
@@ -161,7 +161,7 @@
               required: true
               schema:
                   type: string
-              description: ID yêu cầu đặt thiết bị
+              description: ID yêu cầu đăng ký thiết bị
         requestBody:
             required: true
             content:
@@ -180,11 +180,11 @@
                                 description: Ghi chú
         responses:
             '200':
-                description: Duyệt yêu cầu thành công
+                description: Booking processed successfully
             '404':
-                description: Không tìm thấy yêu cầu hoặc đã được xử lý
+                description: Booking not found
             '500':
-                description: Lỗi máy chủ
+                description: Unexpected error occurred
 
 /api/device-booking/{bookingID}/accept-edit:
     post:
@@ -242,13 +242,13 @@
             '404':
                 description: Không tìm thấy yêu cầu hoặc đã được xử lý
             '500':
-                description: Lỗi máy chủ
+                description: Unexpected error occurred
 
 /api/device-booking/devices/{deviceID}:
     get:
         tags:
             - Quản Lý Đặt Thiết Bị
-        summary: Lấy thông tin thiết bị và lịch sử đặt
+        summary: Danh sách các đơn đăng ký của thiết bị
         security:
             - bearerAuth: []
         parameters:
@@ -311,13 +311,13 @@
             '404':
                 description: Không tìm thấy thiết bị
             '500':
-                description: Lỗi máy chủ
+                description: Unexpected error occurred
 
 /api/device-booking/users/{userID}:
     get:
         tags:
             - Quản Lý Đặt Thiết Bị
-        summary: Lấy lịch sử đặt thiết bị của người dùng
+        summary: Lịch sử đăng ký thiết bị của người dùng
         security:
             - bearerAuth: []
         parameters:

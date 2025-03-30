@@ -5,7 +5,7 @@ const Response = require('../utils/response');
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-// Đăng ký thiết bị cho người dùng
+// Tạo yêu cầu đăng ký thiết bị
 const createDeviceBooking = async (req, res) => {
     try {
         const {
@@ -63,7 +63,7 @@ const createDeviceBooking = async (req, res) => {
     }
 };
 
-// Danh sách tất cả các đăng ký thiết bị
+// Lấy danh sách đơn đăng ký thiết bị
 const getAllBookings = async (req, res) => {
     try {
         const bookings = await DeviceBooking.find()
@@ -85,7 +85,7 @@ const getAllBookings = async (req, res) => {
     }
 };
 
-// Duyệt đơn đăng ký thiết bị
+// Duyệt yêu cầu đăng ký thiết bị
 const approveUsage = async (req, res) => {
     try {
         const { bookingID } = req.params;
@@ -135,7 +135,7 @@ const approveEdit = async (req, res) => {
     }
 };
 
-// Thông tin các đơn đăng ký của 1 thiết bị
+// Danh sách các đơn đăng ký của thiết bị
 const getDeviceInfo = async (req, res) => {
     try {
         const { deviceID } = req.params;
