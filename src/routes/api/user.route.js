@@ -20,6 +20,6 @@ router.get('/', authorizeRoles([ROLES.ADMIN]), getUsers);
 router.get('/:id', authorizeRoles([ROLES.ADMIN]), getUserById);
 router.put('/:id', authorizeRoles([ROLES.ADMIN]), updateUser);
 router.delete('/:id', authorizeRoles([ROLES.ADMIN]), deleteUser);
-router.put('/:id/reset-password', authorizeRoles([ROLES.ADMIN]), resetPassword);
+router.post('/:id/reset-password', authorizeRoles([ROLES.ADMIN]), resetPassword);
 
 module.exports = router;

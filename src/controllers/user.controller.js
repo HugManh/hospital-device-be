@@ -13,7 +13,7 @@ const createUser = async (req, res) => {
             return Response.error(res, 'Email already exists!', 400);
         }
 
-        const password = generatePassword(8);
+        const password = generatePassword();
         const user = new User({ email, name, group, password });
         await user.save();
 
@@ -124,17 +124,13 @@ const deleteUser = async (req, res) => {
 const resetPassword = async (req, res) => {
     try {
         const { id } = req.params;
-        const { password } = req.body;
-
-        if (!password) {
-            return Response.error(res, 'Password is required', 400);
-        }
 
         const user = await User.findById(id);
         if (!user) {
             return Response.notFound(res, 'User not found');
         }
 
+        const password = generatePassword();
         user.password = password;
         await user.save();
 
