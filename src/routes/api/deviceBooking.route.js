@@ -22,7 +22,7 @@ router.post(
 );
 router.get('/', authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]), getAllBookings);
 router.put(
-    '/:bookingID/change-status',
+    '/:bookingID',
     authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]),
     approveUsage
 );

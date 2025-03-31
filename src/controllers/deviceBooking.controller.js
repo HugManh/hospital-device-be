@@ -91,14 +91,21 @@ const getAllBookings = async (req, res) => {
 const approveUsage = async (req, res) => {
     try {
         const { bookingID } = req.params;
-        const { status } = req.body;
+        const { deviceId, codeBA, nameBA, usageTime, usageDay, priority, status } = req.body;
 
         const booking = await DeviceBooking.findById(bookingID);
-        if (!booking) {
-            return Response.notFound(res, 'Booking not found ');
-        }
+        if (!booking) return Response.notFound(res, 'Booking not found');
+        
+        // Cập nhật tất cả các trường từ req.body nếu chúng tồn tại
+        if (deviceId !== undefined) booking.deviceId = deviceId;
+        if (codeBA !== undefined) booking.codeBA = codeBA;
+        if (nameBA !== undefined) booking.nameBA = nameBA;
+        if (usageTime !== undefined) booking.usageTime = usageTime;
+        if (usageDay !== undefined) booking.usageDay = usageDay;
+        if (priority !== undefined) booking.priority = priority;
+        if (status !== undefined) booking.status = status;
 
-        booking.status = status;
+        // Lưu các thay đổi vào database
         await booking.save();
 
         return Response.success(
