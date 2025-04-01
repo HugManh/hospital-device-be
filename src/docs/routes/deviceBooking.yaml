@@ -141,7 +141,72 @@
             '500':
                 description: Unexpected error occurred
 
-/api/device-booking/{bookingID}/change-status:
+/api/device-booking/{bookingID}:
+    get:
+        tags:
+            - Quản Lý Đặt Thiết Bị
+        summary: Lấy thông tin chi tiết đơn đăng ký thiết bị
+        security:
+            - bearerAuth: []
+        parameters:
+            - in: path
+              name: bookingID
+              required: true
+              schema:
+                  type: string
+              description: ID yêu cầu đăng ký thiết bị
+        responses:
+            '200':
+                description: Lấy thông tin thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: object
+                                    properties:
+                                        booking:
+                                            type: object
+                                            properties:
+                                                device:
+                                                    type: object
+                                                    properties:
+                                                        name:
+                                                            type: string
+                                                        location:
+                                                            type: string
+                                                user:
+                                                    type: object
+                                                    properties:
+                                                        name:
+                                                            type: string
+                                                        email:
+                                                            type: string
+                                                codeBA:
+                                                    type: string
+                                                nameBA:
+                                                    type: string
+                                                usageTime:
+                                                    type: string
+                                                usageDay:
+                                                    type: string
+                                                priority:
+                                                    type: string
+                                                purpose:
+                                                    type: string
+                                                status:
+                                                    type: string
+                                                note:
+                                                    type: string
+            '404':
+                description: Không tìm thấy yêu cầu đăng ký
+            '500':
+                description: Unexpected error occurred
     put:
         tags:
             - Quản Lý Đặt Thiết Bị
@@ -166,16 +231,16 @@
                         properties:
                             status:
                                 type: string
-                                enum: ['Ưu tiên', 'Bình thường']
+                                enum: ['Đã duyệt', 'Từ chối']
                                 description: Trạng thái duyệt
                             note:
                                 type: string
                                 description: Ghi chú
         responses:
             '200':
-                description: Booking processed successfully
+                description: Duyệt yêu cầu thành công
             '404':
-                description: Booking not found
+                description: Không tìm thấy yêu cầu đăng ký
             '500':
                 description: Unexpected error occurred
 
@@ -224,7 +289,7 @@
                                 description: Mục đích sử dụng
                             status:
                                 type: string
-                                enum: ['Ưu tiên', 'Bình thường']
+                                enum: ['Đã duyệt', 'Từ chối']
                                 description: Trạng thái duyệt
                             note:
                                 type: string

@@ -149,6 +149,47 @@ const resetPassword = async (req, res) => {
     }
 };
 
+// Cập nhật profile
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { name, currentPassword, newPassword, group } = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return Response.notFound(res, 'User not found');
+        }
+
+        if (currentPassword) {
+            const isMatch = await user.comparePassword(currentPassword);
+            if (!isMatch) {
+                return Response.error(
+                    res,
+                    'Current password is incorrect',
+                    400
+                );
+            }
+        }
+
+        Object.assign(user, { name, group, password: newPassword });
+
+        await user.save();
+
+        return Response.success(
+            res,
+            { name, group },
+            'User updated successfully'
+        );
+    } catch (error) {
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
+    }
+};
+
 module.exports = {
     createUser,
     getUsers,
@@ -156,4 +197,5 @@ module.exports = {
     updateUser,
     deleteUser,
     resetPassword,
+    updateProfile,
 };

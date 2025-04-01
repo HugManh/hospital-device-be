@@ -3,6 +3,7 @@ const router = express.Router();
 const {
     createDeviceBooking,
     getAllBookings,
+    getDeviceBookingById,
     approveUsage,
     approveEdit,
     getDeviceInfo,
@@ -20,7 +21,16 @@ router.post(
     authorizeRoles([ROLES.ADMIN, ROLES.USER]),
     createDeviceBooking
 );
-router.get('/', authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]), getAllBookings);
+router.get(
+    '/',
+    authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
+    getAllBookings
+);
+router.get(
+    '/:bookingID',
+    authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
+    getDeviceBookingById
+);
 router.put(
     '/:bookingID',
     authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]),

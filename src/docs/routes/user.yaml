@@ -1,159 +1,300 @@
 /api/users:
-  post:
-    tags:
-      - Users
-    summary: Create a new user
-    security:
-      - bearerAuth: []
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - email
-              - name
-              - group
-            properties:
-              email:
-                type: string
-                format: email
-              name:
-                type: string
-              group:
-                type: string
-    responses:
-      '201':
-        description: User created successfully
-      '400':
-        description: Email already exists or invalid input
-      '500':
-        description: Server error
+    post:
+        tags:
+            - Quản Lý Người Dùng
+        summary: Tạo mới người dùng
+        security:
+            - bearerAuth: []
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required:
+                            - email
+                            - name
+                            - group
+                        properties:
+                            email:
+                                type: string
+                                format: email
+                                description: Email người dùng
+                            name:
+                                type: string
+                                description: Tên người dùng
+                            group:
+                                type: string
+                                description: Nhóm người dùng
+        responses:
+            '201':
+                description: Tạo người dùng thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: object
+                                    properties:
+                                        name:
+                                            type: string
+                                        group:
+                                            type: string
+                                        password:
+                                            type: string
+            '400':
+                description: Email đã tồn tại
+            '500':
+                description: Unexpected error occurred
 
-  get:
-    tags:
-      - Users
-    summary: Get all users
-    security:
-      - bearerAuth: []
-    responses:
-      '200':
-        description: Users retrieved successfully
-      '500':
-        description: Server error
+    get:
+        tags:
+            - Quản Lý Người Dùng
+        summary: Lấy danh sách người dùng
+        security:
+            - bearerAuth: []
+        responses:
+            '200':
+                description: Lấy danh sách thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties:
+                                            _id:
+                                                type: string
+                                            email:
+                                                type: string
+                                            name:
+                                                type: string
+                                            group:
+                                                type: string
+                                            role:
+                                                type: string
+                                            isActive:
+                                                type: boolean
+            '500':
+                description: Unexpected error occurred
 
 /api/users/{id}:
-  get:
-    tags:
-      - Users
-    summary: Get user by ID
-    security:
-      - bearerAuth: []
-    parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: string
-    responses:
-      '200':
-        description: User retrieved successfully
-      '404':
-        description: User not found
-      '500':
-        description: Server error
+    get:
+        tags:
+            - Quản Lý Người Dùng
+        summary: Lấy thông tin người dùng theo ID
+        security:
+            - bearerAuth: []
+        parameters:
+            - in: path
+              name: id
+              required: true
+              schema:
+                  type: string
+              description: ID người dùng
+        responses:
+            '200':
+                description: Lấy thông tin thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: object
+                                    properties:
+                                        _id:
+                                            type: string
+                                        email:
+                                            type: string
+                                        name:
+                                            type: string
+                                        group:
+                                            type: string
+                                        role:
+                                            type: string
+                                        isActive:
+                                            type: boolean
+            '404':
+                description: Không tìm thấy người dùng
+            '500':
+                description: Unexpected error occurred
 
-  put:
-    tags:
-      - Users
-    summary: Update user
-    security:
-      - bearerAuth: []
-    parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: string
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-              email:
-                type: string
-                format: email
-              group:
-                type: string
-              role:
-                type: string
-                enum: [admin, user]
-              isActive:
-                type: boolean
-    responses:
-      '200':
-        description: User updated successfully
-      '404':
-        description: User not found
-      '500':
-        description: Server error
+    put:
+        tags:
+            - Quản Lý Người Dùng
+        summary: Cập nhật thông tin người dùng
+        security:
+            - bearerAuth: []
+        parameters:
+            - in: path
+              name: id
+              required: true
+              schema:
+                  type: string
+              description: ID người dùng
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required:
+                            - name
+                            - email
+                            - group
+                            - role
+                            - isActive
+                        properties:
+                            name:
+                                type: string
+                                description: Tên người dùng
+                            email:
+                                type: string
+                                format: email
+                                description: Email người dùng
+                            group:
+                                type: string
+                                description: Nhóm người dùng
+                            role:
+                                type: string
+                                enum: ['ADMIN', 'USER', 'APPROVER']
+                                description: Vai trò người dùng
+                            isActive:
+                                type: boolean
+                                description: Trạng thái hoạt động
+        responses:
+            '200':
+                description: Cập nhật thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: object
+                                    properties:
+                                        name:
+                                            type: string
+                                        email:
+                                            type: string
+                                        group:
+                                            type: string
+                                        role:
+                                            type: string
+                                        isActive:
+                                            type: boolean
+            '404':
+                description: Không tìm thấy người dùng
+            '500':
+                description: Unexpected error occurred
 
-  delete:
-    tags:
-      - Users
-    summary: Delete user
-    security:
-      - bearerAuth: []
-    parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: string
-    responses:
-      '200':
-        description: User deleted successfully
-      '404':
-        description: User not found
-      '500':
-        description: Server error
+    delete:
+        tags:
+            - Quản Lý Người Dùng
+        summary: Xóa người dùng
+        security:
+            - bearerAuth: []
+        parameters:
+            - in: path
+              name: id
+              required: true
+              schema:
+                  type: string
+              description: ID người dùng
+        responses:
+            '200':
+                description: Xóa người dùng thành công
+            '404':
+                description: Không tìm thấy người dùng
+            '500':
+                description: Unexpected error occurred
 
 /api/users/{id}/reset-password:
-  post:
-    tags:
-      - Users
-    summary: Reset user password
-    security:
-      - bearerAuth: []
-    parameters:
-      - in: path
-        name: id
-        required: true
-        schema:
-          type: string
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - password
-            properties:
-              password:
-                type: string
-                format: password
-    responses:
-      '200':
-        description: Password reset successfully
-      '400':
-        description: Password is required
-      '404':
-        description: User not found
-      '500':
-        description: Server error
+    post:
+        tags:
+            - Quản Lý Người Dùng
+        summary: Đặt lại mật khẩu người dùng
+        security:
+            - bearerAuth: []
+        parameters:
+            - in: path
+              name: id
+              required: true
+              schema:
+                  type: string
+              description: ID người dùng
+        responses:
+            '200':
+                description: Đặt lại mật khẩu thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: object
+                                    properties:
+                                        password:
+                                            type: string
+            '404':
+                description: Không tìm thấy người dùng
+            '500':
+                description: Unexpected error occurred
+
+/api/users/update-profile:
+    put:
+        tags:
+            - Quản Lý Người Dùng
+        summary: Cập nhật thông tin cá nhân
+        security:
+            - bearerAuth: []
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required:
+                            - name
+                        properties:
+                            name:
+                                type: string
+                                description: Tên người dùng
+                            currentPassword:
+                                type: string
+                                description: Mật khẩu hiện tại
+                            newPassword:
+                                type: string
+                                description: Mật khẩu mới
+        responses:
+            '200':
+                description: Cập nhật thông tin thành công
+            '400':
+                description: Mật khẩu hiện tại không đúng
+            '500':
+                description: Unexpected error occurred
