@@ -2,9 +2,11 @@ const Device = require('../models/device.model');
 const User = require('../models/user.model');
 const DeviceBooking = require('../models/deviceBooking.model');
 const Response = require('../utils/response');
-const { REGISTER_STATUS, PRIORITY_STATUS } = require('../config/contants');
-
-const isDevelopment = process.env.NODE_ENV === 'development';
+const {
+    REGISTER_STATUS,
+    PRIORITY_STATUS,
+    isDevelopment,
+} = require('../config/constants');
 
 // Tạo yêu cầu đăng ký thiết bị
 const createDeviceBooking = async (req, res) => {
@@ -39,7 +41,7 @@ const createDeviceBooking = async (req, res) => {
             deviceId,
             usageDay,
             usageTime,
-            status: { $ne: REGISTER_STATUS.REJECT }
+            status: { $ne: REGISTER_STATUS.REJECT },
         });
 
         // Nếu có đăng ký trùng thời gian và không phải là ưu tiên

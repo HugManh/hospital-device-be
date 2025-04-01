@@ -1,8 +1,7 @@
+const { isDevelopment } = require('../config/constants');
 const User = require('../models/user.model');
 const { generatePassword } = require('../utils/crypto');
 const Response = require('../utils/response');
-
-const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Tạo mới user
 const createUser = async (req, res) => {

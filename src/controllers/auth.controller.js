@@ -1,9 +1,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const Response = require('../utils/response');
+const { isDevelopment } = require('../config/constants');
 const secretKey = process.env.JWT_SECRET;
-
-const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Đăng ký
 const register = async (req, res) => {

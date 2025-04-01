@@ -1,7 +1,6 @@
+const { isDevelopment } = require('../config/constants');
 const Device = require('../models/device.model');
 const Response = require('../utils/response');
-
-const isDevelopment = process.env.NODE_ENV === 'development';
 
 // Tạo mới device
 const addDevice = async (req, res) => {

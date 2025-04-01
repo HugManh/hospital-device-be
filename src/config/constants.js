@@ -14,3 +14,5 @@ export const PRIORITY_STATUS = {
     NORMAL: 'Bình thường',
     PRIORITY: 'Ưu tiên',
 };
+
+export const isDevelopment = process.env.NODE_ENV === 'development';

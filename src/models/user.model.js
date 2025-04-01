@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const BaseSchema = require('./base.model');
 const bcrypt = require('bcrypt');
 const { hashPassword } = require('../utils/crypto');
-const { ROLES } = require('../config/contants');
+const { ROLES } = require('../config/constants');
 
 const UserSchema = new BaseSchema({
     email: { type: String, required: true },
