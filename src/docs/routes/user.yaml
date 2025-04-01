@@ -265,36 +265,3 @@
                 description: Không tìm thấy người dùng
             '500':
                 description: Unexpected error occurred
-
-/api/users/update-profile:
-    put:
-        tags:
-            - Quản Lý Người Dùng
-        summary: Cập nhật thông tin cá nhân
-        security:
-            - bearerAuth: []
-        requestBody:
-            required: true
-            content:
-                application/json:
-                    schema:
-                        type: object
-                        required:
-                            - name
-                        properties:
-                            name:
-                                type: string
-                                description: Tên người dùng
-                            currentPassword:
-                                type: string
-                                description: Mật khẩu hiện tại
-                            newPassword:
-                                type: string
-                                description: Mật khẩu mới
-        responses:
-            '200':
-                description: Cập nhật thông tin thành công
-            '400':
-                description: Mật khẩu hiện tại không đúng
-            '500':
-                description: Unexpected error occurred

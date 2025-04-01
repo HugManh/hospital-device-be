@@ -7,7 +7,6 @@ const {
     updateUser,
     deleteUser,
     resetPassword,
-    updateProfile,
 } = require('../../controllers/user.controller');
 const {
     authenticate,
@@ -26,6 +25,5 @@ router.post(
     authorizeRoles([ROLES.ADMIN]),
     resetPassword
 );
-router.put('/update-profile', updateProfile);
 
 module.exports = router;
