@@ -2,6 +2,7 @@ const Device = require('../models/device.model');
 const User = require('../models/user.model');
 const DeviceBooking = require('../models/deviceBooking.model');
 const Response = require('../utils/response');
+const { REGISTER_STATUS, PRIORITY_STATUS } = require('../config/contants');
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -31,6 +32,23 @@ const createDeviceBooking = async (req, res) => {
         const device = await Device.findById(deviceId);
         if (!device) {
             return Response.notFound(res, 'Device not found');
+        }
+
+        // Kiểm tra xem có đăng ký nào trùng thời gian không
+        const existingBooking = await DeviceBooking.findOne({
+            deviceId,
+            usageDay,
+            usageTime,
+            status: { $ne: REGISTER_STATUS.REJECT }
+        });
+
+        // Nếu có đăng ký trùng thời gian và không phải là ưu tiên
+        if (existingBooking && priority !== PRIORITY_STATUS.PRIORITY) {
+            return Response.error(
+                res,
+                'This time slot is already booked for this device',
+                400
+            );
         }
 
         // Tạo đăng ký mới

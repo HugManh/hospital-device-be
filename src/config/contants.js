@@ -4,14 +4,13 @@ export const ROLES = {
     USER: 'user',
 };
 
-export const STATUS_BOOKING = {
-    APPROVED: 'Duyệt',
+export const REGISTER_STATUS = {
+    APPROVER: 'Duyệt',
     PENDING: 'Chờ duyệt',
-    REJECTED: 'Từ chối',
     COMPLETED: 'Hoàn thành',
 };
 
-export const PRIORITY_BOOKING = {
-    HIGH: 'Ưu tiên',
+export const PRIORITY_STATUS = {
     NORMAL: 'Bình thường',
+    PRIORITY: 'Ưu tiên',
 };
