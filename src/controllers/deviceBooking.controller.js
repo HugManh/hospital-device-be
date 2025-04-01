@@ -194,14 +194,25 @@ const approveEdit = async (req, res) => {
 const getDeviceInfo = async (req, res) => {
     try {
         const { deviceId } = req.params;
+        const { usageDay } = req.query;
 
         const device = await Device.findById(deviceId);
         if (!device) {
             return Response.notFound(res, 'Device not found');
         }
 
+        const filter = { deviceId };
+
+        if (usageDay) {
+            const date = new Date(usageDay);
+            filter.usageDay = {
+                $gte: new Date(date.setHours(0, 0, 0, 0)), // Bắt đầu ngày
+                $lt: new Date(date.setHours(23, 59, 59, 999)), // Kết thúc ngày
+            };
+        }
+
         // Lấy lịch sử đăng ký của thiết bị
-        const bookings = await DeviceBooking.find({ device: deviceId })
+        const bookings = await DeviceBooking.find(filter)
             .populate('userId', 'name email group')
             .sort({ createdAt: -1 });
 
@@ -224,7 +235,7 @@ const getDeviceInfo = async (req, res) => {
 const getUserBookings = async (req, res) => {
     try {
         const { userId } = req.params;
-        const bookings = await DeviceBooking.find({ user: userId })
+        const bookings = await DeviceBooking.find({ userId })
             .populate('deviceId', 'name location')
             .sort({ createdAt: -1 });
 
