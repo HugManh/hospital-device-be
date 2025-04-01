@@ -1,8 +1,8 @@
 /api/auth/register:
     post:
         tags:
-            - Authentication
-        summary: Register a new user
+            - Xác Thực
+        summary: Đăng ký tài khoản
         requestBody:
             required: true
             content:
@@ -13,32 +13,44 @@
                             - email
                             - name
                             - password
-                            - role
                         properties:
                             email:
                                 type: string
                                 format: email
+                                description: Email người dùng
                             name:
                                 type: string
+                                description: Tên người dùng
                             password:
                                 type: string
                                 format: password
+                                description: Mật khẩu
                             role:
                                 type: string
-                                enum: [admin, user]
+                                enum: ['ADMIN', 'USER', 'APPROVER']
+                                description: Vai trò người dùng
         responses:
             '201':
-                description: User registered successfully
+                description: Đăng ký thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
             '400':
-                description: Email already exists or invalid input
+                description: Email đã tồn tại
             '500':
-                description: Server error
+                description: Unexpected error occurred
 
 /api/auth/login:
     post:
         tags:
-            - Authentication
-        summary: Login user
+            - Xác Thực
+        summary: Đăng nhập
         requestBody:
             required: true
             content:
@@ -52,12 +64,14 @@
                             email:
                                 type: string
                                 format: email
+                                description: Email người dùng
                             password:
                                 type: string
                                 format: password
+                                description: Mật khẩu
         responses:
             '200':
-                description: Login successful
+                description: Đăng nhập thành công
                 content:
                     application/json:
                         schema:
@@ -76,40 +90,53 @@
                                             type: string
                                         user:
                                             type: object
+                                            properties:
+                                                name:
+                                                    type: string
+                                                email:
+                                                    type: string
+                                                role:
+                                                    type: string
             '400':
-                description: Invalid credentials
+                description: Thông tin đăng nhập không chính xác
             '500':
-                description: Server error
+                description: Unexpected error occurred
 
 /api/auth/logout:
-    post:
+    get:
         tags:
-            - Authentication
-        summary: Logout user
-        security:
-            - bearerAuth: []
+            - Xác Thực
+        summary: Đăng xuất
         requestBody:
-            required: true
+            required: false
             content:
                 application/json:
                     schema:
                         type: object
-                        required:
-                            - refreshToken
                         properties:
                             refreshToken:
                                 type: string
+                                description: Refresh token để hủy
         responses:
             '200':
-                description: Logout successful
+                description: Đăng xuất thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
             '500':
-                description: Server error
+                description: Unexpected error occurred
 
 /api/auth/refresh-token:
-    post:
+    get:
         tags:
-            - Authentication
-        summary: Refresh access token
+            - Xác Thực
+        summary: Làm mới token
         requestBody:
             required: true
             content:
@@ -121,33 +148,73 @@
                         properties:
                             refreshToken:
                                 type: string
+                                description: Refresh token để làm mới
         responses:
             '200':
-                description: Token refreshed successfully
+                description: Làm mới token thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: object
+                                    properties:
+                                        accessToken:
+                                            type: string
             '400':
-                description: Invalid refresh token
+                description: Refresh token không hợp lệ
             '401':
-                description: No refresh token provided
+                description: Không có refresh token
+            '500':
+                description: Unexpected error occurred
 
 /api/auth/profile:
     get:
         tags:
-            - Authentication
-        summary: Get user profile
+            - Xác Thực
+        summary: Lấy thông tin cá nhân
         security:
             - bearerAuth: []
         responses:
             '200':
-                description: Profile retrieved successfully
+                description: Lấy thông tin thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: object
+                                    properties:
+                                        profile:
+                                            type: object
+                                            properties:
+                                                id:
+                                                    type: string
+                                                name:
+                                                    type: string
+                                                email:
+                                                    type: string
+                                                role:
+                                                    type: string
             '404':
-                description: User not found
+                description: Không tìm thấy người dùng
             '500':
-                description: Server error
+                description: Unexpected error occurred
 
 /api/auth/update-profile:
     put:
         tags:
-            - Authentication
+            - Xác Thực
         summary: Cập nhật thông tin cá nhân
         security:
             - bearerAuth: []
@@ -157,22 +224,36 @@
                 application/json:
                     schema:
                         type: object
-                        required:
-                            - name
                         properties:
                             name:
                                 type: string
                                 description: Tên người dùng
                             currentPassword:
                                 type: string
+                                format: password
                                 description: Mật khẩu hiện tại
                             newPassword:
                                 type: string
+                                format: password
                                 description: Mật khẩu mới
+                            group:
+                                type: string
+                                description: Nhóm người dùng
         responses:
             '200':
                 description: Cập nhật thông tin thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
             '400':
-                description: Mật khẩu hiện tại không đúng
+                description: Mật khẩu hiện tại không chính xác
+            '404':
+                description: Không tìm thấy người dùng
             '500':
                 description: Unexpected error occurred
