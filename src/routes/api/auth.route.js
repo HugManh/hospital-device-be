@@ -7,6 +7,7 @@ const {
     refreshToken,
     getProfile,
     updateProfile,
+    updatePassword,
 } = require('../../controllers/auth.controller');
 const { authenticate } = require('../../middleware/auth.middleware');
 
@@ -15,6 +16,7 @@ router.post('/login', login);
 router.get('/logout', logout);
 router.get('/refresh-token', refreshToken);
 router.get('/profile', authenticate, getProfile);
-router.put('/update-profile', authenticate, updateProfile);
+router.put('/profile', authenticate, updateProfile);
+router.put('/password', authenticate, updatePassword);
 
 module.exports = router;

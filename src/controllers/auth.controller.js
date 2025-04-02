@@ -38,6 +38,10 @@ const login = async (req, res) => {
             return Response.error(res, 'Invalid credentials', 400);
         }
 
+        if (!user.isActive) {
+            return Response.error(res, 'Account is inactive', 400);
+        }
+
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
             return Response.error(res, 'Invalid credentials', 400);
@@ -183,25 +187,14 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
     try {
         const userId = req.user.sub;
-        const { name, currentPassword, newPassword, group } = req.body;
+        const { name, group } = req.body;
 
         const user = await User.findById(userId);
         if (!user) {
             return Response.notFound(res, 'User not found');
         }
 
-        if (currentPassword) {
-            const isMatch = await user.comparePassword(currentPassword);
-            if (!isMatch) {
-                return Response.error(
-                    res,
-                    'Current password is incorrect',
-                    400
-                );
-            }
-        }
-
-        Object.assign(user, { name, group, password: newPassword });
+        Object.assign(user, { name, group });
 
         await user.save();
 
@@ -220,6 +213,53 @@ const updateProfile = async (req, res) => {
     }
 };
 
+const updatePassword = async (req, res) => {
+    try {
+        const userId = req.user.sub;
+        const { confirmPassword, currentPassword, newPassword } = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return Response.notFound(res, 'User not found');
+        }
+
+        // Verify current password
+        const isMatch = await user.comparePassword(currentPassword);
+        if (!isMatch) {
+            return Response.error(res, 'Current password is incorrect', 400);
+        }
+
+        if (confirmPassword !== newPassword) {
+            return Response.error(
+                res,
+                'New password and confirm password do not match',
+                400
+            );
+        }
+
+        // Validate new password
+        if (newPassword.length < 6) {
+            return Response.error(
+                res,
+                'New password must be at least 8 characters long',
+                400
+            );
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        return Response.success(res, null, 'Password updated successfully');
+    } catch (error) {
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
+    }
+};
+
 module.exports = {
     register,
     login,
@@ -227,4 +267,5 @@ module.exports = {
     refreshToken,
     getProfile,
     updateProfile,
+    updatePassword,
 };
