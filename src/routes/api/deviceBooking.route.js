@@ -5,9 +5,10 @@ const {
     getAllBookings,
     getDeviceBookingById,
     approveUsage,
-    approveEdit,
     getDeviceInfo,
     getUserBookings,
+    requestBookingEdit,
+    processEditRequest,
 } = require('../../controllers/deviceBooking.controller');
 const {
     authenticate,
@@ -36,12 +37,6 @@ router.put(
     authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]),
     approveUsage
 );
-
-router.post(
-    '/:bookingID/accept-edit',
-    authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]),
-    approveEdit
-);
 router.get(
     '/devices/:deviceId',
     authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
@@ -51,6 +46,16 @@ router.get(
     '/users/:userId',
     authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
     getUserBookings
+);
+router.post(
+    '/:bookingId/edit-request',
+    authorizeRoles([ROLES.USER]),
+    requestBookingEdit
+);
+router.put(
+    '/:bookingId/edit-request',
+    authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]),
+    processEditRequest
 );
 
 module.exports = router;

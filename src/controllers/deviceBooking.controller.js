@@ -169,27 +169,6 @@ const approveUsage = async (req, res) => {
     }
 };
 
-// Duyệt đề xuất chỉnh sửa đơn đăng ký
-const approveEdit = async (req, res) => {
-    try {
-        const { bookingID } = req.params;
-
-        const booking = await DeviceBooking.findById(bookingID);
-        if (!booking) {
-            return Response.notFound(res, 'Booking not found ');
-        }
-
-        return Response.success(res, 'Booking edit processed successfully');
-    } catch (error) {
-        return Response.error(
-            res,
-            'Unexpected error occurred',
-            500,
-            isDevelopment ? error.message : null
-        );
-    }
-};
-
 // Danh sách các đơn đăng ký của thiết bị
 const getDeviceInfo = async (req, res) => {
     try {
@@ -254,12 +233,103 @@ const getUserBookings = async (req, res) => {
     }
 };
 
+// Xử lý yêu cầu chỉnh sửa đơn đăng ký
+const requestBookingEdit = async (req, res) => {
+    try {
+        const { bookingId } = req.params;
+        const userId = req.user.sub;
+
+        const booking = await DeviceBooking.findById(bookingId);
+        if (!booking) {
+            return Response.notFound(res, 'Booking not found');
+        }
+
+        // Kiểm tra xem người dùng có phải là người tạo đơn không
+        if (booking.userId.toString() !== userId) {
+            return Response.error(
+                res,
+                'Unauthorized to edit this booking',
+                403
+            );
+        }
+
+        // Cập nhật thông tin chỉnh sửa
+        booking.editRequest = {
+            status: 'pending',
+            requestedAt: new Date(),
+        };
+        await booking.save();
+
+        return Response.success(
+            res,
+            booking,
+            'Edit request submitted successfully'
+        );
+    } catch (error) {
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
+    }
+};
+
+// Xử lý duyệt yêu cầu chỉnh sửa từ approver hoặc admin
+const processEditRequest = async (req, res) => {
+    try {
+        const { bookingId } = req.params;
+        const { action, approverNote } = req.body;
+        const approverId = req.user.sub;
+
+        const booking = await DeviceBooking.findById(bookingId);
+        if (!booking) {
+            return Response.notFound(res, 'Booking not found');
+        }
+
+        if (!booking.editRequest) {
+            return Response.error(
+                res,
+                'No edit request found for this booking'
+            );
+        }
+
+        if (action === 'accept') {
+            booking.editRequest.status = 'accepted';
+            booking.editRequest.processedBy = approverId;
+            booking.editRequest.processedAt = new Date();
+            booking.editRequest.approverNote = approverNote;
+        } else if (action === 'reject') {
+            booking.editRequest.status = 'rejected';
+            booking.editRequest.processedBy = approverId;
+            booking.editRequest.processedAt = new Date();
+            booking.editRequest.approverNote = approverNote;
+        }
+
+        await booking.save();
+
+        return Response.success(
+            res,
+            booking,
+            'Edit request processed successfully'
+        );
+    } catch (error) {
+        return Response.error(
+            res,
+            'Unexpected error occurred',
+            500,
+            isDevelopment ? error.message : null
+        );
+    }
+};
+
 module.exports = {
     createDeviceBooking,
     getAllBookings,
     getDeviceBookingById,
     approveUsage,
-    approveEdit,
     getDeviceInfo,
     getUserBookings,
+    requestBookingEdit,
+    processEditRequest,
 };
