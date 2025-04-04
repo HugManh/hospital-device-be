@@ -6,6 +6,7 @@ const {
     REGISTER_STATUS,
     PRIORITY_STATUS,
     isDevelopment,
+    EDIT_REQUEST_STATUS,
 } = require('../config/constants');
 
 // Tạo yêu cầu đăng ký thiết bị
@@ -192,6 +193,7 @@ const getDeviceInfo = async (req, res) => {
 
         // Lấy lịch sử đăng ký của thiết bị
         const bookings = await DeviceBooking.find(filter)
+            .populate('deviceId', 'name location')
             .populate('userId', 'name email group')
             .sort({ createdAt: -1 });
 
@@ -216,6 +218,7 @@ const getUserBookings = async (req, res) => {
         const { userId } = req.params;
         const bookings = await DeviceBooking.find({ userId })
             .populate('deviceId', 'name location')
+            .populate('userId', 'name email group')
             .sort({ createdAt: -1 });
 
         return Response.success(
@@ -237,6 +240,7 @@ const getUserBookings = async (req, res) => {
 const requestBookingEdit = async (req, res) => {
     try {
         const { bookingId } = req.params;
+        const { reason } = req.body;
         const userId = req.user.sub;
 
         const booking = await DeviceBooking.findById(bookingId);
@@ -252,17 +256,26 @@ const requestBookingEdit = async (req, res) => {
                 403
             );
         }
+        // Kiểm tra xem đơn có đang chờ duyệt không
+        if (booking.status !== REGISTER_STATUS.PENDING) {
+            return Response.error(
+                res,
+                'Cannot edit booking that is not pending approval',
+                400
+            );
+        }
 
         // Cập nhật thông tin chỉnh sửa
         booking.editRequest = {
-            status: 'pending',
+            status: EDIT_REQUEST_STATUS.PENDING,
             requestedAt: new Date(),
+            reason: reason,
         };
         await booking.save();
 
         return Response.success(
             res,
-            booking,
+            { editRequest: booking.editRequest },
             'Edit request submitted successfully'
         );
     } catch (error) {
@@ -295,12 +308,12 @@ const processEditRequest = async (req, res) => {
         }
 
         if (action === 'accept') {
-            booking.editRequest.status = 'accepted';
+            booking.editRequest.status = EDIT_REQUEST_STATUS.ACCEPTED;
             booking.editRequest.processedBy = approverId;
             booking.editRequest.processedAt = new Date();
             booking.editRequest.approverNote = approverNote;
         } else if (action === 'reject') {
-            booking.editRequest.status = 'rejected';
+            booking.editRequest.status = EDIT_REQUEST_STATUS.REJECTED;
             booking.editRequest.processedBy = approverId;
             booking.editRequest.processedAt = new Date();
             booking.editRequest.approverNote = approverNote;
@@ -310,7 +323,7 @@ const processEditRequest = async (req, res) => {
 
         return Response.success(
             res,
-            booking,
+            { editRequest: booking.editRequest },
             'Edit request processed successfully'
         );
     } catch (error) {

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const BaseSchema = require('./base.model');
+const { EDIT_REQUEST_STATUS } = require('../config/constants');
 
 const DeviceBookingSchema = new BaseSchema({
     deviceId: {
@@ -49,6 +50,34 @@ const DeviceBookingSchema = new BaseSchema({
     note: {
         type: String,
         description: 'Ghi chú',
+    },
+    editRequest: {
+        status: {
+            type: String,
+            enum: Object.values(EDIT_REQUEST_STATUS),
+            description: 'Trạng thái yêu cầu chỉnh sửa',
+        },
+        reason: {
+            type: String,
+            description: 'Lý do chỉnh sửa',
+        },
+        requestedAt: {
+            type: Date,
+            description: 'Thời gian yêu cầu chỉnh sửa',
+        },
+        processedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            description: 'Người xử lý yêu cầu chỉnh sửa',
+        },
+        processedAt: {
+            type: Date,
+            description: 'Thời gian xử lý yêu cầu chỉnh sửa',
+        },
+        approverNote: {
+            type: String,
+            description: 'Ghi chú của người duyệt',
+        },
     },
 });
 

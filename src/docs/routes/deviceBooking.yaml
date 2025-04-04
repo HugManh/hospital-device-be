@@ -61,9 +61,9 @@
                                         booking:
                                             type: object
                                             properties:
-                                                device:
+                                                deviceId:
                                                     type: string
-                                                user:
+                                                userId:
                                                     type: string
                                                 codeBA:
                                                     type: string
@@ -81,6 +81,29 @@
                                                     type: string
                                                 note:
                                                     type: string
+                                                editRequest:
+                                                    type: object
+                                                    properties:
+                                                        status:
+                                                            type: string
+                                                            enum:
+                                                                [
+                                                                    'pending',
+                                                                    'accepted',
+                                                                    'rejected',
+                                                                ]
+                                                        reason:
+                                                            type: string
+                                                        requestedAt:
+                                                            type: string
+                                                            format: date-time
+                                                        processedBy:
+                                                            type: string
+                                                        processedAt:
+                                                            type: string
+                                                            format: date-time
+                                                        approverNote:
+                                                            type: string
             '404':
                 description: User or Device not found
             '500':
@@ -108,14 +131,14 @@
                                     items:
                                         type: object
                                         properties:
-                                            device:
+                                            deviceId:
                                                 type: object
                                                 properties:
                                                     name:
                                                         type: string
                                                     location:
                                                         type: string
-                                            user:
+                                            userId:
                                                 type: object
                                                 properties:
                                                     name:
@@ -138,6 +161,29 @@
                                                 type: string
                                             note:
                                                 type: string
+                                            editRequest:
+                                                type: object
+                                                properties:
+                                                    status:
+                                                        type: string
+                                                        enum:
+                                                            [
+                                                                'pending',
+                                                                'accepted',
+                                                                'rejected',
+                                                            ]
+                                                    reason:
+                                                        type: string
+                                                    requestedAt:
+                                                        type: string
+                                                        format: date-time
+                                                    processedBy:
+                                                        type: string
+                                                    processedAt:
+                                                        type: string
+                                                        format: date-time
+                                                    approverNote:
+                                                        type: string
             '500':
                 description: Unexpected error occurred
 
@@ -244,64 +290,6 @@
             '500':
                 description: Unexpected error occurred
 
-/api/device-booking/{bookingID}/accept-edit:
-    post:
-        tags:
-            - Quản Lý Đặt Thiết Bị
-        summary: Duyệt chỉnh sửa yêu cầu đặt thiết bị
-        security:
-            - bearerAuth: []
-        parameters:
-            - in: path
-              name: bookingID
-              required: true
-              schema:
-                  type: string
-              description: ID yêu cầu đặt thiết bị
-        requestBody:
-            required: true
-            content:
-                application/json:
-                    schema:
-                        type: object
-                        required:
-                            - status
-                        properties:
-                            codeBA:
-                                type: string
-                                description: Mã bệnh án
-                            nameBA:
-                                type: string
-                                description: Tên bệnh án
-                            usageTime:
-                                type: string
-                                description: Thời gian sử dụng
-                            usageDay:
-                                type: string
-                                format: date
-                                description: Ngày sử dụng
-                            priority:
-                                type: string
-                                enum: ['Ưu tiên', 'Bình thường']
-                                description: Mức độ ưu tiên
-                            purpose:
-                                type: string
-                                description: Mục đích sử dụng
-                            status:
-                                type: string
-                                enum: ['Đã duyệt', 'Từ chối']
-                                description: Trạng thái duyệt
-                            note:
-                                type: string
-                                description: Ghi chú
-        responses:
-            '200':
-                description: Duyệt chỉnh sửa thành công
-            '404':
-                description: Không tìm thấy yêu cầu hoặc đã được xử lý
-            '500':
-                description: Unexpected error occurred
-
 /api/device-booking/devices/{deviceId}:
     get:
         tags:
@@ -316,6 +304,12 @@
               schema:
                   type: string
               description: ID thiết bị
+            - in: query
+              name: usageDay
+              schema:
+                  type: string
+                  format: date
+              description: Ngày sử dụng (tùy chọn)
         responses:
             '200':
                 description: Lấy thông tin thành công
@@ -343,7 +337,7 @@
                                             items:
                                                 type: object
                                                 properties:
-                                                    user:
+                                                    userId:
                                                         type: object
                                                         properties:
                                                             name:
@@ -366,6 +360,29 @@
                                                         type: string
                                                     note:
                                                         type: string
+                                                    editRequest:
+                                                        type: object
+                                                        properties:
+                                                            status:
+                                                                type: string
+                                                                enum:
+                                                                    [
+                                                                        'pending',
+                                                                        'accepted',
+                                                                        'rejected',
+                                                                    ]
+                                                            reason:
+                                                                type: string
+                                                            requestedAt:
+                                                                type: string
+                                                                format: date-time
+                                                            processedBy:
+                                                                type: string
+                                                            processedAt:
+                                                                type: string
+                                                                format: date-time
+                                                            approverNote:
+                                                                type: string
             '404':
                 description: Không tìm thấy thiết bị
             '500':
@@ -402,7 +419,7 @@
                                     items:
                                         type: object
                                         properties:
-                                            device:
+                                            deviceId:
                                                 type: object
                                                 properties:
                                                     name:
@@ -425,5 +442,168 @@
                                                 type: string
                                             note:
                                                 type: string
+                                            editRequest:
+                                                type: object
+                                                properties:
+                                                    status:
+                                                        type: string
+                                                        enum:
+                                                            [
+                                                                'pending',
+                                                                'accepted',
+                                                                'rejected',
+                                                            ]
+                                                    reason:
+                                                        type: string
+                                                    requestedAt:
+                                                        type: string
+                                                        format: date-time
+                                                    processedBy:
+                                                        type: string
+                                                    processedAt:
+                                                        type: string
+                                                        format: date-time
+                                                    approverNote:
+                                                        type: string
             '500':
                 description: Server error
+
+/api/device-booking/{bookingId}/edit-request:
+    post:
+        tags:
+            - Quản Lý Đặt Thiết Bị
+        summary: Yêu cầu chỉnh sửa đơn đăng ký thiết bị
+        security:
+            - bearerAuth: []
+        parameters:
+            - in: path
+              name: bookingId
+              required: true
+              schema:
+                  type: string
+              description: ID yêu cầu đăng ký thiết bị
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required:
+                            - reason
+                        properties:
+                            reason:
+                                type: string
+                                description: Lý do chỉnh sửa
+        responses:
+            '200':
+                description: Yêu cầu chỉnh sửa được gửi thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: object
+                                    properties:
+                                        editRequest:
+                                            type: object
+                                            properties:
+                                                status:
+                                                    type: string
+                                                    enum:
+                                                        [
+                                                            'pending',
+                                                            'accepted',
+                                                            'rejected',
+                                                        ]
+                                                reason:
+                                                    type: string
+                                                requestedAt:
+                                                    type: string
+                                                    format: date-time
+            '400':
+                description: Không thể chỉnh sửa đơn đăng ký
+            '403':
+                description: Không có quyền chỉnh sửa đơn đăng ký này
+            '404':
+                description: Không tìm thấy đơn đăng ký
+            '500':
+                description: Unexpected error occurred
+
+    put:
+        tags:
+            - Quản Lý Đặt Thiết Bị
+        summary: Xử lý yêu cầu chỉnh sửa đơn đăng ký thiết bị
+        security:
+            - bearerAuth: []
+        parameters:
+            - in: path
+              name: bookingId
+              required: true
+              schema:
+                  type: string
+              description: ID yêu cầu đăng ký thiết bị
+        requestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        required:
+                            - action
+                        properties:
+                            action:
+                                type: string
+                                enum: ['accept', 'reject']
+                                description: Hành động xử lý yêu cầu
+                            approverNote:
+                                type: string
+                                description: Ghi chú của người duyệt
+        responses:
+            '200':
+                description: Xử lý yêu cầu chỉnh sửa thành công
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                success:
+                                    type: boolean
+                                message:
+                                    type: string
+                                data:
+                                    type: object
+                                    properties:
+                                        editRequest:
+                                            type: object
+                                            properties:
+                                                status:
+                                                    type: string
+                                                    enum:
+                                                        [
+                                                            'pending',
+                                                            'accepted',
+                                                            'rejected',
+                                                        ]
+                                                reason:
+                                                    type: string
+                                                requestedAt:
+                                                    type: string
+                                                    format: date-time
+                                                processedBy:
+                                                    type: string
+                                                processedAt:
+                                                    type: string
+                                                    format: date-time
+                                                approverNote:
+                                                    type: string
+            '400':
+                description: Không tìm thấy yêu cầu chỉnh sửa
+            '404':
+                description: Không tìm thấy đơn đăng ký
+            '500':
+                description: Unexpected error occurred
