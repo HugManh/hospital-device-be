@@ -14,7 +14,7 @@ const { authenticate } = require('../../middleware/auth.middleware');
 router.post('/register', register);
 router.post('/login', login);
 router.get('/logout', logout);
-router.get('/refresh-token', refreshToken);
+router.post('/refresh-token', refreshToken);
 router.get('/profile', authenticate, getProfile);
 router.put('/profile', authenticate, updateProfile);
 router.put('/password', authenticate, updatePassword);
