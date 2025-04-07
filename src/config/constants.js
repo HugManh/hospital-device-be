@@ -5,8 +5,8 @@ export const ROLES = {
 };
 
 export const REGISTER_STATUS = {
-    APPROVED: 'approved',
     PENDING: 'pending_approval',
+    APPROVED: 'approved',
     COMPLETED: 'completed',
     REJECTED: 'rejected',
 };

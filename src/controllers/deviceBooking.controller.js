@@ -7,6 +7,7 @@ const {
     PRIORITY_STATUS,
     isDevelopment,
     EDIT_REQUEST_STATUS,
+    ROLES,
 } = require('../config/constants');
 
 // Tạo yêu cầu đăng ký thiết bị
@@ -129,6 +130,13 @@ const getDeviceBookingById = async (req, res) => {
 const updateBooking = async (req, res) => {
     try {
         const { bookingID } = req.params;
+        const userId = req.user.sub;
+
+        const user = await User.findById(userId).select(
+            '-password -refreshToken'
+        );
+        if (!user) return Response.notFound(res, 'User not found');
+
         const {
             deviceId,
             codeBA,
@@ -141,6 +149,9 @@ const updateBooking = async (req, res) => {
 
         const booking = await DeviceBooking.findById(bookingID);
         if (!booking) return Response.notFound(res, 'Booking not found');
+        if (user.role === ROLES.USER) {
+            booking.editRequest = null;
+        }
 
         Object.assign(booking, {
             deviceId,
@@ -149,7 +160,7 @@ const updateBooking = async (req, res) => {
             usageTime,
             usageDay,
             priority,
-            status,
+            status: status || REGISTER_STATUS.PENDING,
         });
 
         // Lưu các thay đổi vào database

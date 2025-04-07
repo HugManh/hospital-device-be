@@ -121,8 +121,9 @@ const logout = async (req, res) => {
 };
 
 // Làm mới token
-const refreshToken = (req, res) => {
+const refreshToken = async (req, res) => {
     const { refreshToken } = req.body;
+    const userId = req.user.sub;
 
     if (!refreshToken) {
         return Response.unauthorized(
@@ -132,6 +133,15 @@ const refreshToken = (req, res) => {
     }
 
     try {
+        const user = await User.findById(userId).select('refreshToken');
+        if (!user) return Response.notFound(res, 'User not found');
+        if (user.refreshToken !== refreshToken) {
+            return Response.unauthorized(
+                res,
+                'Access Denied. Invalid refresh token.'
+            );
+        }
+
         const decoded = jwt.verify(refreshToken, secretKey);
         const accessToken = jwt.sign(
             { email: decoded.email, id: decoded.id },
