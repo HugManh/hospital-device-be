@@ -4,7 +4,7 @@ const {
     createDeviceBooking,
     getAllBookings,
     getDeviceBookingById,
-    approveUsage,
+    updateBooking,
     getDeviceInfo,
     getUserBookings,
     requestBookingEdit,
@@ -35,7 +35,7 @@ router.get(
 router.put(
     '/:bookingID',
     authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]),
-    approveUsage
+    updateBooking
 );
 router.get(
     '/devices/:deviceId',

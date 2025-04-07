@@ -126,7 +126,7 @@ const getDeviceBookingById = async (req, res) => {
     }
 };
 // Duyệt yêu cầu đăng ký thiết bị
-const approveUsage = async (req, res) => {
+const updateBooking = async (req, res) => {
     try {
         const { bookingID } = req.params;
         const {
@@ -267,6 +267,7 @@ const requestBookingEdit = async (req, res) => {
 
         // Cập nhật thông tin chỉnh sửa
         booking.editRequest = {
+            requestedBy: userId,
             status: EDIT_REQUEST_STATUS.PENDING,
             requestedAt: new Date(),
             reason: reason,
@@ -294,6 +295,8 @@ const processEditRequest = async (req, res) => {
         const { bookingId } = req.params;
         const { action, approverNote } = req.body;
         const approverId = req.user.sub;
+
+        console.log('processEditRequest', bookingId, action, approverNote);
 
         const booking = await DeviceBooking.findById(bookingId);
         if (!booking) {
@@ -340,7 +343,7 @@ module.exports = {
     createDeviceBooking,
     getAllBookings,
     getDeviceBookingById,
-    approveUsage,
+    updateBooking,
     getDeviceInfo,
     getUserBookings,
     requestBookingEdit,
