@@ -34,7 +34,7 @@ router.get(
 );
 router.put(
     '/:bookingID',
-    authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]),
+    authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
     updateBooking
 );
 router.get(
