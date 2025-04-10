@@ -1,19 +1,11 @@
 const mongoose = require('mongoose');
 const BaseSchema = require('./base.model');
 
-// Actor metadata có thể rõ ràng hơn nếu định nghĩa riêng
-const ActorMetadataSchema = new mongoose.Schema(
-    {
-        role: String,
-    },
-    { _id: false }
-);
-
 const AuditTrailSchema = new BaseSchema({
     action: { type: String, required: true },
     actor: {
         id: { type: String, required: true },
-        metadata: { type: ActorMetadataSchema, required: true },
+        role: { type: String, required: true },
     },
     context: {
         method: { type: String, required: true },
@@ -21,7 +13,8 @@ const AuditTrailSchema = new BaseSchema({
         location: { type: String },
         userAgent: { type: String },
     },
-    status: { type: Number, min: 100, max: 599 },
+    status: { type: String, required: true },
+    details: { type: String },
     occurredAt: { type: Date, default: Date.now },
 });
 

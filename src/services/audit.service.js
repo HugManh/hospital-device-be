@@ -6,17 +6,22 @@ const auditEvent = 'audit';
 
 // Lắng nghe và ghi log
 emitter.on(auditEvent, async function (auditData) {
-    console.log('Audit Event Emitter - Audit:', auditData);
     try {
         const auditDoc = new AuditTrail({
             action: auditData.auditAction,
             actor: {
-                id: auditData.auditBy.id,
-                metadata: auditData.auditBy.metadata,
+                id: auditData.user.id || auditData.user.sub,
+                role: auditData.user.role,
             },
-            context: auditData.context || {},
+            context: {
+                method: auditData.req.method,
+                endpoint: auditData.req.originalUrl,
+                location: auditData.req.ip,
+                userAgent: auditData.req.headers['user-agent'],
+            },
             status: auditData.status,
-            occurredAt: auditData.auditOn || new Date(),
+            details: auditData.details,
+            occurredAt: new Date(),
         });
         await auditDoc.save();
     } catch (error) {
@@ -24,22 +29,13 @@ emitter.on(auditEvent, async function (auditData) {
     }
 });
 
-exports.prepareAudit = function (
-    auditAction,
-    context = {},
-    error = null,
-    auditBy = {},
-    auditOn = null
-) {
-    let status = error ? 500 : 200;
-
+exports.prepareAudit = function (req, auditAction, user, status, details) {
     const auditObj = {
+        req,
         auditAction,
-        context,
-        error,
+        user,
         status,
-        auditBy,
-        auditOn: auditOn || new Date(),
+        details,
     };
 
     emitter.emit(auditEvent, auditObj);

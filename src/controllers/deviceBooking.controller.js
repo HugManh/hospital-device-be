@@ -9,6 +9,8 @@ const {
     EDIT_REQUEST_STATUS,
     ROLES,
 } = require('../config/constants');
+const audit = require('../services/audit.service');
+const auditAction = require('../services/auditAction');
 
 // Tạo yêu cầu đăng ký thiết bị
 const createDeviceBooking = async (req, res) => {
@@ -70,6 +72,14 @@ const createDeviceBooking = async (req, res) => {
         });
 
         await booking.save();
+
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.CREATE_DEVICE_BOOKING,
+            booking,
+            'success',
+            'Device booking created successfully'
+        );
 
         return Response.success(
             res,
@@ -165,6 +175,14 @@ const updateBooking = async (req, res) => {
 
         // Lưu các thay đổi vào database
         await booking.save();
+
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.UPDATE_DEVICE_BOOKING,
+            booking,
+            'success',
+            'Booking processed successfully'
+        );
 
         return Response.success(
             res,
@@ -285,6 +303,14 @@ const requestBookingEdit = async (req, res) => {
         };
         await booking.save();
 
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.REQUEST_BOOKING_EDIT,
+            booking,
+            'success',
+            'Edit request submitted successfully'
+        );
+
         return Response.success(
             res,
             { editRequest: booking.editRequest },
@@ -334,6 +360,14 @@ const processEditRequest = async (req, res) => {
         }
 
         await booking.save();
+
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.PROCESS_EDIT_REQUEST,
+            booking,
+            'success',
+            'Edit request processed successfully'
+        );
 
         return Response.success(
             res,

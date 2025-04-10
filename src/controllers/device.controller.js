@@ -1,6 +1,8 @@
 const { isDevelopment } = require('../config/constants');
 const Device = require('../models/device.model');
 const Response = require('../utils/response');
+const audit = require('../services/audit.service');
+const auditAction = require('../services/auditAction');
 
 // Tạo mới device
 const addDevice = async (req, res) => {
@@ -13,6 +15,15 @@ const addDevice = async (req, res) => {
 
         const device = new Device({ name, location });
         await device.save();
+
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.CREATE_DEVICE,
+            device,
+            'success',
+            'Device created successfully'
+        );
+
         return Response.success(
             res,
             { device },
@@ -71,10 +82,18 @@ const updateDevice = async (req, res) => {
             { name, location },
             { new: true }
         );
-
         if (!device) {
             return Response.notFound(res, 'Device not found');
         }
+
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.UPDATE_DEVICE,
+            device,
+            'success',
+            'Device updated successfully'
+        );
+
         return Response.success(res, { device }, 'Device updated successfully');
     } catch (error) {
         return Response.error(
@@ -93,6 +112,15 @@ const deleteDevice = async (req, res) => {
         if (!device) {
             return Response.notFound(res, 'Device not found');
         }
+
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.DELETE_DEVICE,
+            device,
+            'success',
+            'Device deleted successfully'
+        );
+
         return Response.success(res, null, 'Device deleted successfully');
     } catch (error) {
         return Response.error(

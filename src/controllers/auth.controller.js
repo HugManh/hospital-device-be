@@ -3,6 +3,8 @@ const User = require('../models/user.model');
 const Response = require('../utils/response');
 const { isDevelopment } = require('../config/constants');
 const secretKey = process.env.JWT_SECRET;
+const audit = require('../services/audit.service');
+const auditAction = require('../services/auditAction');
 
 // Đăng ký
 const register = async (req, res) => {
@@ -75,6 +77,14 @@ const login = async (req, res) => {
         user.refreshToken = refreshToken;
         await user.save();
 
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.LOGIN,
+            user,
+            'success',
+            'Login successful'
+        );
+
         return Response.success(
             res,
             {
@@ -111,12 +121,22 @@ const logout = async (req, res) => {
             { $unset: { refreshToken: 1 } }
         );
 
+        const user = updatedUser;
+
         if (updatedUser.nModified === 0) {
             return Response.error(res, 'Invalid or expired refresh token', 401);
         }
 
         res.clearCookie('accessToken', { httpOnly: true, secure: true });
         res.clearCookie('refreshToken', { httpOnly: true, secure: true });
+
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.LOGOUT,
+            user,
+            'success',
+            'Logout successful'
+        );
 
         return Response.success(res, null, 'Logout successful');
     } catch (error) {

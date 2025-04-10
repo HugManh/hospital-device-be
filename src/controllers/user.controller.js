@@ -2,6 +2,8 @@ const { isDevelopment } = require('../config/constants');
 const User = require('../models/user.model');
 const { generatePassword } = require('../utils/crypto');
 const Response = require('../utils/response');
+const audit = require('../services/audit.service');
+const auditAction = require('../services/auditAction');
 
 // Tạo mới user
 const createUser = async (req, res) => {
@@ -15,6 +17,14 @@ const createUser = async (req, res) => {
         const password = generatePassword();
         const user = new User({ email, name, group, password });
         await user.save();
+
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.CREATE_USER,
+            user,
+            'success',
+            'User created successfully'
+        );
 
         return Response.success(
             res,
@@ -84,6 +94,14 @@ const updateUser = async (req, res) => {
 
         await user.save();
 
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.UPDATE_USER,
+            user,
+            'success',
+            'User updated successfully'
+        );
+
         return Response.success(
             res,
             { name, email, group, role, isActive },
@@ -107,6 +125,14 @@ const deleteUser = async (req, res) => {
         if (!user) {
             return Response.notFound(res, 'User not found');
         }
+
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.DELETE_USER,
+            user,
+            'success',
+            'User deleted successfully'
+        );
 
         return Response.success(res, null, 'User deleted successfully');
     } catch (error) {
@@ -132,6 +158,14 @@ const resetPassword = async (req, res) => {
         const password = generatePassword();
         user.password = password;
         await user.save();
+
+        audit.prepareAudit(
+            req,
+            auditAction.actionList.RESET_PASSWORD,
+            user,
+            'success',
+            'Password reset successfully'
+        );
 
         return Response.success(
             res,
