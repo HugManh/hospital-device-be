@@ -82,7 +82,7 @@ const login = async (req, res) => {
             auditAction.actionList.LOGIN,
             user,
             'success',
-            'Login successful'
+            'Đăng nhập thành công'
         );
 
         return Response.success(
@@ -96,12 +96,12 @@ const login = async (req, res) => {
                     role: user.role,
                 },
             },
-            'Login successful'
+            'Đăng nhập thành công'
         );
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -135,14 +135,14 @@ const logout = async (req, res) => {
             auditAction.actionList.LOGOUT,
             user,
             'success',
-            'Logout successful'
+            'Đăng xuất thành công'
         );
 
-        return Response.success(res, null, 'Logout successful');
+        return Response.success(res, null, 'Đăng xuất thành công');
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );

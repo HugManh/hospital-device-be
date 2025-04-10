@@ -1,0 +1,12 @@
+/api/audits:
+    get:
+        tags:
+            - Audit
+        summary: Get all audits
+        security:
+            - bearerAuth: []
+        responses:
+            '200':
+                description: Audits retrieved successfully
+            '500':
+                description: Server error

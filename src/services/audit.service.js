@@ -21,7 +21,6 @@ emitter.on(auditEvent, async function (auditData) {
             },
             status: auditData.status,
             details: auditData.details,
-            occurredAt: new Date(),
         });
         await auditDoc.save();
     } catch (error) {

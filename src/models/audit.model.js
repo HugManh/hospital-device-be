@@ -15,11 +15,10 @@ const AuditTrailSchema = new BaseSchema({
     },
     status: { type: String, required: true },
     details: { type: String },
-    occurredAt: { type: Date, default: Date.now },
 });
 
 AuditTrailSchema.index({ 'actor.id': 1 });
-AuditTrailSchema.index({ action: 1, occurredAt: -1 });
+AuditTrailSchema.index({ action: 1, createdAt: -1 });
 AuditTrailSchema.index({ 'context.endpoint': 1 });
 
 const AuditTrail = mongoose.model('AuditTrail', AuditTrailSchema);
