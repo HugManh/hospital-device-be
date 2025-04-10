@@ -4,9 +4,8 @@ const Response = require('../utils/response');
 
 // Tạo mới device
 const addDevice = async (req, res) => {
-    const { location, name } = req.body;
-
     try {
+        const { location, name } = req.body;
         // const existingDevice = await Device.findOne({ code });
         // if (existingDevice) {
         //     return Response.error(res, 'Device code already exists!', 400);
@@ -14,7 +13,6 @@ const addDevice = async (req, res) => {
 
         const device = new Device({ name, location });
         await device.save();
-
         return Response.success(
             res,
             { device },
@@ -77,7 +75,6 @@ const updateDevice = async (req, res) => {
         if (!device) {
             return Response.notFound(res, 'Device not found');
         }
-
         return Response.success(res, { device }, 'Device updated successfully');
     } catch (error) {
         return Response.error(
@@ -96,7 +93,6 @@ const deleteDevice = async (req, res) => {
         if (!device) {
             return Response.notFound(res, 'Device not found');
         }
-
         return Response.success(res, null, 'Device deleted successfully');
     } catch (error) {
         return Response.error(

@@ -101,14 +101,23 @@ const login = async (req, res) => {
 // Đăng xuất
 const logout = async (req, res) => {
     const { refreshToken } = req.body;
+    if (!refreshToken) {
+        return Response.error(res, 'Refresh token is required', 400);
+    }
 
     try {
-        if (refreshToken) {
-            await User.updateOne(
-                { refreshToken },
-                { $unset: { refreshToken: 1 } }
-            );
+        const updatedUser = await User.updateOne(
+            { refreshToken },
+            { $unset: { refreshToken: 1 } }
+        );
+
+        if (updatedUser.nModified === 0) {
+            return Response.error(res, 'Invalid or expired refresh token', 401);
         }
+
+        res.clearCookie('accessToken', { httpOnly: true, secure: true });
+        res.clearCookie('refreshToken', { httpOnly: true, secure: true });
+
         return Response.success(res, null, 'Logout successful');
     } catch (error) {
         return Response.error(

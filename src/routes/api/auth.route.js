@@ -13,10 +13,12 @@ const { authenticate } = require('../../middleware/auth.middleware');
 
 router.post('/register', register);
 router.post('/login', login);
-router.get('/logout', logout);
+
+router.use(authenticate);
+router.post('/logout', logout);
 router.post('/refresh-token', refreshToken);
-router.get('/profile', authenticate, getProfile);
-router.put('/profile', authenticate, updateProfile);
-router.put('/password', authenticate, updatePassword);
+router.get('/profile', getProfile);
+router.put('/profile', updateProfile);
+router.put('/password', updatePassword);
 
 module.exports = router;

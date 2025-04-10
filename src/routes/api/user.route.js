@@ -9,12 +9,10 @@ const {
     resetPassword,
 } = require('../../controllers/user.controller');
 const {
-    authenticate,
     authorizeRoles,
 } = require('../../middleware/auth.middleware');
 const { ROLES } = require('../../config/constants');
 
-router.use(authenticate);
 router.post('/', authorizeRoles([ROLES.ADMIN]), createUser);
 router.get('/', authorizeRoles([ROLES.ADMIN]), getUsers);
 router.get('/:id', authorizeRoles([ROLES.ADMIN]), getUserById);

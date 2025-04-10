@@ -8,12 +8,10 @@ const {
     deleteDevice,
 } = require('../../controllers/device.controller');
 const {
-    authenticate,
     authorizeRoles,
 } = require('../../middleware/auth.middleware');
 const { ROLES } = require('../../config/constants');
 
-router.use(authenticate);
 router.post('/', authorizeRoles([ROLES.ADMIN]), addDevice);
 router.get(
     '/',

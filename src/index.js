@@ -1,8 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 const connectDB = require('./config/mongo.config');
 const swaggerUi = require('./docs/swagger-ui');
@@ -15,6 +16,8 @@ const app = express();
 // Kết nối MongoDB
 connectDB();
 
+app.disable('x-powered-by');
+app.use(compression());
 // Cấu hình CORS
 app.use(
     cors({
@@ -42,15 +45,24 @@ app.get('/', (req, res) => {
     res.json({ message: 'Who are you?' });
 });
 
-// Xử lý lỗi 404
-app.use((req, res) => {
-    res.status(404).json({ error: 'Endpoint not found' });
+// Catch 404 and forward to error handler
+app.use((req, res, next) => {
+    const FAVICON_REGEX =
+        /\/(favicon|(apple-)?touch-icon(-i(phone|pad))?(-\d{2,}x\d{2,})?(-precomposed)?)\.(jpe?g|png|ico|gif)$/i;
+    if (FAVICON_REGEX.test(req.url)) {
+        res.statusCode = 204;
+        return res.end();
+    }
+    const err = new Error('Not Found: ' + req.method + ' - ' + req.originalUrl);
+    err.status = 404;
+    next(err);
 });
 
-// Xử lý lỗi toàn cục
-app.use((err, req, res) => {
-    console.error('Server Error:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
+// Error handler
+app.use((err, req, res, next) => {
+    // Render the error page
+    if (err.status != 404) console.error('[ErrorHandler] err', err);
+    res.status(err.status || 500).end(err.message);
 });
 
 // Khởi động server
