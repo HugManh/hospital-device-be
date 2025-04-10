@@ -333,8 +333,6 @@ const processEditRequest = async (req, res) => {
         const { action, approverNote } = req.body;
         const approverId = req.user.sub;
 
-        console.log('processEditRequest', bookingId, action, approverNote);
-
         const booking = await DeviceBooking.findById(bookingId);
         if (!booking) {
             return Response.notFound(res, 'Booking not found');

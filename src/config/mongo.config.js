@@ -1,19 +1,21 @@
 const mongoose = require('mongoose');
+const LoggerService = require('../services/logger.service');
 
 const clientOptions = {
     serverApi: { version: '1', strict: true, deprecationErrors: true },
 };
 
 const connectDB = async () => {
-    console.log('Connecting to MongoDB', process.env.MONGO_URI);
+    const logger = new LoggerService('mongo.config');
+    logger.debug('Connecting to MongoDB', process.env.MONGO_URI);
     try {
         await mongoose.connect(process.env.MONGO_URI, clientOptions);
         await mongoose.connection.db.admin().command({ ping: 1 });
-        console.log(
+        logger.info(
             'Pinged your deployment. You successfully connected to MongoDB!'
         );
     } catch (error) {
-        console.error('MongoDB connection error:', error);
+        logger.error('MongoDB connection error:', error);
         await mongoose.disconnect();
         process.exit(1);
     }
