@@ -47,6 +47,10 @@ class LoggerService {
     async debug(message, obj = null) {
         this.logger.log('debug', message, { obj });
     }
+
+    async event(message, obj = null) {
+        this.logger.log('http', message, { obj });
+    }
 }
 
 module.exports = LoggerService;

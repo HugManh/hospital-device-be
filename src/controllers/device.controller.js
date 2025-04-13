@@ -3,15 +3,17 @@ const Device = require('../models/device.model');
 const Response = require('../utils/response');
 const audit = require('../services/audit.service');
 const auditAction = require('../services/auditAction');
+const QueryBuilder = require('../utils/queryBuilder');
 
 // Tạo mới device
 const addDevice = async (req, res) => {
     try {
         const { location, name } = req.body;
-        // const existingDevice = await Device.findOne({ code });
-        // if (existingDevice) {
-        //     return Response.error(res, 'Device code already exists!', 400);
-        // }
+        if (!name || !location) {
+            return Response.validationError(res, [
+                'Name, location are required',
+            ]);
+        }
 
         const device = new Device({ name, location });
         await device.save();
@@ -43,8 +45,18 @@ const addDevice = async (req, res) => {
 // Lấy danh sách device
 const getDevices = async (req, res) => {
     try {
-        const devices = await Device.find().sort({ createdAt: -1 });
-        return Response.success(res, devices, 'Devices retrieved successfully');
+        const devices = await new QueryBuilder(Device, req.query)
+            .filter()
+            .sort()
+            .paginate()
+            .exec();
+
+        return Response.success(
+            res,
+            devices.data,
+            devices.meta,
+            'Devices retrieved successfully'
+        );
     } catch (error) {
         return Response.error(
             res,

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
     createDeviceBooking,
-    getAllBookings,
+    getDeviceBookings,
     getDeviceBookingById,
     updateBooking,
     getDeviceInfo,
@@ -10,9 +10,7 @@ const {
     requestBookingEdit,
     processEditRequest,
 } = require('../../controllers/deviceBooking.controller');
-const {
-    authorizeRoles,
-} = require('../../middleware/auth.middleware');
+const { authorizeRoles } = require('../../middleware/auth.middleware');
 const { ROLES } = require('../../config/constants');
 
 router.post(
@@ -23,7 +21,7 @@ router.post(
 router.get(
     '/',
     authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
-    getAllBookings
+    getDeviceBookings
 );
 router.get(
     '/:bookingID',

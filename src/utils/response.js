@@ -9,12 +9,22 @@ class Response {
      * @param {string} message - Success message
      * @param {number} statusCode - HTTP status code
      */
-    static success(res, data = null, message = 'Success', statusCode = 200) {
-        return res.status(statusCode).json({
+    static success(
+        res,
+        data = null,
+        meta = null,
+        message = 'Success',
+        statusCode = 200
+    ) {
+        const response = {
             success: true,
             message,
             data,
-        });
+        };
+        if (meta) {
+            response.meta = meta;
+        }
+        return res.status(statusCode).json(response);
     }
 
     /**

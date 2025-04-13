@@ -10,6 +10,7 @@ const swaggerUi = require('./docs/swagger-ui');
 
 // Routes
 const api = require('./routes/api');
+const LoggerService = require('./services/logger.service');
 
 const app = express();
 
@@ -32,8 +33,15 @@ app.use(
 app.use(express.json()); // For parsing JSON data
 app.use(express.urlencoded({ extended: true })); // For parsing URL-encoded form data
 app.use(cookieParser());
-if (process.env.NODE_ENV === 'development')
-    app.use(morgan(':method :url :status :response-time ms'));
+const logger = new LoggerService();
+const loggerHTTP = new LoggerService('http');
+if (process.env.NODE_ENV === 'development') {
+    app.use(
+        morgan(':method :url :status :response-time ms', {
+            stream: { write: (message) => loggerHTTP.event(message.trim()) },
+        })
+    );
+}
 
 // Routes
 app.use('/api', api);
@@ -68,7 +76,7 @@ app.use((err, req, res, next) => {
 // Khởi động server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    logger.info(`Server running on port ${PORT}`);
     if (process.env.NODE_ENV === 'development')
-        console.log(`API docs available at http://localhost:${PORT}/api-docs`);
+        logger.info(`API docs available at http://localhost:${PORT}/api-docs`);
 });

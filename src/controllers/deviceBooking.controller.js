@@ -11,6 +11,7 @@ const {
 } = require('../config/constants');
 const audit = require('../services/audit.service');
 const auditAction = require('../services/auditAction');
+const QueryBuilder = require('../utils/queryBuilder');
 
 // Tạo yêu cầu đăng ký thiết bị
 const createDeviceBooking = async (req, res) => {
@@ -98,15 +99,22 @@ const createDeviceBooking = async (req, res) => {
 };
 
 // Lấy danh sách đơn đăng ký thiết bị
-const getAllBookings = async (req, res) => {
+const getDeviceBookings = async (req, res) => {
     try {
-        const bookings = await DeviceBooking.find()
-            .populate('deviceId', 'name location')
-            .populate('userId', 'name email group')
-            .sort({ createdAt: -1 });
+        const bookings = await new QueryBuilder(DeviceBooking, req.query)
+            .filter()
+            .sort()
+            .populate([
+                { path: 'deviceId', select: 'name location' },
+                { path: 'userId', select: 'name email group' },
+            ])
+            .paginate()
+            .exec();
+
         return Response.success(
             res,
-            bookings,
+            bookings.data,
+            bookings.meta,
             'Bookings retrieved successfully'
         );
     } catch (error) {
@@ -384,7 +392,7 @@ const processEditRequest = async (req, res) => {
 
 module.exports = {
     createDeviceBooking,
-    getAllBookings,
+    getDeviceBookings,
     getDeviceBookingById,
     updateBooking,
     getDeviceInfo,
