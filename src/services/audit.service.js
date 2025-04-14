@@ -11,6 +11,7 @@ emitter.on(auditEvent, async function (auditData) {
             action: auditData.auditAction,
             actor: {
                 id: auditData.user.id || auditData.user.sub,
+                name: auditData.user.name,
                 role: auditData.user.role,
             },
             context: {
