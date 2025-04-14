@@ -17,7 +17,6 @@ const addDevice = async (req, res) => {
 
         const device = new Device({ name, location });
         await device.save();
-        console.log('req', req.user);
 
         audit.prepareAudit(
             req,

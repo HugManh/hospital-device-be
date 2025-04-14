@@ -7,7 +7,6 @@ const auditEvent = 'audit';
 // Lắng nghe và ghi log
 emitter.on(auditEvent, async function (auditData) {
     try {
-        console.log('-------auditData', auditData);
         const userData = auditData.req.user;
         const auditDoc = new AuditTrail({
             action: auditData.auditAction,
