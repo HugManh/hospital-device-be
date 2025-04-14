@@ -108,7 +108,7 @@ class QueryBuilder {
     async exec({ useEstimatedCount = false, baseUrl = '' } = {}) {
         try {
             const [data, totalCount] = await Promise.all([
-                this.query.lean(),
+                this.query,
                 useEstimatedCount
                     ? this.model.estimatedDocumentCount()
                     : this.model.countDocuments(this.query.getFilter()),
