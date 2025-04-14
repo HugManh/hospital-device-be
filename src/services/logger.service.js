@@ -1,5 +1,6 @@
 const winston = require('winston');
 const { combine, timestamp, printf, colorize } = winston.format;
+const { isDevelopment } = require('../config/constants');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -27,28 +28,32 @@ class LoggerService {
                 new winston.transports.Console({
                     format: combine(colorize(), logFormat),
                 }),
-                new winston.transports.File({
-                    format: combine(logFormat),
-                    filename: 'logs/hospital.log',
-                }),
+                ...(isDevelopment
+                    ? [
+                        new winston.transports.File({
+                            format: combine(logFormat),
+                            filename: 'logs/hospital.log',
+                        }),
+                    ]
+                    : []),
             ],
         });
         this.logger = logger;
     }
 
-    async info(message, obj = null) {
+    info(message, obj = null) {
         this.logger.log('info', message, { obj });
     }
 
-    async error(message, obj = null) {
+    error(message, obj = null) {
         this.logger.log('error', message, { obj });
     }
 
-    async debug(message, obj = null) {
+    debug(message, obj = null) {
         this.logger.log('debug', message, { obj });
     }
 
-    async event(message, obj = null) {
+    event(message, obj = null) {
         this.logger.log('http', message, { obj });
     }
 }
