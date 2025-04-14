@@ -50,7 +50,7 @@
             '400':
                 description: Email đã tồn tại
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định
 
     get:
         tags:
@@ -88,7 +88,7 @@
                                             isActive:
                                                 type: boolean
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định
 
 /api/users/{id}:
     get:
@@ -134,7 +134,7 @@
             '404':
                 description: Không tìm thấy người dùng
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định
 
     put:
         tags:
@@ -207,7 +207,7 @@
             '404':
                 description: Không tìm thấy người dùng
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định
 
     delete:
         tags:
@@ -228,7 +228,7 @@
             '404':
                 description: Không tìm thấy người dùng
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định
 
 /api/users/{id}/reset-password:
     post:
@@ -264,4 +264,4 @@
             '404':
                 description: Không tìm thấy người dùng
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định

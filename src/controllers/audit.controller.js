@@ -1,5 +1,6 @@
 const AuditTrail = require('../models/audit.model');
 const Response = require('../utils/response');
+const { isDevelopment } = require('../config/constants');
 
 const getAudit = async (req, res) => {
     try {
@@ -11,9 +12,14 @@ const getAudit = async (req, res) => {
             .sort({ timestamp: -1 })
             .skip((page - 1) * limit)
             .limit(Number(limit));
-        return Response.success(res, audit, 'Audit retrieved successfully');
+        return Response.success(res, audit, 'Lấy lịch sử truy vết thành công');
     } catch (error) {
-        return Response.error(res, error.message, 500);
+        return Response.error(
+            res,
+            'Đã xảy ra lỗi không xác định',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 

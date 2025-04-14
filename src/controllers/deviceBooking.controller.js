@@ -32,13 +32,13 @@ const createDeviceBooking = async (req, res) => {
         // Kiểm tra user tồn tại
         const user = await User.findById(userId);
         if (!user) {
-            return Response.notFound(res, 'User not found');
+            return Response.notFound(res, 'Không tìm thấy người dùng');
         }
 
         // Kiểm tra thiết bị tồn tại
         const device = await Device.findById(deviceId);
         if (!device) {
-            return Response.notFound(res, 'Device not found');
+            return Response.notFound(res, 'Không tìm thấy thiết bị');
         }
 
         // Kiểm tra xem có đăng ký nào trùng thời gian không
@@ -77,7 +77,6 @@ const createDeviceBooking = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE_BOOKING,
-            booking,
             'success',
             'Device booking created successfully'
         );
@@ -91,7 +90,7 @@ const createDeviceBooking = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -120,7 +119,7 @@ const getDeviceBookings = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -138,7 +137,7 @@ const getDeviceBookingById = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -153,7 +152,7 @@ const updateBooking = async (req, res) => {
         const user = await User.findById(userId).select(
             '-password -refreshToken'
         );
-        if (!user) return Response.notFound(res, 'User not found');
+        if (!user) return Response.notFound(res, 'Không tìm thấy người dùng');
 
         const {
             deviceId,
@@ -187,7 +186,6 @@ const updateBooking = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.UPDATE_DEVICE_BOOKING,
-            booking,
             'success',
             'Booking processed successfully'
         );
@@ -200,7 +198,7 @@ const updateBooking = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -215,7 +213,7 @@ const getDeviceInfo = async (req, res) => {
 
         const device = await Device.findById(deviceId);
         if (!device) {
-            return Response.notFound(res, 'Device not found');
+            return Response.notFound(res, 'Không tìm thấy thiết bị');
         }
 
         const filter = { deviceId };
@@ -242,7 +240,7 @@ const getDeviceInfo = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -266,7 +264,7 @@ const getUserBookings = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -314,7 +312,6 @@ const requestBookingEdit = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.REQUEST_BOOKING_EDIT,
-            booking,
             'success',
             'Edit request submitted successfully'
         );
@@ -327,7 +324,7 @@ const requestBookingEdit = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -370,7 +367,6 @@ const processEditRequest = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.PROCESS_EDIT_REQUEST,
-            booking,
             'success',
             'Edit request processed successfully'
         );
@@ -383,7 +379,7 @@ const processEditRequest = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );

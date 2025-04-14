@@ -9,4 +9,4 @@
             '200':
                 description: Audits retrieved successfully
             '500':
-                description: Server error
+                description: Đã xảy ra lỗi không xác định

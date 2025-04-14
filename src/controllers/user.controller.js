@@ -11,7 +11,7 @@ const createUser = async (req, res) => {
         const { email, name, group } = req.body;
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return Response.error(res, 'Email already exists!', 400);
+            return Response.error(res, 'Email đã tồn tại!', 400);
         }
 
         const password = generatePassword();
@@ -21,7 +21,6 @@ const createUser = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.CREATE_USER,
-            user,
             'success',
             'User created successfully'
         );
@@ -35,7 +34,7 @@ const createUser = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -50,7 +49,7 @@ const getUsers = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -62,13 +61,13 @@ const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) {
-            return Response.notFound(res, 'User not found');
+            return Response.notFound(res, 'Không tìm thấy người dùng');
         }
         return Response.success(res, user, 'User retrieved successfully');
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -83,7 +82,7 @@ const updateUser = async (req, res) => {
 
         const user = await User.findById(id);
         if (!user) {
-            return Response.notFound(res, 'User not found');
+            return Response.notFound(res, 'Không tìm thấy người dùng');
         }
 
         user.name = name;
@@ -97,20 +96,19 @@ const updateUser = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.UPDATE_USER,
-            user,
             'success',
-            'User updated successfully'
+            'Cập nhật người dùng thành công'
         );
 
         return Response.success(
             res,
             { name, email, group, role, isActive },
-            'User updated successfully'
+            'Cập nhật người dùng thành công'
         );
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -123,13 +121,12 @@ const deleteUser = async (req, res) => {
         const { id } = req.params;
         const user = await User.findByIdAndDelete(id);
         if (!user) {
-            return Response.notFound(res, 'User not found');
+            return Response.notFound(res, 'Không tìm thấy người dùng');
         }
 
         audit.prepareAudit(
             req,
             auditAction.actionList.DELETE_USER,
-            user,
             'success',
             'User deleted successfully'
         );
@@ -138,7 +135,7 @@ const deleteUser = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -152,7 +149,7 @@ const resetPassword = async (req, res) => {
 
         const user = await User.findById(id);
         if (!user) {
-            return Response.notFound(res, 'User not found');
+            return Response.notFound(res, 'Không tìm thấy người dùng');
         }
 
         const password = generatePassword();
@@ -162,7 +159,6 @@ const resetPassword = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.RESET_PASSWORD,
-            user,
             'success',
             'Password reset successfully'
         );
@@ -175,7 +171,7 @@ const resetPassword = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );

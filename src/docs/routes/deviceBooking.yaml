@@ -105,9 +105,9 @@
                                                         approverNote:
                                                             type: string
             '404':
-                description: User or Device not found
+                description: User or Không tìm thấy thiết bị
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định
     get:
         tags:
             - Quản Lý Đặt Thiết Bị
@@ -185,7 +185,7 @@
                                                     approverNote:
                                                         type: string
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định
 
 /api/device-booking/{bookingID}:
     get:
@@ -252,7 +252,7 @@
             '404':
                 description: Không tìm thấy yêu cầu đăng ký
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định
     put:
         tags:
             - Quản Lý Đặt Thiết Bị
@@ -288,7 +288,7 @@
             '404':
                 description: Không tìm thấy yêu cầu đăng ký
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định
 
 /api/device-booking/devices/{deviceId}:
     get:
@@ -386,7 +386,7 @@
             '404':
                 description: Không tìm thấy thiết bị
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định
 
 /api/device-booking/users/{userId}:
     get:
@@ -466,7 +466,7 @@
                                                     approverNote:
                                                         type: string
             '500':
-                description: Server error
+                description: Đã xảy ra lỗi không xác định
 
 /api/device-booking/{bookingId}/edit-request:
     post:
@@ -532,7 +532,7 @@
             '404':
                 description: Không tìm thấy đơn đăng ký
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định
 
     put:
         tags:
@@ -606,4 +606,4 @@
             '404':
                 description: Không tìm thấy đơn đăng ký
             '500':
-                description: Unexpected error occurred
+                description: Đã xảy ra lỗi không xác định

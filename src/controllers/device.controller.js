@@ -17,25 +17,25 @@ const addDevice = async (req, res) => {
 
         const device = new Device({ name, location });
         await device.save();
+        console.log('req', req.user);
 
         audit.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE,
-            device,
             'success',
-            'Device created successfully'
+            'Thêm thiết bị thành công'
         );
 
         return Response.success(
             res,
             { device },
-            'Device created successfully',
+            'Thêm thiết bị thành công',
             201
         );
     } catch (error) {
         return Response.error(
             res,
-            'Server error',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -55,12 +55,12 @@ const getDevices = async (req, res) => {
             res,
             devices.data,
             devices.meta,
-            'Devices retrieved successfully'
+            'Lấy danh sách thiết bị thành công'
         );
     } catch (error) {
         return Response.error(
             res,
-            'Server error',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -72,13 +72,17 @@ const getDeviceById = async (req, res) => {
     try {
         const device = await Device.findById(req.params.id);
         if (!device) {
-            return Response.notFound(res, 'Device not found');
+            return Response.notFound(res, 'Không tìm thấy thiết bị');
         }
-        return Response.success(res, device, 'Device retrieved successfully');
+        return Response.success(
+            res,
+            device,
+            'Lấy thông tin thiết bị thành công'
+        );
     } catch (error) {
         return Response.error(
             res,
-            'Server error',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -95,22 +99,25 @@ const updateDevice = async (req, res) => {
             { new: true }
         );
         if (!device) {
-            return Response.notFound(res, 'Device not found');
+            return Response.notFound(res, 'Không tìm thấy thiết bị');
         }
 
         audit.prepareAudit(
             req,
             auditAction.actionList.UPDATE_DEVICE,
-            device,
             'success',
-            'Device updated successfully'
+            'Cập nhật thông tin thiết bị thành công'
         );
 
-        return Response.success(res, { device }, 'Device updated successfully');
+        return Response.success(
+            res,
+            { device },
+            'Cập nhật thông tin thiết bị thành công'
+        );
     } catch (error) {
         return Response.error(
             res,
-            'Server error',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -122,22 +129,21 @@ const deleteDevice = async (req, res) => {
     try {
         const device = await Device.findByIdAndDelete(req.params.id);
         if (!device) {
-            return Response.notFound(res, 'Device not found');
+            return Response.notFound(res, 'Không tìm thấy thiết bị');
         }
 
         audit.prepareAudit(
             req,
             auditAction.actionList.DELETE_DEVICE,
-            device,
             'success',
-            'Device deleted successfully'
+            'Xóa thiết bị thành công'
         );
 
-        return Response.success(res, null, 'Device deleted successfully');
+        return Response.success(res, null, 'Xóa thiết bị thành công');
     } catch (error) {
         return Response.error(
             res,
-            'Server error',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );

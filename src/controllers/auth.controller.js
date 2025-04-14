@@ -13,17 +13,22 @@ const register = async (req, res) => {
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return Response.error(res, 'Email already exists!', 400);
+            return Response.error(res, 'Email đã tồn tại!', 400);
         }
 
         const user = new User({ email, name, password, role });
         await user.save();
 
-        return Response.success(res, null, 'User registered successfully', 201);
+        return Response.success(
+            res,
+            null,
+            'Đăng ký người dùng thành công',
+            201
+        );
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -37,16 +42,16 @@ const login = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return Response.error(res, 'Invalid credentials', 400);
+            return Response.error(res, 'Thông tin đăng nhập không hợp lệ', 400);
         }
 
         if (!user.isActive) {
-            return Response.error(res, 'Account is inactive', 400);
+            return Response.error(res, 'Tài khoản đã bị vô hiệu hóa', 400);
         }
 
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return Response.error(res, 'Invalid credentials', 400);
+            return Response.error(res, 'Thông tin đăng nhập không hợp lệ', 400);
         }
 
         // Tạo access token
@@ -76,11 +81,10 @@ const login = async (req, res) => {
         // Lưu refresh token vào database
         user.refreshToken = refreshToken;
         await user.save();
-
+        req.user = user;
         audit.prepareAudit(
             req,
             auditAction.actionList.LOGIN,
-            user,
             'success',
             'Đăng nhập thành công'
         );
@@ -112,7 +116,7 @@ const login = async (req, res) => {
 const logout = async (req, res) => {
     const { refreshToken } = req.body;
     if (!refreshToken) {
-        return Response.error(res, 'Refresh token is required', 400);
+        return Response.error(res, 'Token không hợp lệ', 400);
     }
 
     try {
@@ -124,16 +128,20 @@ const logout = async (req, res) => {
         const user = updatedUser;
 
         if (updatedUser.nModified === 0) {
-            return Response.error(res, 'Invalid or expired refresh token', 401);
+            return Response.error(
+                res,
+                'Token không hợp lệ hoặc đã hết hạn',
+                401
+            );
         }
 
         res.clearCookie('accessToken', { httpOnly: true, secure: true });
         res.clearCookie('refreshToken', { httpOnly: true, secure: true });
 
+        req.user = user;
         audit.prepareAudit(
             req,
             auditAction.actionList.LOGOUT,
-            user,
             'success',
             'Đăng xuất thành công'
         );
@@ -155,20 +163,14 @@ const refreshToken = async (req, res) => {
     const userId = req.user.sub;
 
     if (!refreshToken) {
-        return Response.unauthorized(
-            res,
-            'Access Denied. No refresh token provided.'
-        );
+        return Response.unauthorized(res, 'Từ chối truy cập.');
     }
 
     try {
         const user = await User.findById(userId).select('refreshToken');
-        if (!user) return Response.notFound(res, 'User not found');
+        if (!user) return Response.notFound(res, 'Không tìm thấy người dùng');
         if (user.refreshToken !== refreshToken) {
-            return Response.unauthorized(
-                res,
-                'Access Denied. Invalid refresh token.'
-            );
+            return Response.unauthorized(res, 'Từ chối truy cập.');
         }
 
         const decoded = jwt.verify(refreshToken, secretKey);
@@ -178,13 +180,9 @@ const refreshToken = async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        return Response.success(
-            res,
-            { accessToken },
-            'Token refreshed successfully'
-        );
+        return Response.success(res, { accessToken }, 'Lấy token thành công');
     } catch (error) {
-        return Response.error(res, 'Invalid refresh token', 400);
+        return Response.error(res, 'Token không hợp lệ', 400);
     }
 };
 
@@ -197,7 +195,7 @@ const getProfile = async (req, res) => {
         );
 
         if (!user) {
-            return Response.notFound(res, 'User not found');
+            return Response.notFound(res, 'Không tìm thấy người dùng');
         }
 
         return Response.success(
@@ -210,12 +208,12 @@ const getProfile = async (req, res) => {
                     role: user.role,
                 },
             },
-            'Profile retrieved successfully'
+            'Lấy thông tin hồ sơ thành công'
         );
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -230,7 +228,7 @@ const updateProfile = async (req, res) => {
 
         const user = await User.findById(userId);
         if (!user) {
-            return Response.notFound(res, 'User not found');
+            return Response.notFound(res, 'Không tìm thấy người dùng');
         }
 
         Object.assign(user, { name, group });
@@ -240,12 +238,12 @@ const updateProfile = async (req, res) => {
         return Response.success(
             res,
             { name, group },
-            'User updated successfully'
+            'Cập nhật người dùng thành công'
         );
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );
@@ -259,19 +257,19 @@ const updatePassword = async (req, res) => {
 
         const user = await User.findById(userId);
         if (!user) {
-            return Response.notFound(res, 'User not found');
+            return Response.notFound(res, 'Không tìm thấy người dùng');
         }
 
         // Verify current password
         const isMatch = await user.comparePassword(currentPassword);
         if (!isMatch) {
-            return Response.error(res, 'Current password is incorrect', 400);
+            return Response.error(res, 'Mật khẩu hiện tại không đúng', 400);
         }
 
         if (confirmPassword !== newPassword) {
             return Response.error(
                 res,
-                'New password and confirm password do not match',
+                'Mật khẩu mới và xác nhận mật khẩu không khớp',
                 400
             );
         }
@@ -280,7 +278,7 @@ const updatePassword = async (req, res) => {
         if (newPassword.length < 6) {
             return Response.error(
                 res,
-                'New password must be at least 8 characters long',
+                'Mật khẩu mới phải có ít nhất 8 ký tự',
                 400
             );
         }
@@ -288,11 +286,11 @@ const updatePassword = async (req, res) => {
         user.password = newPassword;
         await user.save();
 
-        return Response.success(res, null, 'Password updated successfully');
+        return Response.success(res, null, 'Cập nhật mật khẩu thành công');
     } catch (error) {
         return Response.error(
             res,
-            'Unexpected error occurred',
+            'Đã xảy ra lỗi không xác định',
             500,
             isDevelopment ? error.message : null
         );

@@ -7,12 +7,14 @@ const auditEvent = 'audit';
 // Lắng nghe và ghi log
 emitter.on(auditEvent, async function (auditData) {
     try {
+        console.log('-------auditData', auditData);
+        const userData = auditData.req.user;
         const auditDoc = new AuditTrail({
             action: auditData.auditAction,
             actor: {
-                id: auditData.user.id || auditData.user.sub,
-                name: auditData.user.name,
-                role: auditData.user.role,
+                id: userData.id || userData.sub,
+                name: userData.name,
+                role: userData.role,
             },
             context: {
                 method: auditData.req.method,
@@ -29,11 +31,10 @@ emitter.on(auditEvent, async function (auditData) {
     }
 });
 
-exports.prepareAudit = function (req, auditAction, user, status, details) {
+exports.prepareAudit = function (req, auditAction, status, details) {
     const auditObj = {
         req,
         auditAction,
-        user,
         status,
         details,
     };
