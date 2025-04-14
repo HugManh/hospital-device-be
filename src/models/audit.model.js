@@ -6,6 +6,7 @@ const AuditTrailSchema = new BaseSchema({
     actor: {
         id: { type: String, required: true },
         role: { type: String, required: true },
+        name: { type: String, required: true },
     },
     context: {
         method: { type: String, required: true },

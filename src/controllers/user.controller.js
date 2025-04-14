@@ -22,13 +22,13 @@ const createUser = async (req, res) => {
             req,
             auditAction.actionList.CREATE_USER,
             'success',
-            'User created successfully'
+            'Tạo người dùng thành công'
         );
 
         return Response.success(
             res,
             { name, group, password },
-            'User created successfully',
+            'Tạo người dùng thành công',
             201
         );
     } catch (error) {
@@ -45,7 +45,11 @@ const createUser = async (req, res) => {
 const getUsers = async (req, res) => {
     try {
         const users = await User.getAll();
-        return Response.success(res, users, 'Users retrieved successfully');
+        return Response.success(
+            res,
+            users,
+            'Lấy danh sách người dùng thành công'
+        );
     } catch (error) {
         return Response.error(
             res,
@@ -63,7 +67,11 @@ const getUserById = async (req, res) => {
         if (!user) {
             return Response.notFound(res, 'Không tìm thấy người dùng');
         }
-        return Response.success(res, user, 'User retrieved successfully');
+        return Response.success(
+            res,
+            user,
+            'Lấy thông tin người dùng thành công'
+        );
     } catch (error) {
         return Response.error(
             res,
@@ -128,10 +136,10 @@ const deleteUser = async (req, res) => {
             req,
             auditAction.actionList.DELETE_USER,
             'success',
-            'User deleted successfully'
+            'Đã xoá người dùng thành công'
         );
 
-        return Response.success(res, null, 'User deleted successfully');
+        return Response.success(res, null, 'Đã xoá người dùng thành công');
     } catch (error) {
         return Response.error(
             res,
@@ -160,13 +168,13 @@ const resetPassword = async (req, res) => {
             req,
             auditAction.actionList.RESET_PASSWORD,
             'success',
-            'Password reset successfully'
+            'Đã tạo mới mật khẩu thành công'
         );
 
         return Response.success(
             res,
             { password },
-            'Password reset successfully'
+            'Đã tạo mới mật khẩu thành công'
         );
     } catch (error) {
         return Response.error(

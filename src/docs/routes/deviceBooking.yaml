@@ -116,7 +116,7 @@
             - bearerAuth: []
         responses:
             '200':
-                description: Bookings retrieved successfully
+                description: Lấy danh sách đơn đăng ký thành công
                 content:
                     application/json:
                         schema:

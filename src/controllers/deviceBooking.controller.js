@@ -53,7 +53,7 @@ const createDeviceBooking = async (req, res) => {
         if (existingBooking && priority !== PRIORITY_STATUS.PRIORITY) {
             return Response.error(
                 res,
-                'This time slot is already booked for this device',
+                'Khung giờ này đã được đăng ký cho thiết bị này',
                 400
             );
         }
@@ -78,13 +78,13 @@ const createDeviceBooking = async (req, res) => {
             req,
             auditAction.actionList.CREATE_DEVICE_BOOKING,
             'success',
-            'Device booking created successfully'
+            'Tạo đơn đăng ký thiết bị thành công'
         );
 
         return Response.success(
             res,
             { booking },
-            'Device booking created successfully',
+            'Tạo đơn đăng ký thiết bị thành công',
             201
         );
     } catch (error) {
@@ -114,7 +114,7 @@ const getDeviceBookings = async (req, res) => {
             res,
             bookings.data,
             bookings.meta,
-            'Bookings retrieved successfully'
+            'Lấy danh sách đơn đăng ký thành công'
         );
     } catch (error) {
         return Response.error(
@@ -131,9 +131,13 @@ const getDeviceBookingById = async (req, res) => {
         const { bookingID } = req.params;
         const booking = await DeviceBooking.findById(bookingID);
         if (!booking) {
-            return Response.notFound(res, 'Booking not found');
+            return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
         }
-        return Response.success(res, booking, 'Booking retrieved successfully');
+        return Response.success(
+            res,
+            booking,
+            'Lấy thông tin đơn đăng ký thành công'
+        );
     } catch (error) {
         return Response.error(
             res,
@@ -165,7 +169,8 @@ const updateBooking = async (req, res) => {
         } = req.body;
 
         const booking = await DeviceBooking.findById(bookingID);
-        if (!booking) return Response.notFound(res, 'Booking not found');
+        if (!booking)
+            return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
         if (user.role === ROLES.USER) {
             booking.editRequest = null;
         }
@@ -187,14 +192,10 @@ const updateBooking = async (req, res) => {
             req,
             auditAction.actionList.UPDATE_DEVICE_BOOKING,
             'success',
-            'Booking processed successfully'
+            'Đã xử lý đơn đăng ký'
         );
 
-        return Response.success(
-            res,
-            { booking },
-            'Booking processed successfully'
-        );
+        return Response.success(res, { booking }, 'Đã xử lý đơn đăng ký');
     } catch (error) {
         return Response.error(
             res,
@@ -235,7 +236,7 @@ const getDeviceInfo = async (req, res) => {
         return Response.success(
             res,
             { device, bookings },
-            'Device information retrieved successfully'
+            'Lấy danh sách đơn của thiết bị thành công'
         );
     } catch (error) {
         return Response.error(
@@ -259,7 +260,7 @@ const getUserBookings = async (req, res) => {
         return Response.success(
             res,
             bookings,
-            'User bookings retrieved successfully'
+            'Lấy lịch sử đăng ký của người dùng thành công'
         );
     } catch (error) {
         return Response.error(
@@ -280,7 +281,7 @@ const requestBookingEdit = async (req, res) => {
 
         const booking = await DeviceBooking.findById(bookingId);
         if (!booking) {
-            return Response.notFound(res, 'Booking not found');
+            return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
         }
 
         // Kiểm tra xem người dùng có phải là người tạo đơn không
@@ -340,7 +341,7 @@ const processEditRequest = async (req, res) => {
 
         const booking = await DeviceBooking.findById(bookingId);
         if (!booking) {
-            return Response.notFound(res, 'Booking not found');
+            return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
         }
 
         if (!booking.editRequest) {
