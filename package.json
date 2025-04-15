@@ -6,6 +6,7 @@
     "scripts": {
         "start": "node src/index.js",
         "dev": "nodemon src/index.js",
+        "docs": "node src/scripts/generate-docs.js",
         "test": "mocha src/tests --exit",
         "lint": "eslint .",
         "format": "prettier --write ."
@@ -36,6 +37,7 @@
     },
     "devDependencies": {
         "eslint": "^8.57.0",
+        "fs-extra": "^11.3.0",
         "nodemon": "^3.1.0",
         "prettier": "^3.2.5"
     }
