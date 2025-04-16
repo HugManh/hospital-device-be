@@ -40,12 +40,6 @@ UserSchema.methods.comparePassword = async function (plainPassword) {
     return bcrypt.compare(plainPassword, this.password);
 };
 
-UserSchema.statics.getAll = function () {
-    return this.find()
-        .select('-password -refreshToken')
-        .sort({ createdAt: -1 });
-};
-
 // Tạo model từ schema
 const User = mongoose.model('User', UserSchema);
 

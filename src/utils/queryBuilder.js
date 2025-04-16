@@ -57,14 +57,12 @@ class QueryBuilder {
         return this;
     }
 
-    // select() {
-    //     const { fields } = this.queryParams;
-    //     if (fields) {
-    //         const fieldsArray = fields.split(',').map((field) => field.trim());
-    //         this.query = this.query.select(fieldsArray);
-    //     }
-    //     return this;
-    // }
+    select(fields) {
+        if (fields) {
+            this.query = this.query.select(fields);
+        }
+        return this;
+    }
 
     populate(fields) {
         if (fields) {

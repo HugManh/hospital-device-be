@@ -45,7 +45,6 @@ const addDevice = async (req, res) => {
 const getDevices = async (req, res) => {
     try {
         const devices = await new QueryBuilder(Device, req.query)
-            .filter()
             .sort()
             .paginate()
             .exec();

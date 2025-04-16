@@ -4,6 +4,7 @@ const { generatePassword } = require('../utils/crypto');
 const Response = require('../utils/response');
 const audit = require('../services/audit.service');
 const auditAction = require('../services/auditAction');
+const QueryBuilder = require('../utils/queryBuilder');
 
 // Tạo mới user
 const createUser = async (req, res) => {
@@ -44,7 +45,11 @@ const createUser = async (req, res) => {
 // Lấy danh sách user
 const getUsers = async (req, res) => {
     try {
-        const users = await User.getAll();
+        const users = await new QueryBuilder(User, req.query)
+            .sort()
+            .select('-password -refreshToken')
+            .paginate()
+            .exec();
         return Response.success(
             res,
             users,
