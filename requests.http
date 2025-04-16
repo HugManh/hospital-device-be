@@ -1,0 +1,131 @@
+### Get all audits
+GET http://localhost:8000/api/audits
+Accept: application/json
+
+
+### Đăng ký tài khoản
+POST http://localhost:8000/api/auth/register
+Accept: application/json
+
+
+### Đăng nhập
+POST http://localhost:8000/api/auth/login
+Accept: application/json
+
+
+### Đăng xuất
+GET http://localhost:8000/api/auth/logout
+Accept: application/json
+
+
+### Làm mới token
+GET http://localhost:8000/api/auth/refresh-token
+Accept: application/json
+
+
+### Lấy thông tin cá nhân
+GET http://localhost:8000/api/auth/profile
+Accept: application/json
+
+
+### Cập nhật thông tin cá nhân
+PUT http://localhost:8000/api/auth/update-profile
+Accept: application/json
+
+
+### Create a new device
+POST http://localhost:8000/api/devices
+Accept: application/json
+
+
+### Get all devices
+GET http://localhost:8000/api/devices
+Accept: application/json
+
+
+### Get device by ID
+GET http://localhost:8000/api/devices/{{id}}
+Accept: application/json
+
+
+### Update device
+PUT http://localhost:8000/api/devices/{{id}}
+Accept: application/json
+
+
+### Delete device
+DELETE http://localhost:8000/api/devices/{{id}}
+Accept: application/json
+
+
+### Tạo yêu cầu đăng ký thiết bị
+POST http://localhost:8000/api/device-booking
+Accept: application/json
+
+
+### Lấy danh sách đơn đăng ký thiết bị
+GET http://localhost:8000/api/device-booking
+Accept: application/json
+
+
+### Lấy thông tin chi tiết đơn đăng ký thiết bị
+GET http://localhost:8000/api/device-booking/{{bookingID}}
+Accept: application/json
+
+
+### Duyệt yêu cầu đăng ký thiết bị
+PUT http://localhost:8000/api/device-booking/{{bookingID}}
+Accept: application/json
+
+
+### Danh sách các đơn đăng ký của thiết bị
+GET http://localhost:8000/api/device-booking/devices/{{deviceId}}
+Accept: application/json
+usageDay=<value>
+
+
+### Lịch sử đăng ký thiết bị của người dùng
+GET http://localhost:8000/api/device-booking/users/{{userId}}
+Accept: application/json
+
+
+### Yêu cầu chỉnh sửa đơn đăng ký thiết bị
+POST http://localhost:8000/api/device-booking/{{bookingId}}/edit-request
+Accept: application/json
+
+
+### Xử lý yêu cầu chỉnh sửa đơn đăng ký thiết bị
+PUT http://localhost:8000/api/device-booking/{{bookingId}}/edit-request
+Accept: application/json
+
+
+### Tạo mới người dùng
+POST http://localhost:8000/api/users
+Accept: application/json
+
+
+### Lấy danh sách người dùng
+GET http://localhost:8000/api/users
+Accept: application/json
+
+
+### Lấy thông tin người dùng theo ID
+GET http://localhost:8000/api/users/{{id}}
+Accept: application/json
+
+
+### Cập nhật thông tin người dùng
+PUT http://localhost:8000/api/users/{{id}}
+Accept: application/json
+
+
+### Xóa người dùng
+DELETE http://localhost:8000/api/users/{{id}}
+Accept: application/json
+
+
+### Đặt lại mật khẩu người dùng
+POST http://localhost:8000/api/users/{{id}}/reset-password
+Accept: application/json
+
+
