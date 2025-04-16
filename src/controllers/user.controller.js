@@ -52,7 +52,8 @@ const getUsers = async (req, res) => {
             .exec();
         return Response.success(
             res,
-            users,
+            users.data,
+            users.meta,
             'Lấy danh sách người dùng thành công'
         );
     } catch (error) {
