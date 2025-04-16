@@ -46,6 +46,7 @@ const createUser = async (req, res) => {
 const getUsers = async (req, res) => {
     try {
         const users = await new QueryBuilder(User, req.query)
+            .filter()
             .sort()
             .select('-password -refreshToken')
             .paginate()

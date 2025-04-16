@@ -101,6 +101,7 @@ const createDeviceBooking = async (req, res) => {
 const getDeviceBookings = async (req, res) => {
     try {
         const bookings = await new QueryBuilder(DeviceBooking, req.query)
+            .filter()
             .sort()
             .populate([
                 { path: 'deviceId', select: 'name location' },

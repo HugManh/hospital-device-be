@@ -26,7 +26,18 @@ class QueryBuilder {
                 /\b(gte|gt|lte|lt|in|ne|eq|nin|regex)\b/g,
                 (match) => `$${match}`
             );
-            this.query = this.query.find(JSON.parse(queryStr));
+            const parsedQuery = JSON.parse(queryStr, (key, value) => {
+                if (!isNaN(value)) return Number(value); // number
+                if (
+                    typeof value === 'string' &&
+                    value.startsWith('/') &&
+                    value.endsWith('/')
+                ) {
+                    return new RegExp(value.slice(1, -1)); // regex
+                }
+                return value;
+            });
+            this.query = this.query.find(parsedQuery);
         }
         return this;
     }
