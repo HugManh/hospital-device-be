@@ -21,8 +21,8 @@ emitter.on(auditEvent, async function (auditData) {
                 location: auditData.req.ip,
                 userAgent: auditData.req.headers['user-agent'],
             },
-            status: auditData.status,
-            details: auditData.details,
+            message: auditData.message,
+            detail: auditData.detail,
         });
         await auditDoc.save();
     } catch (error) {
@@ -30,12 +30,12 @@ emitter.on(auditEvent, async function (auditData) {
     }
 });
 
-exports.prepareAudit = function (req, auditAction, status, details) {
+exports.prepareAudit = function (req, auditAction, message, detail = {}) {
     const auditObj = {
         req,
         auditAction,
-        status,
-        details,
+        message,
+        detail,
     };
 
     emitter.emit(auditEvent, auditObj);

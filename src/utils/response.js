@@ -61,6 +61,20 @@ class Response {
     }
 
     /**
+     * Bad request response (400)
+     * @param {Object} res - Express response object
+     * @param {string} message - Error message
+     * @param {*} errors - Optional details
+     */
+    static badRequest(res, message = 'Bad request', errors = null) {
+        return res.status(400).json({
+            success: false,
+            message,
+            errors,
+        });
+    }
+
+    /**
      * Not found response
      * @param {Object} res - Express response object
      * @param {string} message - Not found message

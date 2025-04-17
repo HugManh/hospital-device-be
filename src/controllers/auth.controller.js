@@ -57,7 +57,7 @@ const login = async (req, res) => {
         // Tạo access token
         const accessToken = jwt.sign(
             {
-                sub: user._id,
+                sub: user.id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
@@ -69,7 +69,7 @@ const login = async (req, res) => {
         // Tạo refresh token
         const refreshToken = jwt.sign(
             {
-                sub: user._id,
+                sub: user.id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
@@ -85,8 +85,14 @@ const login = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.LOGIN,
-            'success',
-            'Đăng nhập thành công'
+            'Đăng nhập thành công',
+            {
+                id: user.id,
+                name: user.name,
+                role: user.role,
+                email: user.email,
+                group: user.group,
+            }
         );
 
         return Response.success(
@@ -142,7 +148,6 @@ const logout = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.LOGOUT,
-            'success',
             'Đăng xuất thành công'
         );
 

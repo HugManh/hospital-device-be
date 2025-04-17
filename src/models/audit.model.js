@@ -14,8 +14,8 @@ const AuditTrailSchema = new BaseSchema({
         location: { type: String },
         userAgent: { type: String },
     },
-    status: { type: String, required: true },
-    details: { type: String },
+    message: { type: String },
+    detail: { type: Object },
 });
 
 AuditTrailSchema.index({ 'actor.id': 1 });

@@ -4,6 +4,7 @@ const Response = require('../utils/response');
 const audit = require('../services/audit.service');
 const auditAction = require('../services/auditAction');
 const QueryBuilder = require('../utils/queryBuilder');
+const { diffObjects } = require('../utils/diffs');
 
 // Tạo mới device
 const addDevice = async (req, res) => {
@@ -21,8 +22,10 @@ const addDevice = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE,
-            'success',
-            'Thêm thiết bị thành công'
+            'Thêm thiết bị thành công',
+            {
+                device,
+            }
         );
 
         return Response.success(
@@ -88,29 +91,73 @@ const getDeviceById = async (req, res) => {
     }
 };
 
-// Cập nhật device
+/**
+ * Updates a device.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<Object>} Response with updated device or error
+ */
 const updateDevice = async (req, res) => {
     try {
         const { name, location } = req.body;
-        const device = await Device.findByIdAndUpdate(
-            req.params.id,
-            { name, location },
-            { new: true }
-        );
+        // Validate input
+        if (!name && !location) {
+            return Response.validationError(
+                res,
+                'Phải có ít nhất một trường để cập nhật'
+            );
+        }
+
+        const device = await Device.findById(req.params.id);
         if (!device) {
             return Response.notFound(res, 'Không tìm thấy thiết bị');
         }
 
+        // Giữ lại bản gốc để audit
+        const oldData = {
+            name: device.name,
+            location: device.location,
+        };
+
+        // Kiểm tra có gì thay đổi không
+        const updates = {};
+        if (name !== undefined && name !== oldData.name) updates.name = name;
+        if (location !== undefined && location !== oldData.location)
+            updates.location = location;
+
+        if (Object.keys(updates).length === 0) {
+            return Response.success(
+                res,
+                { device },
+                'Không có thay đổi nào được thực hiện'
+            );
+        }
+
+        // Update device
+        const updatedDevice = await Device.findOneAndUpdate(
+            { _id: req.params.id },
+            { $set: updates },
+            { new: true, runValidators: true }
+        );
+
+        // Prepare audit log
+        const changes = diffObjects(oldData, updatedDevice, [
+            'name',
+            'location',
+        ]);
         audit.prepareAudit(
             req,
             auditAction.actionList.UPDATE_DEVICE,
-            'success',
-            'Cập nhật thông tin thiết bị thành công'
+            'Cập nhật thông tin thiết bị',
+            {
+                deviceId: req.params.id,
+                changes,
+            }
         );
 
         return Response.success(
             res,
-            { device },
+            { device: updatedDevice },
             'Cập nhật thông tin thiết bị thành công'
         );
     } catch (error) {
@@ -123,7 +170,12 @@ const updateDevice = async (req, res) => {
     }
 };
 
-// Xóa device
+/**
+ * Deletes a device.
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<Object>} Response with success or error
+ */
 const deleteDevice = async (req, res) => {
     try {
         const device = await Device.findByIdAndDelete(req.params.id);
@@ -131,11 +183,18 @@ const deleteDevice = async (req, res) => {
             return Response.notFound(res, 'Không tìm thấy thiết bị');
         }
 
+        // Prepare audit log with device details
+        const auditData = {
+            id: device.id,
+            name: device.name,
+            location: device.location,
+        };
+
         audit.prepareAudit(
             req,
             auditAction.actionList.DELETE_DEVICE,
-            'success',
-            'Xóa thiết bị thành công'
+            'Xóa thiết bị thành công',
+            auditData
         );
 
         return Response.success(res, null, 'Xóa thiết bị thành công');

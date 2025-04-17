@@ -77,7 +77,6 @@ const createDeviceBooking = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE_BOOKING,
-            'success',
             'Tạo đơn đăng ký thiết bị thành công'
         );
 
@@ -191,7 +190,6 @@ const updateBooking = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.UPDATE_DEVICE_BOOKING,
-            'success',
             'Đã xử lý đơn đăng ký'
         );
 
@@ -313,7 +311,6 @@ const requestBookingEdit = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.REQUEST_BOOKING_EDIT,
-            'success',
             'Edit request submitted successfully'
         );
 
@@ -367,8 +364,7 @@ const processEditRequest = async (req, res) => {
 
         audit.prepareAudit(
             req,
-            auditAction.actionList.PROCESS_EDIT_REQUEST,
-            'success',
+            auditAction.actionList.PROCESS_EDIT_REQUEST,         
             'Edit request processed successfully'
         );
 

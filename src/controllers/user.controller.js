@@ -22,8 +22,14 @@ const createUser = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.CREATE_USER,
-            'success',
-            'Tạo người dùng thành công'
+            'Tạo người dùng thành công',
+            {
+                id: user.id,
+                name,
+                role: user.role,
+                email,
+                group,
+            }
         );
 
         return Response.success(
@@ -111,7 +117,6 @@ const updateUser = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.UPDATE_USER,
-            'success',
             'Cập nhật người dùng thành công'
         );
 
@@ -142,7 +147,6 @@ const deleteUser = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.DELETE_USER,
-            'success',
             'Đã xoá người dùng thành công'
         );
 
@@ -174,7 +178,6 @@ const resetPassword = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.RESET_PASSWORD,
-            'success',
             'Đã tạo mới mật khẩu thành công'
         );
 
