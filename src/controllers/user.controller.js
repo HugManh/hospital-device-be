@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const { isDevelopment } = require('../config/constants');
 const User = require('../models/user.model');
 const { generatePassword } = require('../utils/crypto');
@@ -5,6 +6,7 @@ const Response = require('../utils/response');
 const audit = require('../services/audit.service');
 const auditAction = require('../services/auditAction');
 const QueryBuilder = require('../utils/queryBuilder');
+const { diffObjects } = require('../utils/diffs');
 
 // Tạo mới user
 const createUser = async (req, res) => {
@@ -106,24 +108,55 @@ const updateUser = async (req, res) => {
             return Response.notFound(res, 'Không tìm thấy người dùng');
         }
 
-        user.name = name;
-        user.email = email;
-        user.group = group;
-        user.role = role;
-        user.isActive = isActive;
+        const oldData = {
+            name: user.name,
+            email: user.email,
+            group: user.group,
+            role: user.role,
+            isActive: user.isActive,
+        };
 
-        await user.save();
-
-        audit.prepareAudit(
-            req,
-            auditAction.actionList.UPDATE_USER,
-            'Cập nhật người dùng thành công'
+        const updates = _.pickBy(
+            { name, email, group, role, isActive },
+            (value) => !_.isUndefined(value) || !_.isEmpty(value)
         );
+
+        const updatedUser = await User.findOneAndUpdate(
+            { _id: id },
+            { $set: updates },
+            { new: true, runValidators: true }
+        );
+
+        // Ghi audit log
+        const changes = diffObjects(oldData, updates, [
+            'name',
+            'email',
+            'group',
+            'role',
+            'isActive',
+        ]);
+        if (Object.keys(changes).length > 0) {
+            audit.prepareAudit(
+                req,
+                auditAction.actionList.UPDATE_USER,
+                'Cập nhật thông tin người dùng thành công',
+                {
+                    userId: id,
+                    changes,
+                }
+            );
+        }
 
         return Response.success(
             res,
-            { name, email, group, role, isActive },
-            'Cập nhật người dùng thành công'
+            {
+                name: updatedUser.name,
+                email: updatedUser.email,
+                group: updatedUser.group,
+                role: updatedUser.role,
+                isActive: updatedUser.isActive,
+            },
+            'Cập nhật thông tin người dùng thành công'
         );
     } catch (error) {
         return Response.error(
@@ -147,7 +180,14 @@ const deleteUser = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.DELETE_USER,
-            'Đã xoá người dùng thành công'
+            'Đã xoá người dùng thành công',
+            {
+                id: user.id,
+                name: user.name,
+                role: user.role,
+                email: user.email,
+                group: user.group,
+            }
         );
 
         return Response.success(res, null, 'Đã xoá người dùng thành công');
@@ -178,7 +218,14 @@ const resetPassword = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.RESET_PASSWORD,
-            'Đã tạo mới mật khẩu thành công'
+            'Đã tạo mới mật khẩu thành công',
+            {
+                id: user.id,
+                name: user.name,
+                role: user.role,
+                email: user.email,
+                group: user.group,
+            }
         );
 
         return Response.success(

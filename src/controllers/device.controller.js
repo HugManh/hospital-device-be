@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const { isDevelopment } = require('../config/constants');
 const Device = require('../models/device.model');
 const Response = require('../utils/response');
@@ -99,8 +100,9 @@ const getDeviceById = async (req, res) => {
  */
 const updateDevice = async (req, res) => {
     try {
+        const { id } = req.params;
         const { name, location } = req.body;
-        // Validate input
+
         if (!name && !location) {
             return Response.validationError(
                 res,
@@ -108,52 +110,42 @@ const updateDevice = async (req, res) => {
             );
         }
 
-        const device = await Device.findById(req.params.id);
+        const device = await Device.findById(id);
         if (!device) {
             return Response.notFound(res, 'Không tìm thấy thiết bị');
         }
 
-        // Giữ lại bản gốc để audit
         const oldData = {
             name: device.name,
             location: device.location,
         };
 
-        // Kiểm tra có gì thay đổi không
-        const updates = {};
-        if (name !== undefined && name !== oldData.name) updates.name = name;
-        if (location !== undefined && location !== oldData.location)
-            updates.location = location;
+        const updates = _.pickBy(
+            { name, location },
+            (value) => !_.isUndefined(value) || !_.isEmpty(value)
+        );
 
-        if (Object.keys(updates).length === 0) {
-            return Response.success(
-                res,
-                { device },
-                'Không có thay đổi nào được thực hiện'
-            );
-        }
-
-        // Update device
         const updatedDevice = await Device.findOneAndUpdate(
-            { _id: req.params.id },
+            { _id: id },
             { $set: updates },
             { new: true, runValidators: true }
         );
 
-        // Prepare audit log
         const changes = diffObjects(oldData, updatedDevice, [
             'name',
             'location',
         ]);
-        audit.prepareAudit(
-            req,
-            auditAction.actionList.UPDATE_DEVICE,
-            'Cập nhật thông tin thiết bị',
-            {
-                deviceId: req.params.id,
-                changes,
-            }
-        );
+        if (Object.keys(changes).length > 0) {
+            audit.prepareAudit(
+                req,
+                auditAction.actionList.UPDATE_DEVICE,
+                'Cập nhật thông tin thiết bị',
+                {
+                    deviceId: req.params.id,
+                    changes,
+                }
+            );
+        }
 
         return Response.success(
             res,
