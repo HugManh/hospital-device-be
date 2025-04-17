@@ -5,8 +5,8 @@ const {
     getDeviceBookings,
     getDeviceBookingById,
     updateBooking,
-    getDeviceInfo,
-    getUserBookings,
+    listDeviceBookings,
+    listUserBookings,
     requestBookingEdit,
     processEditRequest,
 } = require('../../controllers/deviceBooking.controller');
@@ -36,12 +36,12 @@ router.put(
 router.get(
     '/devices/:deviceId',
     authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
-    getDeviceInfo
+    listDeviceBookings
 );
 router.get(
     '/users/:userId',
     authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
-    getUserBookings
+    listUserBookings
 );
 router.post(
     '/:bookingId/edit-request',

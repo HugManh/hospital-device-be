@@ -81,6 +81,31 @@ const DeviceBookingSchema = new BaseSchema({
     },
 });
 
+// DeviceBookingSchema.set('toJSON', {
+//     virtuals: true,
+//     transform: (doc, ret) => {
+//         ret.id = ret._id;
+//         delete ret._id;
+//         delete ret.__v;
+
+//         if (ret.deviceId) {
+//             ret.device = {
+//                 ...ret.deviceId,
+//                 id: ret.deviceId.id,
+//             };
+//             delete ret.deviceId;
+//         }
+//         if (ret.userId) {
+//             ret.user = {
+//                 ...ret.userId,
+//                 id: ret.userId.id,
+//             };
+//             delete ret.userId;
+//         }
+//         return ret;
+//     },
+// });
+
 // Tạo model từ schema
 const DeviceBooking = mongoose.model('DeviceBooking', DeviceBookingSchema);
 

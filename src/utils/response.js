@@ -6,6 +6,7 @@ class Response {
      * Success response
      * @param {Object} res - Express response object
      * @param {*} data - Response data
+     * @param {*} meta - Response metadata
      * @param {string} message - Success message
      * @param {number} statusCode - HTTP status code
      */

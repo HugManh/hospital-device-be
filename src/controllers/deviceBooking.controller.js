@@ -146,6 +146,7 @@ const getDeviceBookingById = async (req, res) => {
         );
     }
 };
+
 // Duyệt yêu cầu đăng ký thiết bị
 const updateBooking = async (req, res) => {
     try {
@@ -205,35 +206,30 @@ const updateBooking = async (req, res) => {
 };
 
 // Danh sách các đơn đăng ký của thiết bị
-const getDeviceInfo = async (req, res) => {
+const listDeviceBookings = async (req, res) => {
     try {
         const { deviceId } = req.params;
-        const { usageDay } = req.query;
+        const queryParams = {
+            ...req.query,
+            deviceId,
+        };
 
-        const device = await Device.findById(deviceId);
-        if (!device) {
-            return Response.notFound(res, 'Không tìm thấy thiết bị');
-        }
+        const bookings = await new QueryBuilder(DeviceBooking, queryParams)
+            .filter()
+            .populate([
+                { path: 'deviceId', select: 'name location' },
+                { path: 'userId', select: 'name email group' },
+            ])
+            .sort()
+            .paginate()
+            .exec();
 
-        const filter = { deviceId };
-
-        if (usageDay) {
-            const date = new Date(usageDay);
-            filter.usageDay = {
-                $gte: new Date(date.setHours(0, 0, 0, 0)), // Bắt đầu ngày
-                $lt: new Date(date.setHours(23, 59, 59, 999)), // Kết thúc ngày
-            };
-        }
-
-        // Lấy lịch sử đăng ký của thiết bị
-        const bookings = await DeviceBooking.find(filter)
-            .populate('deviceId', 'name location')
-            .populate('userId', 'name email group')
-            .sort({ createdAt: -1 });
+        const { data, meta } = bookings;
 
         return Response.success(
             res,
-            { device, bookings },
+            data,
+            meta,
             'Lấy danh sách đơn của thiết bị thành công'
         );
     } catch (error) {
@@ -247,17 +243,30 @@ const getDeviceInfo = async (req, res) => {
 };
 
 // Lịch sử đăng ký thiết bị của người dùng
-const getUserBookings = async (req, res) => {
+const listUserBookings = async (req, res) => {
     try {
         const { userId } = req.params;
-        const bookings = await DeviceBooking.find({ userId })
-            .populate('deviceId', 'name location')
-            .populate('userId', 'name email group')
-            .sort({ createdAt: -1 });
+        const queryParams = {
+            ...req.query,
+            userId,
+        };
+
+        const bookings = await new QueryBuilder(DeviceBooking, queryParams)
+            .filter()
+            .populate([
+                { path: 'deviceId', select: 'name location' },
+                { path: 'userId', select: 'name email group' },
+            ])
+            .sort()
+            .paginate()
+            .exec();
+
+        const { data, meta } = bookings;
 
         return Response.success(
             res,
-            bookings,
+            data,
+            meta,
             'Lấy lịch sử đăng ký của người dùng thành công'
         );
     } catch (error) {
@@ -364,7 +373,7 @@ const processEditRequest = async (req, res) => {
 
         audit.prepareAudit(
             req,
-            auditAction.actionList.PROCESS_EDIT_REQUEST,         
+            auditAction.actionList.PROCESS_EDIT_REQUEST,
             'Edit request processed successfully'
         );
 
@@ -388,8 +397,8 @@ module.exports = {
     getDeviceBookings,
     getDeviceBookingById,
     updateBooking,
-    getDeviceInfo,
-    getUserBookings,
+    listDeviceBookings,
+    listUserBookings,
     requestBookingEdit,
     processEditRequest,
 };
