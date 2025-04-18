@@ -5,9 +5,13 @@ const {
     authenticate,
 } = require('../../middleware/auth.middleware');
 const { ROLES } = require('../../config/constants');
-const { getAudit } = require('../../controllers/audit.controller');
+const {
+    getAudit,
+    getAuditById,
+} = require('../../controllers/audit.controller');
 
 router.use(authenticate);
-router.use('/', authorizeRoles([ROLES.ADMIN]), getAudit);
+router.get('/', authorizeRoles([ROLES.ADMIN]), getAudit);
+router.get('/:id', authorizeRoles([ROLES.ADMIN]), getAuditById);
 
 module.exports = router;
