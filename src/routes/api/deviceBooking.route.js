@@ -24,12 +24,12 @@ router.get(
     getDeviceBookings
 );
 router.get(
-    '/:bookingID',
+    '/:bookingId',
     authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
     getDeviceBookingById
 );
 router.put(
-    '/:bookingID',
+    '/:bookingId',
     authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
     updateBooking
 );

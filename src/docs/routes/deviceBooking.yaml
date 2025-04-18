@@ -187,7 +187,7 @@
             '500':
                 description: Đã xảy ra lỗi không xác định
 
-/api/device-booking/{bookingID}:
+/api/device-booking/{bookingId}:
     get:
         tags:
             - Quản Lý Đặt Thiết Bị
@@ -196,7 +196,7 @@
             - bearerAuth: []
         parameters:
             - in: path
-              name: bookingID
+              name: bookingId
               required: true
               schema:
                   type: string
@@ -261,7 +261,7 @@
             - bearerAuth: []
         parameters:
             - in: path
-              name: bookingID
+              name: bookingId
               required: true
               schema:
                   type: string

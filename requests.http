@@ -69,12 +69,12 @@ Accept: application/json
 
 
 ### Lấy thông tin chi tiết đơn đăng ký thiết bị
-GET http://localhost:8000/api/device-booking/{{bookingID}}
+GET http://localhost:8000/api/device-booking/{{bookingId}}
 Accept: application/json
 
 
 ### Duyệt yêu cầu đăng ký thiết bị
-PUT http://localhost:8000/api/device-booking/{{bookingID}}
+PUT http://localhost:8000/api/device-booking/{{bookingId}}
 Accept: application/json
 
 

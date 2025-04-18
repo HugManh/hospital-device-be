@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const Device = require('../models/device.model');
 const User = require('../models/user.model');
 const DeviceBooking = require('../models/deviceBooking.model');
@@ -12,6 +13,7 @@ const {
 const audit = require('../services/audit.service');
 const auditAction = require('../services/auditAction');
 const QueryBuilder = require('../utils/queryBuilder');
+const { diffObjects } = require('../utils/diffs');
 
 // Tạo yêu cầu đăng ký thiết bị
 const createDeviceBooking = async (req, res) => {
@@ -77,7 +79,10 @@ const createDeviceBooking = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE_BOOKING,
-            'Tạo đơn đăng ký thiết bị thành công'
+            'Tạo đơn đăng ký thiết bị thành công',
+            {
+                booking,
+            }
         );
 
         return Response.success(
@@ -127,8 +132,8 @@ const getDeviceBookings = async (req, res) => {
 
 const getDeviceBookingById = async (req, res) => {
     try {
-        const { bookingID } = req.params;
-        const booking = await DeviceBooking.findById(bookingID);
+        const { bookingId } = req.params;
+        const booking = await DeviceBooking.findById(bookingId);
         if (!booking) {
             return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
         }
@@ -150,14 +155,8 @@ const getDeviceBookingById = async (req, res) => {
 // Duyệt yêu cầu đăng ký thiết bị
 const updateBooking = async (req, res) => {
     try {
-        const { bookingID } = req.params;
-        const userId = req.user.sub;
-
-        const user = await User.findById(userId).select(
-            '-password -refreshToken'
-        );
-        if (!user) return Response.notFound(res, 'Không tìm thấy người dùng');
-
+        const { bookingId } = req.params;
+        const userId = req.user?.sub;
         const {
             deviceId,
             codeBA,
@@ -168,31 +167,63 @@ const updateBooking = async (req, res) => {
             status,
         } = req.body;
 
-        const booking = await DeviceBooking.findById(bookingID);
-        if (!booking)
+        const user = await User.findById(userId);
+        if (!user) return Response.notFound(res, 'Không tìm thấy người dùng');
+
+        const booking = await DeviceBooking.findById(bookingId);
+        if (!booking) {
             return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
-        if (user.role === ROLES.USER) {
-            booking.editRequest = null;
         }
 
-        Object.assign(booking, {
-            deviceId,
-            codeBA,
-            nameBA,
-            usageTime,
-            usageDay,
-            priority,
-            status: status || REGISTER_STATUS.PENDING,
-        });
+        const oldData = {
+            deviceId: booking.deviceId,
+            codeBA: booking.codeBA,
+            nameBA: booking.nameBA,
+            usageTime: booking.usageTime,
+            usageDay: booking.usageDay,
+            priority: booking.priority,
+            status: booking.status,
+            editRequest: booking.editRequest,
+        };
 
-        // Lưu các thay đổi vào database
+        const updates = _.pickBy(
+            {
+                deviceId,
+                codeBA,
+                nameBA,
+                usageTime,
+                usageDay,
+                priority,
+                status: status || REGISTER_STATUS.PENDING,
+                ...(user.role === ROLES.USER ? { editRequest: null } : {}),
+            },
+            (value) => !_.isUndefined(value) && !_.isNull(value)
+        );
+        Object.assign(booking, updates);
         await booking.save();
 
-        audit.prepareAudit(
-            req,
-            auditAction.actionList.UPDATE_DEVICE_BOOKING,
-            'Đã xử lý đơn đăng ký'
-        );
+        const changes = diffObjects(oldData, updates, [
+            'deviceId',
+            'codeBA',
+            'nameBA',
+            'usageTime',
+            'usageDay',
+            'priority',
+            'status',
+            'editRequest',
+        ]);
+        if (Object.keys(changes).length > 0) {
+            audit.prepareAudit(
+                req,
+                auditAction.actionList.UPDATE_DEVICE_BOOKING,
+                'Đã xử lý đơn đăng ký',
+                {
+                    bookingId,
+                    userId,
+                    changes,
+                }
+            );
+        }
 
         return Response.success(res, { booking }, 'Đã xử lý đơn đăng ký');
     } catch (error) {
@@ -320,7 +351,10 @@ const requestBookingEdit = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.REQUEST_BOOKING_EDIT,
-            'Edit request submitted successfully'
+            'Edit request submitted successfully',
+            {
+                ...booking.editRequest,
+            }
         );
 
         return Response.success(
@@ -374,7 +408,10 @@ const processEditRequest = async (req, res) => {
         audit.prepareAudit(
             req,
             auditAction.actionList.PROCESS_EDIT_REQUEST,
-            'Edit request processed successfully'
+            'Edit request processed successfully',
+            {
+                ...booking.editRequest,
+            }
         );
 
         return Response.success(
