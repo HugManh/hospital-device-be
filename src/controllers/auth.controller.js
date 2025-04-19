@@ -185,7 +185,7 @@ const refreshToken = async (req, res) => {
     try {
         const decoded = jwt.verify(refreshToken, secretKey);
         const userId = decoded.sub;
-        const user = await User.findById(userId).select('refreshToken');
+        const user = await User.findById(userId);
 
         if (!user) return Response.unauthorized(res, 'Từ chối truy cập.');
         if (user.refreshToken !== refreshToken) {

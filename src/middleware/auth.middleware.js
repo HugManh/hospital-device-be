@@ -24,6 +24,7 @@ const authenticate = (req, res, next) => {
     } catch (error) {
         return res.status(401).json({
             success: false,
+            code: 'TokenExpiredError',
             message: 'Token không hợp lệ hoặc đã hết hạn',
             error: error.message,
         });
