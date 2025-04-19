@@ -59,7 +59,7 @@ const login = async (req, res) => {
                 role: user.role,
             },
             secretKey,
-            { expiresIn: '3s' }
+            { expiresIn: '2h' }
         );
 
         // Tạo refresh token
@@ -200,7 +200,7 @@ const refreshToken = async (req, res) => {
                 role: user.role,
             },
             secretKey,
-            { expiresIn: '1h' }
+            { expiresIn: '2h' }
         );
 
         return Response.success(res, { accessToken }, 'Lấy token thành công');
