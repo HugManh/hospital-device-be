@@ -2,7 +2,7 @@ const _ = require('lodash');
 const { isDevelopment } = require('../config/constants');
 const Device = require('../models/device.model');
 const Response = require('../utils/response');
-const audit = require('../services/audit.service');
+const auditService = require('../services/audit.service');
 const auditAction = require('../services/auditAction');
 const QueryBuilder = require('../utils/queryBuilder');
 const { diffObjects } = require('../utils/diffs');
@@ -17,22 +17,26 @@ const addDevice = async (req, res) => {
             ]);
         }
 
-        const device = new Device({ name, location });
-        await device.save();
+        const newDevice = new Device({ name, location });
+        await newDevice.save();
 
-        audit.prepareAudit(
+        const auditData = auditService.formatCreateJSON({
+            resourceType: 'thiết bị',
+            detail: newDevice,
+            performedBy: req.user.name,
+        });
+
+        auditService.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE,
-            'Thêm thiết bị thành công',
-            {
-                ...device,
-            }
+            auditData.message,
+            auditData.formattedDetails
         );
 
         return Response.success(
             res,
-            { device },
-            'Thêm thiết bị thành công',
+            { newDevice },
+            'Thêm thiết bị mới thành công',
             201
         );
     } catch (error) {
@@ -135,18 +139,21 @@ const updateDevice = async (req, res) => {
             'name',
             'location',
         ]);
-        if (Object.keys(changes).length > 0) {
-            audit.prepareAudit(
-                req,
-                auditAction.actionList.UPDATE_DEVICE,
-                'Cập nhật thông tin thiết bị',
-                {
-                    deviceId: req.params.id,
-                    changes,
-                }
-            );
-        }
+        // if (Object.keys(changes).length > 0) {
+        const auditData = auditService.formatUpdateJSON({
+            resourceType: 'thiết bị',
+            detail: { changes },
+            performedBy: req.user.name,
+        });
+        auditService.prepareAudit(
+            req,
+            auditAction.actionList.UPDATE_DEVICE,
+            auditData.message,
+            auditData.formattedChanges
+        );
+        // }
 
+        // TODO: Có cần thiết phải trả data trong response không?
         return Response.success(
             res,
             { device: updatedDevice },
@@ -175,21 +182,20 @@ const deleteDevice = async (req, res) => {
             return Response.notFound(res, 'Không tìm thấy thiết bị');
         }
 
-        // Prepare audit log with device details
-        const auditData = {
-            id: device.id,
-            name: device.name,
-            location: device.location,
-        };
+        const auditData = auditService.formatDeleteJSON({
+            resourceType: 'tài khoản',
+            detail: device,
+            performedBy: req.user.name,
+        });
 
-        audit.prepareAudit(
+        auditService.prepareAudit(
             req,
             auditAction.actionList.DELETE_DEVICE,
-            'Xóa thiết bị thành công',
-            auditData
+            auditData.message,
+            auditData.formattedDetails
         );
 
-        return Response.success(res, null, 'Xóa thiết bị thành công');
+        return Response.success(res, 'Đã xóa thiết bị thành công');
     } catch (error) {
         return Response.error(
             res,

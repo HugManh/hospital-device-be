@@ -1,9 +1,10 @@
+const _ = require('lodash');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const Response = require('../utils/response');
 const { isDevelopment } = require('../config/constants');
 const secretKey = process.env.JWT_SECRET;
-const audit = require('../services/audit.service');
+const auditService = require('../services/audit.service');
 const auditAction = require('../services/auditAction');
 
 // Đăng ký
@@ -81,18 +82,28 @@ const login = async (req, res) => {
         // Lưu refresh token vào database
         user.refreshToken = refreshToken;
         await user.save();
+
         req.user = user;
-        audit.prepareAudit(
+        const updateUser = _.pick(user, [
+            'id',
+            'email',
+            'name',
+            'role',
+            'group',
+            'isActive',
+        ]);
+
+        const auditData = auditService.formatCreateJSON({
+            resourceType: 'đăng nhập',
+            detail: updateUser,
+            performedBy: req.user.name,
+        });
+
+        auditService.prepareAudit(
             req,
             auditAction.actionList.LOGIN,
-            'Đăng nhập thành công',
-            {
-                id: user.id,
-                name: user.name,
-                role: user.role,
-                email: user.email,
-                group: user.group,
-            }
+            auditData.message,
+            auditData.formattedDetails
         );
 
         return Response.success(
@@ -131,8 +142,6 @@ const logout = async (req, res) => {
             { $unset: { refreshToken: 1 } }
         );
 
-        const user = updatedUser;
-
         if (updatedUser.nModified === 0) {
             return Response.error(
                 res,
@@ -144,14 +153,30 @@ const logout = async (req, res) => {
         res.clearCookie('accessToken', { httpOnly: true, secure: true });
         res.clearCookie('refreshToken', { httpOnly: true, secure: true });
 
-        req.user = user;
-        audit.prepareAudit(
+        req.user = updatedUser;
+        const updateUser = _.pick(updatedUser, [
+            'id',
+            'email',
+            'name',
+            'role',
+            'group',
+            'isActive',
+        ]);
+
+        const auditData = auditService.formatCreateJSON({
+            resourceType: 'đăng xuất',
+            detail: updateUser,
+            performedBy: req.user.name,
+        });
+
+        auditService.prepareAudit(
             req,
-            auditAction.actionList.LOGOUT,
-            'Đăng xuất thành công'
+            auditAction.actionList.LOGIN,
+            auditData.message,
+            auditData.formattedDetails
         );
 
-        return Response.success(res, null, 'Đăng xuất thành công');
+        return Response.success(res, 'Đăng xuất thành công');
     } catch (error) {
         return Response.error(
             res,

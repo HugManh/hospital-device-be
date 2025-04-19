@@ -3,7 +3,7 @@ const { isDevelopment } = require('../config/constants');
 const User = require('../models/user.model');
 const { generatePassword } = require('../utils/crypto');
 const Response = require('../utils/response');
-const audit = require('../services/audit.service');
+const auditService = require('../services/audit.service');
 const auditAction = require('../services/auditAction');
 const QueryBuilder = require('../utils/queryBuilder');
 const { diffObjects } = require('../utils/diffs');
@@ -11,33 +11,40 @@ const { diffObjects } = require('../utils/diffs');
 // Tạo mới user
 const createUser = async (req, res) => {
     try {
-        const { email, name, group } = req.body;
+        const { email, name, group, status } = req.body;
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return Response.error(res, 'Email đã tồn tại!', 400);
         }
 
         const password = generatePassword();
-        const user = new User({ email, name, group, password });
+        const newUser = {
+            name,
+            email,
+            group,
+            status: status || true,
+        };
+
+        const user = new User({ ...newUser, password });
         await user.save();
 
-        audit.prepareAudit(
+        const auditData = auditService.formatCreateJSON({
+            resourceType: 'tài khoản',
+            detail: newUser,
+            performedBy: req.user.name,
+        });
+
+        auditService.prepareAudit(
             req,
             auditAction.actionList.CREATE_USER,
-            'Tạo người dùng thành công',
-            {
-                id: user.id,
-                name,
-                role: user.role,
-                email,
-                group,
-            }
+            auditData.message,
+            auditData.formattedDetails
         );
 
         return Response.success(
             res,
-            { name, group, password },
-            'Tạo người dùng thành công',
+            { ...newUser, password },
+            'Tạo tài khoản thành công',
             201
         );
     } catch (error) {
@@ -63,7 +70,7 @@ const getUsers = async (req, res) => {
             res,
             users.data,
             users.meta,
-            'Lấy danh sách người dùng thành công'
+            'Lấy danh sách tài khoản thành công'
         );
     } catch (error) {
         return Response.error(
@@ -80,12 +87,12 @@ const getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) {
-            return Response.notFound(res, 'Không tìm thấy người dùng');
+            return Response.notFound(res, 'Không tìm thấy tài khoản');
         }
         return Response.success(
             res,
             user,
-            'Lấy thông tin người dùng thành công'
+            'Lấy thông tin tài khoản thành công'
         );
     } catch (error) {
         return Response.error(
@@ -105,7 +112,7 @@ const updateUser = async (req, res) => {
 
         const user = await User.findById(id);
         if (!user) {
-            return Response.notFound(res, 'Không tìm thấy người dùng');
+            return Response.notFound(res, 'Không tìm thấy tài khoản');
         }
 
         const oldData = {
@@ -135,18 +142,20 @@ const updateUser = async (req, res) => {
             'role',
             'isActive',
         ]);
-        if (Object.keys(changes).length > 0) {
-            audit.prepareAudit(
-                req,
-                auditAction.actionList.UPDATE_USER,
-                'Cập nhật thông tin người dùng thành công',
-                {
-                    userId: id,
-                    changes,
-                }
-            );
-        }
-
+        // if (Object.keys(changes).length > 0) {
+        const auditData = auditService.formatUpdateJSON({
+            resourceType: 'tài khoản',
+            detail: { changes },
+            performedBy: req.user.name,
+        });
+        auditService.prepareAudit(
+            req,
+            auditAction.actionList.UPDATE_USER,
+            auditData.message,
+            auditData.formattedChanges
+        );
+        // }
+        // TODO: Có cần thiết phải trả data trong response không?
         return Response.success(
             res,
             {
@@ -156,7 +165,7 @@ const updateUser = async (req, res) => {
                 role: updatedUser.role,
                 isActive: updatedUser.isActive,
             },
-            'Cập nhật thông tin người dùng thành công'
+            'Cập nhật thông tin tài khoản thành công'
         );
     } catch (error) {
         return Response.error(
@@ -174,23 +183,32 @@ const deleteUser = async (req, res) => {
         const { id } = req.params;
         const user = await User.findByIdAndDelete(id);
         if (!user) {
-            return Response.notFound(res, 'Không tìm thấy người dùng');
+            return Response.notFound(res, 'Không tìm thấy tài khoản');
         }
 
-        audit.prepareAudit(
+        const deletedUser = _.pick(user, [
+            'id',
+            'email',
+            'name',
+            'role',
+            'group',
+            'isActive',
+        ]);
+
+        const auditData = auditService.formatDeleteJSON({
+            resourceType: 'tài khoản',
+            detail: deletedUser,
+            performedBy: req.user.name,
+        });
+
+        auditService.prepareAudit(
             req,
             auditAction.actionList.DELETE_USER,
-            'Đã xoá người dùng thành công',
-            {
-                id: user.id,
-                name: user.name,
-                role: user.role,
-                email: user.email,
-                group: user.group,
-            }
+            auditData.message,
+            auditData.formattedDetails
         );
 
-        return Response.success(res, null, 'Đã xoá người dùng thành công');
+        return Response.success(res, 'Đã xoá tài khoản thành công');
     } catch (error) {
         return Response.error(
             res,
@@ -208,24 +226,33 @@ const resetPassword = async (req, res) => {
 
         const user = await User.findById(id);
         if (!user) {
-            return Response.notFound(res, 'Không tìm thấy người dùng');
+            return Response.notFound(res, 'Không tìm thấy tài khoản');
         }
 
         const password = generatePassword();
         user.password = password;
         await user.save();
 
-        audit.prepareAudit(
+        const updateUser = _.pick(user, [
+            'id',
+            'email',
+            'name',
+            'role',
+            'group',
+            'isActive',
+        ]);
+
+        const auditData = auditService.formatCreateJSON({
+            resourceType: 'mật khẩu mới',
+            detail: updateUser,
+            performedBy: req.user.name,
+        });
+
+        auditService.prepareAudit(
             req,
             auditAction.actionList.RESET_PASSWORD,
-            'Đã tạo mới mật khẩu thành công',
-            {
-                id: user.id,
-                name: user.name,
-                role: user.role,
-                email: user.email,
-                group: user.group,
-            }
+            auditData.message,
+            auditData.formattedDetails
         );
 
         return Response.success(

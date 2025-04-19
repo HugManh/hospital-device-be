@@ -10,7 +10,7 @@ const {
     EDIT_REQUEST_STATUS,
     ROLES,
 } = require('../config/constants');
-const audit = require('../services/audit.service');
+const auditService = require('../services/audit.service');
 const auditAction = require('../services/auditAction');
 const QueryBuilder = require('../utils/queryBuilder');
 const { diffObjects } = require('../utils/diffs');
@@ -63,7 +63,9 @@ const createDeviceBooking = async (req, res) => {
         // Tạo đăng ký mới
         const booking = new DeviceBooking({
             deviceId,
+            deviceName: device.name,
             userId,
+            accountName: user.name,
             group: user.group,
             codeBA,
             nameBA,
@@ -76,13 +78,16 @@ const createDeviceBooking = async (req, res) => {
 
         await booking.save();
 
-        audit.prepareAudit(
+        const auditData = auditService.formatCreateJSON({
+            resourceType: 'đơn đăng ký thiêt bị',
+            detail: booking,
+            performedBy: req.user.name,
+        });
+        auditService.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE_BOOKING,
-            'Tạo đơn đăng ký thiết bị thành công',
-            {
-                ...booking,
-            }
+            auditData.message,
+            auditData.formattedDetails
         );
 
         return Response.success(
@@ -212,18 +217,19 @@ const updateBooking = async (req, res) => {
             'status',
             'editRequest',
         ]);
-        if (Object.keys(changes).length > 0) {
-            audit.prepareAudit(
-                req,
-                auditAction.actionList.UPDATE_DEVICE_BOOKING,
-                'Đã xử lý đơn đăng ký',
-                {
-                    bookingId,
-                    userId,
-                    changes,
-                }
-            );
-        }
+        const auditData = auditService.formatUpdateJSON({
+            resourceType: 'đơn đăng ký thiết bị',
+            detail: { changes },
+            performedBy: req.user.name,
+        });
+        // if (Object.keys(changes).length > 0) {
+        auditService.prepareAudit(
+            req,
+            auditAction.actionList.UPDATE_DEVICE_BOOKING,
+            auditData.message,
+            auditData.formattedDetails
+        );
+        // }
 
         return Response.success(res, { booking }, 'Đã xử lý đơn đăng ký');
     } catch (error) {
@@ -348,13 +354,16 @@ const requestBookingEdit = async (req, res) => {
         };
         await booking.save();
 
-        audit.prepareAudit(
+        const auditData = auditService.formatCreateJSON({
+            resourceType: 'yêu cầu chỉnh sửa đơn đăng ký thiết bị',
+            detail: booking.editRequest,
+            performedBy: req.user.name,
+        });
+        auditService.prepareAudit(
             req,
             auditAction.actionList.REQUEST_BOOKING_EDIT,
-            'Edit request submitted successfully',
-            {
-                ...booking.editRequest,
-            }
+            auditData.message,
+            auditData.formattedDetails
         );
 
         return Response.success(
@@ -405,13 +414,17 @@ const processEditRequest = async (req, res) => {
 
         await booking.save();
 
-        audit.prepareAudit(
+        const auditData = auditService.formatCreateJSON({
+            resourceType: 'duyệt yêu cầu chỉnh sửa đơn đăng ký thiết bị',
+            detail: booking.editRequest,
+            performedBy: req.user.name,
+        });
+
+        auditService.prepareAudit(
             req,
             auditAction.actionList.PROCESS_EDIT_REQUEST,
-            'Edit request processed successfully',
-            {
-                ...booking.editRequest,
-            }
+            auditData.message,
+            auditData.formattedDetails
         );
 
         return Response.success(
