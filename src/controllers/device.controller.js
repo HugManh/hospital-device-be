@@ -25,7 +25,7 @@ const addDevice = async (req, res) => {
             auditAction.actionList.CREATE_DEVICE,
             'Thêm thiết bị thành công',
             {
-                device,
+                ...device,
             }
         );
 

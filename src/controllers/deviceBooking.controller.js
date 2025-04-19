@@ -81,7 +81,7 @@ const createDeviceBooking = async (req, res) => {
             auditAction.actionList.CREATE_DEVICE_BOOKING,
             'Tạo đơn đăng ký thiết bị thành công',
             {
-                booking,
+                ...booking,
             }
         );
 
