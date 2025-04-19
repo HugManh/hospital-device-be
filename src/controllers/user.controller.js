@@ -38,7 +38,7 @@ const createUser = async (req, res) => {
             req,
             auditAction.actionList.CREATE_USER,
             auditData.message,
-            auditData.formattedDetails
+            auditData.details
         );
 
         return Response.success(
@@ -152,7 +152,7 @@ const updateUser = async (req, res) => {
             req,
             auditAction.actionList.UPDATE_USER,
             auditData.message,
-            auditData.formattedChanges
+            auditData.details
         );
         // }
         // TODO: Có cần thiết phải trả data trong response không?
@@ -186,14 +186,7 @@ const deleteUser = async (req, res) => {
             return Response.notFound(res, 'Không tìm thấy tài khoản');
         }
 
-        const deletedUser = _.pick(user, [
-            'id',
-            'email',
-            'name',
-            'role',
-            'group',
-            'isActive',
-        ]);
+        const deletedUser = _.omit(user, ['password']);
 
         const auditData = auditService.formatDeleteJSON({
             resourceType: 'tài khoản',
@@ -205,7 +198,7 @@ const deleteUser = async (req, res) => {
             req,
             auditAction.actionList.DELETE_USER,
             auditData.message,
-            auditData.formattedDetails
+            auditData.details
         );
 
         return Response.success(res, 'Đã xoá tài khoản thành công');
@@ -252,7 +245,7 @@ const resetPassword = async (req, res) => {
             req,
             auditAction.actionList.RESET_PASSWORD,
             auditData.message,
-            auditData.formattedDetails
+            auditData.details
         );
 
         return Response.success(

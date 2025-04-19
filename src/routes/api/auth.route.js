@@ -13,10 +13,10 @@ const { authenticate } = require('../../middleware/auth.middleware');
 
 router.post('/register', register);
 router.post('/login', login);
+router.post('/refresh-token', refreshToken);
 
 router.use(authenticate);
 router.post('/logout', logout);
-router.post('/refresh-token', refreshToken);
 router.get('/profile', getProfile);
 router.put('/profile', updateProfile);
 router.put('/password', updatePassword);

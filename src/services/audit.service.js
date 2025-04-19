@@ -36,6 +36,8 @@ auditEmitter.on(AUDIT_EVENT, async (auditData) => {
         }
 
         const { req, auditAction, message, detail } = auditData;
+        console.log(detail);
+
         const userData = req.user || {};
 
         const auditDoc = new AuditTrail({
@@ -85,7 +87,7 @@ const formatUpdateJSON = ({ resourceType, detail, performedBy }) => {
         );
     }
 
-    const formattedChanges = detail?.changes
+    const details = detail?.changes
         ? Object.entries(detail.changes).map(([field, { from, to }]) => ({
               field,
               label: translateField(field),
@@ -96,7 +98,7 @@ const formatUpdateJSON = ({ resourceType, detail, performedBy }) => {
 
     return {
         message: `"${performedBy}" đã cập nhật ${resourceType}`,
-        formattedChanges,
+        details,
     };
 };
 
@@ -115,7 +117,7 @@ const formatCreateJSON = ({ resourceType, detail, performedBy }) => {
         );
     }
 
-    const formattedDetails = detail
+    const details = detail
         ? Object.entries(detail).map(([field, value]) => ({
               field,
               label: translateField(field),
@@ -125,7 +127,7 @@ const formatCreateJSON = ({ resourceType, detail, performedBy }) => {
 
     return {
         message: `${performedBy} đã tạo ${resourceType}`,
-        formattedDetails,
+        details,
     };
 };
 
@@ -144,7 +146,7 @@ const formatDeleteJSON = ({ resourceType, detail, performedBy }) => {
         );
     }
 
-    const formattedDetails = detail
+    const details = detail
         ? Object.entries(detail).map(([field, value]) => ({
               field,
               label: translateField(field),
@@ -154,7 +156,7 @@ const formatDeleteJSON = ({ resourceType, detail, performedBy }) => {
 
     return {
         message: `${performedBy} đã xóa ${resourceType}`,
-        formattedDetails,
+        details,
     };
 };
 

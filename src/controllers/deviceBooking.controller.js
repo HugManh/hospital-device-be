@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const { Types } = require('mongoose');
 const Device = require('../models/device.model');
 const User = require('../models/user.model');
 const DeviceBooking = require('../models/deviceBooking.model');
@@ -80,14 +81,14 @@ const createDeviceBooking = async (req, res) => {
 
         const auditData = auditService.formatCreateJSON({
             resourceType: 'đơn đăng ký thiêt bị',
-            detail: booking,
+            detail: booking.toObject(),
             performedBy: req.user.name,
         });
         auditService.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE_BOOKING,
             auditData.message,
-            auditData.formattedDetails
+            auditData.details
         );
 
         return Response.success(
@@ -157,7 +158,7 @@ const getDeviceBookingById = async (req, res) => {
     }
 };
 
-// Duyệt yêu cầu đăng ký thiết bị
+// Duyệt đơn và thay đổi đơn đăng ký thiết bị
 const updateBooking = async (req, res) => {
     try {
         const { bookingId } = req.params;
@@ -193,14 +194,18 @@ const updateBooking = async (req, res) => {
 
         const updates = _.pickBy(
             {
-                deviceId,
+                deviceId:
+                    deviceId && Types.ObjectId.isValid(deviceId)
+                        ? new Types.ObjectId(deviceId)
+                        : undefined,
                 codeBA,
                 nameBA,
                 usageTime,
-                usageDay,
+                usageDay: usageDay ? new Date(usageDay) : undefined,
                 priority,
                 status: status || REGISTER_STATUS.PENDING,
-                ...(user.role === ROLES.USER ? { editRequest: null } : {}),
+                editRequest:
+                    user.role === ROLES.USER ? {} : booking.editRequest,
             },
             (value) => !_.isUndefined(value) && !_.isNull(value)
         );
@@ -217,17 +222,19 @@ const updateBooking = async (req, res) => {
             'status',
             'editRequest',
         ]);
+
         const auditData = auditService.formatUpdateJSON({
             resourceType: 'đơn đăng ký thiết bị',
             detail: { changes },
             performedBy: req.user.name,
         });
+        console.log('auditData', auditData);
         // if (Object.keys(changes).length > 0) {
         auditService.prepareAudit(
             req,
             auditAction.actionList.UPDATE_DEVICE_BOOKING,
             auditData.message,
-            auditData.formattedDetails
+            auditData.details
         );
         // }
 
@@ -316,7 +323,7 @@ const listUserBookings = async (req, res) => {
     }
 };
 
-// Xử lý yêu cầu chỉnh sửa đơn đăng ký
+// Yêu cầu chỉnh sửa đơn đăng ký của user
 const requestBookingEdit = async (req, res) => {
     try {
         const { bookingId } = req.params;
@@ -363,7 +370,7 @@ const requestBookingEdit = async (req, res) => {
             req,
             auditAction.actionList.REQUEST_BOOKING_EDIT,
             auditData.message,
-            auditData.formattedDetails
+            auditData.details
         );
 
         return Response.success(
@@ -381,7 +388,7 @@ const requestBookingEdit = async (req, res) => {
     }
 };
 
-// Xử lý duyệt yêu cầu chỉnh sửa từ approver hoặc admin
+// Xử lý yêu cầu chỉnh sửa của user, người cho phép: approver | admin
 const processEditRequest = async (req, res) => {
     try {
         const { bookingId } = req.params;
@@ -424,7 +431,7 @@ const processEditRequest = async (req, res) => {
             req,
             auditAction.actionList.PROCESS_EDIT_REQUEST,
             auditData.message,
-            auditData.formattedDetails
+            auditData.details
         );
 
         return Response.success(

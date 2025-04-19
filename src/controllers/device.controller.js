@@ -17,8 +17,9 @@ const addDevice = async (req, res) => {
             ]);
         }
 
-        const newDevice = new Device({ name, location });
-        await newDevice.save();
+        const newDevice = { name, location };
+        const device = new Device(newDevice);
+        await device.save();
 
         const auditData = auditService.formatCreateJSON({
             resourceType: 'thiết bị',
@@ -30,7 +31,7 @@ const addDevice = async (req, res) => {
             req,
             auditAction.actionList.CREATE_DEVICE,
             auditData.message,
-            auditData.formattedDetails
+            auditData.details
         );
 
         return Response.success(
@@ -149,7 +150,7 @@ const updateDevice = async (req, res) => {
             req,
             auditAction.actionList.UPDATE_DEVICE,
             auditData.message,
-            auditData.formattedChanges
+            auditData.details
         );
         // }
 
@@ -184,7 +185,7 @@ const deleteDevice = async (req, res) => {
 
         const auditData = auditService.formatDeleteJSON({
             resourceType: 'tài khoản',
-            detail: device,
+            detail: device.toObject(),
             performedBy: req.user.name,
         });
 
@@ -192,7 +193,7 @@ const deleteDevice = async (req, res) => {
             req,
             auditAction.actionList.DELETE_DEVICE,
             auditData.message,
-            auditData.formattedDetails
+            auditData.details
         );
 
         return Response.success(res, 'Đã xóa thiết bị thành công');

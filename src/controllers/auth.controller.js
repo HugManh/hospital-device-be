@@ -20,12 +20,7 @@ const register = async (req, res) => {
         const user = new User({ email, name, password, role });
         await user.save();
 
-        return Response.success(
-            res,
-            null,
-            'Đăng ký người dùng thành công',
-            201
-        );
+        return Response.success(res, null, 'Đăng ký tài khoản thành công', 201);
     } catch (error) {
         return Response.error(
             res,
@@ -84,14 +79,7 @@ const login = async (req, res) => {
         await user.save();
 
         req.user = user;
-        const updateUser = _.pick(user, [
-            'id',
-            'email',
-            'name',
-            'role',
-            'group',
-            'isActive',
-        ]);
+        const updateUser = _.omit(user, ['password']);
 
         const auditData = auditService.formatCreateJSON({
             resourceType: 'đăng nhập',
@@ -103,7 +91,7 @@ const login = async (req, res) => {
             req,
             auditAction.actionList.LOGIN,
             auditData.message,
-            auditData.formattedDetails
+            auditData.details
         );
 
         return Response.success(
@@ -154,14 +142,7 @@ const logout = async (req, res) => {
         res.clearCookie('refreshToken', { httpOnly: true, secure: true });
 
         req.user = updatedUser;
-        const updateUser = _.pick(updatedUser, [
-            'id',
-            'email',
-            'name',
-            'role',
-            'group',
-            'isActive',
-        ]);
+        const updateUser = _.omit(updatedUser, ['password']);
 
         const auditData = auditService.formatCreateJSON({
             resourceType: 'đăng xuất',
@@ -173,7 +154,7 @@ const logout = async (req, res) => {
             req,
             auditAction.actionList.LOGIN,
             auditData.message,
-            auditData.formattedDetails
+            auditData.details
         );
 
         return Response.success(res, 'Đăng xuất thành công');
@@ -190,20 +171,21 @@ const logout = async (req, res) => {
 // Làm mới token
 const refreshToken = async (req, res) => {
     const { refreshToken } = req.body;
-    const userId = req.user.sub;
 
     if (!refreshToken) {
         return Response.unauthorized(res, 'Từ chối truy cập.');
     }
 
     try {
+        const decoded = jwt.verify(refreshToken, secretKey);
+        const userId = decoded.id;
+
         const user = await User.findById(userId).select('refreshToken');
-        if (!user) return Response.notFound(res, 'Không tìm thấy người dùng');
+        if (!user) return Response.unauthorized(res, 'Từ chối truy cập.');
         if (user.refreshToken !== refreshToken) {
             return Response.unauthorized(res, 'Từ chối truy cập.');
         }
 
-        const decoded = jwt.verify(refreshToken, secretKey);
         const accessToken = jwt.sign(
             { email: decoded.email, id: decoded.id },
             secretKey,
@@ -212,7 +194,12 @@ const refreshToken = async (req, res) => {
 
         return Response.success(res, { accessToken }, 'Lấy token thành công');
     } catch (error) {
-        return Response.error(res, 'Token không hợp lệ', 400);
+        return Response.error(
+            res,
+            'Đã xảy ra lỗi không xác định',
+            500,
+            isDevelopment ? error.message : null
+        );
     }
 };
 
@@ -225,7 +212,7 @@ const getProfile = async (req, res) => {
         );
 
         if (!user) {
-            return Response.notFound(res, 'Không tìm thấy người dùng');
+            return Response.notFound(res, 'Không tìm thấy tài khoản');
         }
 
         return Response.success(
@@ -258,7 +245,7 @@ const updateProfile = async (req, res) => {
 
         const user = await User.findById(userId);
         if (!user) {
-            return Response.notFound(res, 'Không tìm thấy người dùng');
+            return Response.notFound(res, 'Không tìm thấy tài khoản');
         }
 
         Object.assign(user, { name, group });
@@ -268,7 +255,7 @@ const updateProfile = async (req, res) => {
         return Response.success(
             res,
             { name, group },
-            'Cập nhật người dùng thành công'
+            'Cập nhật tài khoản thành công'
         );
     } catch (error) {
         return Response.error(
@@ -287,7 +274,7 @@ const updatePassword = async (req, res) => {
 
         const user = await User.findById(userId);
         if (!user) {
-            return Response.notFound(res, 'Không tìm thấy người dùng');
+            return Response.notFound(res, 'Không tìm thấy tài khoản');
         }
 
         // Verify current password
