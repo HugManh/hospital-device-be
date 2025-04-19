@@ -58,8 +58,8 @@ const login = async (req, res) => {
                 email: user.email,
                 role: user.role,
             },
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            secretKey,
+            { expiresIn: '3s' }
         );
 
         // Tạo refresh token
@@ -70,7 +70,7 @@ const login = async (req, res) => {
                 email: user.email,
                 role: user.role,
             },
-            process.env.JWT_SECRET,
+            secretKey,
             { expiresIn: '2d' }
         );
 
@@ -79,7 +79,10 @@ const login = async (req, res) => {
         await user.save();
 
         req.user = user;
-        const updateUser = _.omit(user, ['password']);
+        const updateUser = _.omit(user.toObject(), [
+            'password',
+            'refreshToken',
+        ]);
 
         const auditData = auditService.formatCreateJSON({
             resourceType: 'đăng nhập',
@@ -125,12 +128,12 @@ const logout = async (req, res) => {
     }
 
     try {
-        const updatedUser = await User.updateOne(
+        const user = await User.updateOne(
             { refreshToken },
             { $unset: { refreshToken: 1 } }
         );
 
-        if (updatedUser.nModified === 0) {
+        if (user.nModified === 0) {
             return Response.error(
                 res,
                 'Token không hợp lệ hoặc đã hết hạn',
@@ -141,8 +144,11 @@ const logout = async (req, res) => {
         res.clearCookie('accessToken', { httpOnly: true, secure: true });
         res.clearCookie('refreshToken', { httpOnly: true, secure: true });
 
-        req.user = updatedUser;
-        const updateUser = _.omit(updatedUser, ['password']);
+        req.user = user;
+        const updateUser = _.omit(user.toObject(), [
+            'password',
+            'refreshToken',
+        ]);
 
         const auditData = auditService.formatCreateJSON({
             resourceType: 'đăng xuất',
@@ -178,16 +184,21 @@ const refreshToken = async (req, res) => {
 
     try {
         const decoded = jwt.verify(refreshToken, secretKey);
-        const userId = decoded.id;
-
+        const userId = decoded.sub;
         const user = await User.findById(userId).select('refreshToken');
+
         if (!user) return Response.unauthorized(res, 'Từ chối truy cập.');
         if (user.refreshToken !== refreshToken) {
             return Response.unauthorized(res, 'Từ chối truy cập.');
         }
 
         const accessToken = jwt.sign(
-            { email: decoded.email, id: decoded.id },
+            {
+                sub: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
             secretKey,
             { expiresIn: '1h' }
         );

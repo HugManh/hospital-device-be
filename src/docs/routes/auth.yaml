@@ -133,7 +133,7 @@
                 description: Đã xảy ra lỗi không xác định
 
 /api/auth/refresh-token:
-    get:
+    post:
         tags:
             - Xác Thực
         summary: Làm mới token

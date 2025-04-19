@@ -186,7 +186,10 @@ const deleteUser = async (req, res) => {
             return Response.notFound(res, 'Không tìm thấy tài khoản');
         }
 
-        const deletedUser = _.omit(user, ['password']);
+        const deletedUser = _.omit(user.toObject(), [
+            'password',
+            'refreshToken',
+        ]);
 
         const auditData = auditService.formatDeleteJSON({
             resourceType: 'tài khoản',
