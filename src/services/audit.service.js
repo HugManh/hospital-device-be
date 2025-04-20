@@ -126,7 +126,7 @@ const formatCreateJSON = ({ resourceType, detail, performedBy }) => {
         : [];
 
     return {
-        message: `${performedBy} đã tạo ${resourceType}`,
+        message: `"${performedBy}" đã tạo ${resourceType}`,
         details,
     };
 };
@@ -155,7 +155,7 @@ const formatDeleteJSON = ({ resourceType, detail, performedBy }) => {
         : [];
 
     return {
-        message: `${performedBy} đã xóa ${resourceType}`,
+        message: `"${performedBy}" đã xóa ${resourceType}`,
         details,
     };
 };
