@@ -228,15 +228,13 @@ const updateBooking = async (req, res) => {
             detail: { changes },
             performedBy: req.user.name,
         });
-        console.log('auditData', auditData);
-        // if (Object.keys(changes).length > 0) {
+
         auditService.prepareAudit(
             req,
             auditAction.actionList.UPDATE_DEVICE_BOOKING,
             auditData.message,
             auditData.details
         );
-        // }
 
         return Response.success(res, { booking }, 'Đã xử lý đơn đăng ký');
     } catch (error) {
@@ -313,6 +311,48 @@ const listUserBookings = async (req, res) => {
             meta,
             'Lấy lịch sử đăng ký của người dùng thành công'
         );
+    } catch (error) {
+        return Response.error(
+            res,
+            'Đã xảy ra lỗi không xác định',
+            500,
+            isDevelopment ? error.message : null
+        );
+    }
+};
+
+// Admin xử lý đơn đăng ký
+const approverBooking = async (req, res) => {
+    try {
+        const { bookingId } = req.params;
+        const userId = req.user?.sub;
+        const { status } = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) return Response.notFound(res, 'Không tìm thấy người dùng');
+
+        const booking = await DeviceBooking.findById(bookingId);
+        if (!booking) {
+            return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
+        }
+
+        booking.status = status;
+        await booking.save();
+
+        const auditData = auditService.formatCreateJSON({
+            resourceType: `${status}`,
+            detail: status,
+            performedBy: req.user.name,
+        });
+
+        auditService.prepareAudit(
+            req,
+            auditAction.actionList.PROCESS_DEVICE_BOOKING,
+            auditData.message,
+            auditData.details
+        );
+
+        return Response.success(res, `Đã ${status} đơn đăng ký`);
     } catch (error) {
         return Response.error(
             res,
@@ -456,6 +496,7 @@ module.exports = {
     updateBooking,
     listDeviceBookings,
     listUserBookings,
+    approverBooking,
     requestBookingEdit,
     processEditRequest,
 };

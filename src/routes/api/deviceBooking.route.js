@@ -9,6 +9,7 @@ const {
     listUserBookings,
     requestBookingEdit,
     processEditRequest,
+    approverBooking,
 } = require('../../controllers/deviceBooking.controller');
 const { authorizeRoles } = require('../../middleware/auth.middleware');
 const { ROLES } = require('../../config/constants');
@@ -42,6 +43,11 @@ router.get(
     '/users/:userId',
     authorizeRoles([ROLES.USER, ROLES.APPROVER, ROLES.ADMIN]),
     listUserBookings
+);
+router.post(
+    '/:bookingId/approver',
+    authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]),
+    approverBooking
 );
 router.post(
     '/:bookingId/edit-request',
