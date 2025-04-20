@@ -30,11 +30,11 @@ class LoggerService {
                 }),
                 ...(isDevelopment
                     ? [
-                        new winston.transports.File({
-                            format: combine(logFormat),
-                            filename: 'logs/hospital.log',
-                        }),
-                    ]
+                          new winston.transports.File({
+                              format: combine(logFormat),
+                              filename: 'logs/hospital.log',
+                          }),
+                      ]
                     : []),
             ],
         });

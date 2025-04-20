@@ -5,16 +5,22 @@ const { hashPassword } = require('../utils/crypto');
 const { ROLES } = require('../config/constants');
 
 const UserSchema = new BaseSchema({
-    email: { type: String, required: true },
-    name: { type: String, required: true },
-    password: { type: String, required: true },
+    email: { type: String, required: true, label: 'Tài khoản' },
+    name: { type: String, required: true, label: 'Tên người dùng' },
+    password: { type: String, required: true, label: 'Mật khẩu' },
     role: {
         type: String,
         enum: Object.values(ROLES),
         default: ROLES.USER,
+        label: 'Vai trò',
     },
-    group: { type: String, required: true, default: 'Thiếu thông tin' },
-    isActive: { type: Boolean, default: true },
+    group: {
+        type: String,
+        required: true,
+        default: 'Thiếu thông tin',
+        label: 'Đơn vị',
+    },
+    isActive: { type: Boolean, default: true, label: 'Trạng thái' },
     refreshToken: { type: String },
 });
 

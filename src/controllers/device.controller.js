@@ -36,7 +36,7 @@ const addDevice = async (req, res) => {
 
         return Response.success(
             res,
-            { newDevice },
+            device.toObject(),
             'Thêm thiết bị mới thành công',
             201
         );

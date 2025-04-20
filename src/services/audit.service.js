@@ -1,22 +1,10 @@
 const EventEmitter = require('events');
 const AuditTrail = require('../models/audit.model');
+const { label } = require('../utils/fieldLabelRegistry');
 
 // Initialize EventEmitter for audit events
 const auditEmitter = new EventEmitter();
 const AUDIT_EVENT = 'audit';
-
-// Map for field translations
-const fieldTranslationMap = new Map([
-    ['name', 'Tên'],
-    ['status', 'Trạng thái'],
-    ['role', 'Vai trò'],
-    // Add more field translations here as needed
-]);
-
-// Utility function to translate field names using Map
-const translateField = (field) => {
-    return fieldTranslationMap.get(field) || field;
-};
 
 // Utility function to format values for display
 const formatValue = (value) => {
@@ -90,7 +78,7 @@ const formatUpdateJSON = ({ resourceType, detail, performedBy }) => {
     const details = detail?.changes
         ? Object.entries(detail.changes).map(([field, { from, to }]) => ({
               field,
-              label: translateField(field),
+              label: label(field),
               from: formatValue(from),
               to: formatValue(to),
           }))
@@ -120,7 +108,7 @@ const formatCreateJSON = ({ resourceType, detail, performedBy }) => {
     const details = detail
         ? Object.entries(detail).map(([field, value]) => ({
               field,
-              label: translateField(field),
+              label: label(field),
               value: formatValue(value),
           }))
         : [];
@@ -149,7 +137,7 @@ const formatDeleteJSON = ({ resourceType, detail, performedBy }) => {
     const details = detail
         ? Object.entries(detail).map(([field, value]) => ({
               field,
-              label: translateField(field),
+              label: label(field),
               value: formatValue(value),
           }))
         : [];
