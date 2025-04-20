@@ -68,13 +68,7 @@ const prepareAudit = (req, auditAction, message, detail = {}) => {
  * @param {string} params.performedBy - Name of the user performing the action.
  * @returns {Object} Formatted audit data.
  */
-const formatUpdateJSON = ({ resourceType, detail, performedBy }) => {
-    if (!resourceType || !performedBy) {
-        throw new Error(
-            'Missing required parameters: resourceType or performedBy'
-        );
-    }
-
+const formatUpdateJSON = ({ detail }) => {
     const details = detail?.changes
         ? Object.entries(detail.changes).map(([field, { from, to }]) => ({
               field,
@@ -84,56 +78,18 @@ const formatUpdateJSON = ({ resourceType, detail, performedBy }) => {
           }))
         : [];
 
-    return {
-        message: `"${performedBy}" đã cập nhật ${resourceType}`,
-        details,
-    };
+    return details;
 };
 
 /**
- * Formats audit data for a CREATE operation.
- * @param {Object} params - Parameters for formatting.
- * @param {string} params.resourceType - Type of resource being created.
- * @param {Object} params.detail - Details of the created resource.
- * @param {string} params.performedBy - Name of the user performing the action.
- * @returns {Object} Formatted audit data.
- */
-const formatCreateJSON = ({ resourceType, detail, performedBy }) => {
-    if (!resourceType || !performedBy) {
-        throw new Error(
-            'Missing required parameters: resourceType or performedBy'
-        );
-    }
-
-    const details = detail
-        ? Object.entries(detail).map(([field, value]) => ({
-              field,
-              label: label(field),
-              value: formatValue(value),
-          }))
-        : [];
-
-    return {
-        message: `"${performedBy}" đã tạo ${resourceType}`,
-        details,
-    };
-};
-
-/**
- * Formats audit data for a DELETE operation.
+ * Formats audit data for a CREATE or DELETE operation.
  * @param {Object} params - Parameters for formatting.
  * @param {string} params.resourceType - Type of resource being deleted.
  * @param {Object} params.detail - Details of the deleted resource.
  * @param {string} params.performedBy - Name of the user performing the action.
  * @returns {Object} Formatted audit data.
  */
-const formatDeleteJSON = ({ resourceType, detail, performedBy }) => {
-    if (!resourceType || !performedBy) {
-        throw new Error(
-            'Missing required parameters: resourceType or performedBy'
-        );
-    }
-
+const formatInfoJSON = ({ detail }) => {
     const details = detail
         ? Object.entries(detail).map(([field, value]) => ({
               field,
@@ -142,16 +98,12 @@ const formatDeleteJSON = ({ resourceType, detail, performedBy }) => {
           }))
         : [];
 
-    return {
-        message: `"${performedBy}" đã xóa ${resourceType}`,
-        details,
-    };
+    return details;
 };
 
 // Export the audit service functions
 module.exports = {
     prepareAudit,
     formatUpdateJSON,
-    formatCreateJSON,
-    formatDeleteJSON,
+    formatInfoJSON,
 };

@@ -28,7 +28,7 @@ const createUser = async (req, res) => {
         const user = new User({ ...newUser, password });
         await user.save();
 
-        const auditData = auditService.formatCreateJSON({
+        const auditData = auditService.formatInfoJSON({
             resourceType: 'tài khoản',
             detail: newUser,
             performedBy: req.user.name,
@@ -238,7 +238,7 @@ const resetPassword = async (req, res) => {
             'isActive',
         ]);
 
-        const auditData = auditService.formatCreateJSON({
+        const auditData = auditService.formatInfoJSON({
             resourceType: 'mật khẩu mới',
             detail: updateUser,
             performedBy: req.user.name,

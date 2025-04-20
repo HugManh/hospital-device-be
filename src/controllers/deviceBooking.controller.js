@@ -79,7 +79,7 @@ const createDeviceBooking = async (req, res) => {
 
         await booking.save();
 
-        const auditData = auditService.formatCreateJSON({
+        const auditData = auditService.formatInfoJSON({
             resourceType: 'đơn đăng ký thiêt bị',
             detail: booking.toObject(),
             performedBy: req.user.name,
@@ -339,7 +339,7 @@ const approverBooking = async (req, res) => {
         booking.status = status;
         await booking.save();
 
-        const auditData = auditService.formatCreateJSON({
+        const auditData = auditService.formatInfoJSON({
             resourceType: `${status}`,
             detail: status,
             performedBy: req.user.name,
@@ -401,7 +401,7 @@ const requestBookingEdit = async (req, res) => {
         };
         await booking.save();
 
-        const auditData = auditService.formatCreateJSON({
+        const auditData = auditService.formatInfoJSON({
             resourceType: 'yêu cầu chỉnh sửa đơn đăng ký thiết bị',
             detail: booking.editRequest,
             performedBy: req.user.name,
@@ -461,7 +461,7 @@ const processEditRequest = async (req, res) => {
 
         await booking.save();
 
-        const auditData = auditService.formatCreateJSON({
+        const auditData = auditService.formatInfoJSON({
             resourceType: 'duyệt yêu cầu chỉnh sửa đơn đăng ký thiết bị',
             detail: booking.editRequest,
             performedBy: req.user.name,

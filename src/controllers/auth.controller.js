@@ -84,7 +84,7 @@ const login = async (req, res) => {
             'refreshToken',
         ]);
 
-        const auditData = auditService.formatCreateJSON({
+        const auditData = auditService.formatInfoJSON({
             resourceType: 'đăng nhập',
             detail: updateUser,
             performedBy: req.user.name,
@@ -150,7 +150,7 @@ const logout = async (req, res) => {
             'refreshToken',
         ]);
 
-        const auditData = auditService.formatCreateJSON({
+        const auditData = auditService.formatInfoJSON({
             resourceType: 'đăng xuất',
             detail: updateUser,
             performedBy: req.user.name,

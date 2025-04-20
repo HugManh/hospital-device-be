@@ -21,7 +21,7 @@ const addDevice = async (req, res) => {
         const device = new Device(newDevice);
         await device.save();
 
-        const auditData = auditService.formatCreateJSON({
+        const auditData = auditService.formatInfoJSON({
             resourceType: 'thiết bị',
             detail: newDevice,
             performedBy: req.user.name,
