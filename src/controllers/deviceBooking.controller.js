@@ -158,7 +158,7 @@ const getDeviceBookingById = async (req, res) => {
     }
 };
 
-// Duyệt đơn và thay đổi đơn đăng ký thiết bị
+// Thay đổi đơn thông tin đăng ký thiết bị
 const updateBooking = async (req, res) => {
     try {
         const { bookingId } = req.params;
@@ -324,9 +324,8 @@ const listUserBookings = async (req, res) => {
 // Admin xử lý đơn đăng ký
 const approverBooking = async (req, res) => {
     try {
-        const { bookingId } = req.params;
+        const { bookingId, status, note } = req.body;
         const userId = req.user?.sub;
-        const { status } = req.body;
 
         const user = await User.findById(userId);
         if (!user) return Response.notFound(res, 'Không tìm thấy người dùng');
@@ -337,6 +336,7 @@ const approverBooking = async (req, res) => {
         }
 
         booking.status = status;
+        if (note) booking.note = note;
         await booking.save();
 
         const auditData = auditService.formatCreateJSON({

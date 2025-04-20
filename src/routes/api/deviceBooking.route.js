@@ -45,7 +45,7 @@ router.get(
     listUserBookings
 );
 router.post(
-    '/:bookingId/approver',
+    '/approver',
     authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]),
     approverBooking
 );
