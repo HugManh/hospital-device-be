@@ -90,7 +90,7 @@ const login = async (req, res) => {
             'refreshToken',
         ]);
 
-        const auditData = auditService.formatInfoJSON({
+        const auditData = await auditService.formatInfoJSON({
             modelName: 'User',
             detail: updateUser,
         });
@@ -98,7 +98,7 @@ const login = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.LOGIN,
-            `"${req.user.name}" đã đăng nhập`,
+            `${req.user.name} đã đăng nhập`,
             auditData
         );
 
@@ -151,7 +151,7 @@ const logout = async (req, res) => {
             'refreshToken',
         ]);
 
-        const auditData = auditService.formatInfoJSON({
+        const auditData = await auditService.formatInfoJSON({
             modelName: 'User',
             detail: updateUser,
         });
@@ -159,7 +159,7 @@ const logout = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.LOGIN,
-            `"${req.user.name}" đã đăng xuất`,
+            `${req.user.name} đã đăng xuất`,
             auditData
         );
 

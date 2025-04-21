@@ -79,7 +79,7 @@ const createDeviceBooking = async (req, res) => {
 
         await booking.save();
 
-        const auditData = auditService.formatInfoJSON({
+        const auditData = await auditService.formatInfoJSON({
             modelName: 'DeviceBooking',
             detail: booking.toObject(),
         });
@@ -222,7 +222,7 @@ const updateBooking = async (req, res) => {
             'status',
         ]);
 
-        const auditData = auditService.formatUpdateJSON({
+        const auditData = await auditService.formatUpdateJSON({
             modelName: 'DeviceBooking',
             detail: { changes },
         });
@@ -337,7 +337,7 @@ const approverBooking = async (req, res) => {
         if (note) booking.note = note;
         await booking.save();
 
-        const auditData = auditService.formatInfoJSON({
+        const auditData = await auditService.formatInfoJSON({
             modelName: 'DeviceBooking',
             detail: status,
         });
@@ -398,7 +398,7 @@ const requestBookingEdit = async (req, res) => {
         };
         await booking.save();
 
-        const auditData = auditService.formatInfoJSON({
+        const auditData = await auditService.formatInfoJSON({
             modelName: 'editRequest',
             detail: booking.editRequest,
         });
@@ -455,7 +455,7 @@ const processEditRequest = async (req, res) => {
 
         await booking.save();
 
-        const auditData = auditService.formatInfoJSON({
+        const auditData = await auditService.formatInfoJSON({
             modelName: 'editRequest',
             detail: booking.editRequest,
         });

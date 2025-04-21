@@ -28,7 +28,7 @@ const createUser = async (req, res) => {
         const user = new User({ ...newUser, password });
         await user.save();
 
-        const auditData = auditService.formatInfoJSON({
+        const auditData = await auditService.formatInfoJSON({
             modelName: 'User',
             detail: newUser,
         });
@@ -145,7 +145,7 @@ const updateUser = async (req, res) => {
             'isActive',
         ]);
         // if (Object.keys(changes).length > 0) {
-        const auditData = auditService.formatUpdateJSON({
+        const auditData = await auditService.formatUpdateJSON({
             modelName: 'User',
             detail: { changes },
         });
@@ -192,7 +192,7 @@ const deleteUser = async (req, res) => {
             'refreshToken',
         ]);
 
-        const auditData = auditService.formatDeleteJSON({
+        const auditData = await auditService.formatInfoJSON({
             modelName: 'User',
             detail: deletedUser,
         });
@@ -238,7 +238,7 @@ const resetPassword = async (req, res) => {
             'isActive',
         ]);
 
-        const auditData = auditService.formatInfoJSON({
+        const auditData = await auditService.formatInfoJSON({
             modelName: 'User',
             detail: updateUser,
         });

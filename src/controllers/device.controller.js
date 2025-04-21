@@ -21,7 +21,7 @@ const addDevice = async (req, res) => {
         const device = new Device(newDevice);
         await device.save();
 
-        const auditData = auditService.formatInfoJSON({
+        const auditData = await auditService.formatInfoJSON({
             modelName: 'Device',
             detail: newDevice,
         });
@@ -143,7 +143,7 @@ const updateDevice = async (req, res) => {
             'location',
         ]);
         // if (Object.keys(changes).length > 0) {
-        const auditData = auditService.formatUpdateJSON({
+        const auditData = await auditService.formatUpdateJSON({
             modelName: 'Device',
             detail: { changes },
         });
@@ -182,10 +182,12 @@ const deleteDevice = async (req, res) => {
             return Response.notFound(res, 'Không tìm thấy thiết bị');
         }
 
-        const auditData = auditService.formatDeleteJSON({
+        const auditData = await auditService.formatInfoJSON({
             modelName: 'Device',
             detail: device.toObject(),
         });
+
+        console.log(auditData);
 
         auditService.prepareAudit(
             req,
