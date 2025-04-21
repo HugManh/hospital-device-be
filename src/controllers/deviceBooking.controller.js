@@ -79,16 +79,15 @@ const createDeviceBooking = async (req, res) => {
 
         await booking.save();
 
-        const auditData = auditService.formatCreateJSON({
-            resourceType: 'đơn đăng ký thiêt bị',
+        const auditData = auditService.formatInfoJSON({
+            modelName: 'DeviceBooking',
             detail: booking.toObject(),
-            performedBy: req.user.name,
         });
         auditService.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE_BOOKING,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã tạo đơn đăng ký thiết bị`,
+            auditData
         );
 
         return Response.success(
@@ -192,7 +191,6 @@ const updateBooking = async (req, res) => {
             usageDay: booking.usageDay,
             priority: booking.priority,
             status: booking.status,
-            editRequest: booking.editRequest,
         };
 
         const updates = _.pickBy(
@@ -207,8 +205,7 @@ const updateBooking = async (req, res) => {
                 usageDay: usageDay ? new Date(usageDay) : undefined,
                 priority,
                 status: status || REGISTER_STATUS.PENDING,
-                editRequest:
-                    user.role === ROLES.USER ? {} : booking.editRequest,
+                ...(user.role === ROLES.USER && { editRequest: {} }),
             },
             (value) => !_.isUndefined(value) && !_.isNull(value)
         );
@@ -223,20 +220,18 @@ const updateBooking = async (req, res) => {
             'usageDay',
             'priority',
             'status',
-            'editRequest',
         ]);
 
         const auditData = auditService.formatUpdateJSON({
-            resourceType: 'đơn đăng ký thiết bị',
+            modelName: 'DeviceBooking',
             detail: { changes },
-            performedBy: req.user.name,
         });
 
         auditService.prepareAudit(
             req,
             auditAction.actionList.UPDATE_DEVICE_BOOKING,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã cập nhật đơn đăng ký thiết bị`,
+            auditData
         );
 
         return Response.success(res, 'Đã xử lý đơn đăng ký', { booking });
@@ -342,17 +337,16 @@ const approverBooking = async (req, res) => {
         if (note) booking.note = note;
         await booking.save();
 
-        const auditData = auditService.formatCreateJSON({
-            resourceType: `${status}`,
+        const auditData = auditService.formatInfoJSON({
+            modelName: 'DeviceBooking',
             detail: status,
-            performedBy: req.user.name,
         });
 
         auditService.prepareAudit(
             req,
             auditAction.actionList.PROCESS_DEVICE_BOOKING,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã xử lý đơn đăng ký thiết bị`,
+            auditData
         );
 
         return Response.success(res, `Đã ${status} đơn đăng ký`, { note });
@@ -404,16 +398,15 @@ const requestBookingEdit = async (req, res) => {
         };
         await booking.save();
 
-        const auditData = auditService.formatCreateJSON({
-            resourceType: 'yêu cầu chỉnh sửa đơn đăng ký thiết bị',
+        const auditData = auditService.formatInfoJSON({
+            modelName: 'editRequest',
             detail: booking.editRequest,
-            performedBy: req.user.name,
         });
         auditService.prepareAudit(
             req,
             auditAction.actionList.REQUEST_BOOKING_EDIT,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã yêu cầu chỉnh sửa đơn đăng ký thiết bị`,
+            auditData
         );
 
         return Response.success(res, 'Edit request submitted successfully', {
@@ -462,17 +455,16 @@ const processEditRequest = async (req, res) => {
 
         await booking.save();
 
-        const auditData = auditService.formatCreateJSON({
-            resourceType: 'duyệt yêu cầu chỉnh sửa đơn đăng ký thiết bị',
+        const auditData = auditService.formatInfoJSON({
+            modelName: 'editRequest',
             detail: booking.editRequest,
-            performedBy: req.user.name,
         });
 
         auditService.prepareAudit(
             req,
             auditAction.actionList.PROCESS_EDIT_REQUEST,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã xử lý yêu cầu chỉnh sửa`,
+            auditData
         );
 
         return Response.success(res, 'Edit request processed successfully', {

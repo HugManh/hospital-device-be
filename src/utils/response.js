@@ -15,7 +15,7 @@ class Response {
         message = 'Success',
         data = null,
         meta = null,
-        statusCode = 200,
+        statusCode = 200
     ) {
         const response = {
             success: true,

@@ -1,0 +1,85 @@
+{
+    "User": {
+        "email": {
+            "vi": "Tài khoản"
+        },
+        "name": {
+            "vi": "Tên người dùng"
+        },
+        "password": {
+            "vi": "Mật khẩu"
+        },
+        "role": {
+            "vi": "Vai trò"
+        },
+        "group": {
+            "vi": "Đơn vị"
+        },
+        "isActive": {
+            "vi": "Trạng thái"
+        }
+    },
+    "Device": {
+        "name": {
+            "vi": "Tên thiết bị"
+        },
+        "location": {
+            "vi": "Vị trí"
+        },
+        "description": {
+            "vi": "Mô tả"
+        }
+    },
+    "DeviceBooking": {
+        "deviceId": {
+            "vi": "Thiết bị"
+        },
+        "userId": {
+            "vi": "Người dùng"
+        },
+        "codeBA": {
+            "vi": "Mã bệnh án"
+        },
+        "nameBA": {
+            "vi": "Tên bệnh án"
+        },
+        "usageTime": {
+            "vi": "Thời gian đăng ký"
+        },
+        "usageDay": {
+            "vi": "Ngày đăng ký"
+        },
+        "priority": {
+            "vi": "Độ ưu tiên"
+        },
+        "purpose": {
+            "vi": "Mục đích"
+        },
+        "status": {
+            "vi": "Trạng thái"
+        },
+        "note": {
+            "vi": "Ghi chú"
+        }
+    },
+    "editRequest": {
+        "status": {
+            "vi": "Trạng thái yêu cầu chỉnh sửa"
+        },
+        "reason": {
+            "vi": "Lý do chỉnh sửa"
+        },
+        "requestedAt": {
+            "vi": "Thời gian yêu cầu chỉnh sửa"
+        },
+        "processedBy": {
+            "vi": "Người xử lý yêu cầu chỉnh sửa"
+        },
+        "processedAt": {
+            "vi": "Thời gian xử lý yêu cầu chỉnh sửa"
+        },
+        "approverNote": {
+            "vi": "Ghi chú của người duyệt"
+        }
+    }
+}

@@ -90,17 +90,16 @@ const login = async (req, res) => {
             'refreshToken',
         ]);
 
-        const auditData = auditService.formatCreateJSON({
-            resourceType: 'đăng nhập',
+        const auditData = auditService.formatInfoJSON({
+            modelName: 'User',
             detail: updateUser,
-            performedBy: req.user.name,
         });
 
         auditService.prepareAudit(
             req,
             auditAction.actionList.LOGIN,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã đăng nhập`,
+            auditData
         );
 
         return Response.success(res, 'Đăng nhập thành công', {
@@ -152,17 +151,16 @@ const logout = async (req, res) => {
             'refreshToken',
         ]);
 
-        const auditData = auditService.formatCreateJSON({
-            resourceType: 'đăng xuất',
+        const auditData = auditService.formatInfoJSON({
+            modelName: 'User',
             detail: updateUser,
-            performedBy: req.user.name,
         });
 
         auditService.prepareAudit(
             req,
             auditAction.actionList.LOGIN,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã đăng xuất`,
+            auditData
         );
 
         return Response.success(res, 'Đăng xuất thành công');

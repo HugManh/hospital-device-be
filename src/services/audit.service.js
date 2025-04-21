@@ -1,22 +1,10 @@
 const EventEmitter = require('events');
 const AuditTrail = require('../models/audit.model');
+const { getLabel } = require('../utils/fieldLabelRegistry');
 
 // Initialize EventEmitter for audit events
 const auditEmitter = new EventEmitter();
 const AUDIT_EVENT = 'audit';
-
-// Map for field translations
-const fieldTranslationMap = new Map([
-    ['name', 'Tên'],
-    ['status', 'Trạng thái'],
-    ['role', 'Vai trò'],
-    // Add more field translations here as needed
-]);
-
-// Utility function to translate field names using Map
-const translateField = (field) => {
-    return fieldTranslationMap.get(field) || field;
-};
 
 // Utility function to format values for display
 const formatValue = (value) => {
@@ -74,95 +62,52 @@ const prepareAudit = (req, auditAction, message, detail = {}) => {
 /**
  * Formats audit data for an UPDATE operation.
  * @param {Object} params - Parameters for formatting.
- * @param {string} params.resourceType - Type of resource being updated.
+ * @param {string} params.modelName - Type of resource being updated.
  * @param {Object} params.detail - Details of the changes.
- * @param {string} params.performedBy - Name of the user performing the action.
+ * @param {string} params.locale - Language locale (default: 'vi').
  * @returns {Object} Formatted audit data.
  */
-const formatUpdateJSON = ({ resourceType, detail, performedBy }) => {
-    if (!resourceType || !performedBy) {
-        throw new Error(
-            'Missing required parameters: resourceType or performedBy'
-        );
-    }
-
+const formatUpdateJSON = async ({ modelName, detail, locale = 'vi' }) => {
     const details = detail?.changes
-        ? Object.entries(detail.changes).map(([field, { from, to }]) => ({
-              field,
-              label: translateField(field),
-              from: formatValue(from),
-              to: formatValue(to),
-          }))
+        ? await Promise.all(
+              Object.entries(detail.changes).map(
+                  async ([field, { from, to }]) => ({
+                      field,
+                      label: await getLabel(modelName, field, locale),
+                      from: formatValue(from),
+                      to: formatValue(to),
+                  })
+              )
+          )
         : [];
 
-    return {
-        message: `"${performedBy}" đã cập nhật ${resourceType}`,
-        details,
-    };
+    return details;
 };
 
 /**
- * Formats audit data for a CREATE operation.
+ * Formats audit data for a CREATE or DELETE operation.
  * @param {Object} params - Parameters for formatting.
- * @param {string} params.resourceType - Type of resource being created.
- * @param {Object} params.detail - Details of the created resource.
- * @param {string} params.performedBy - Name of the user performing the action.
+ * @param {string} params.modelName - Type of resource.
+ * @param {Object} params.detail - Details of the resource.
+ * @param {string} params.locale - Language locale (default: 'vi').
  * @returns {Object} Formatted audit data.
  */
-const formatCreateJSON = ({ resourceType, detail, performedBy }) => {
-    if (!resourceType || !performedBy) {
-        throw new Error(
-            'Missing required parameters: resourceType or performedBy'
-        );
-    }
-
+const formatInfoJSON = async ({ modelName, detail, locale = 'vi' }) => {
     const details = detail
-        ? Object.entries(detail).map(([field, value]) => ({
-              field,
-              label: translateField(field),
-              value: formatValue(value),
-          }))
+        ? await Promise.all(
+              Object.entries(detail).map(async ([field, value]) => ({
+                  field,
+                  label: await getLabel(modelName, field, locale),
+                  value: formatValue(value),
+              }))
+          )
         : [];
 
-    return {
-        message: `"${performedBy}" đã tạo ${resourceType}`,
-        details,
-    };
+    return details;
 };
 
-/**
- * Formats audit data for a DELETE operation.
- * @param {Object} params - Parameters for formatting.
- * @param {string} params.resourceType - Type of resource being deleted.
- * @param {Object} params.detail - Details of the deleted resource.
- * @param {string} params.performedBy - Name of the user performing the action.
- * @returns {Object} Formatted audit data.
- */
-const formatDeleteJSON = ({ resourceType, detail, performedBy }) => {
-    if (!resourceType || !performedBy) {
-        throw new Error(
-            'Missing required parameters: resourceType or performedBy'
-        );
-    }
-
-    const details = detail
-        ? Object.entries(detail).map(([field, value]) => ({
-              field,
-              label: translateField(field),
-              value: formatValue(value),
-          }))
-        : [];
-
-    return {
-        message: `"${performedBy}" đã xóa ${resourceType}`,
-        details,
-    };
-};
-
-// Export the audit service functions
 module.exports = {
     prepareAudit,
     formatUpdateJSON,
-    formatCreateJSON,
-    formatDeleteJSON,
+    formatInfoJSON,
 };

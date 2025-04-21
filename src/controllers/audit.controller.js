@@ -15,7 +15,7 @@ const getAudit = async (req, res) => {
             res,
             'Lấy danh sách nhật ký thành công',
             data,
-            meta,
+            meta
         );
     } catch (error) {
         return Response.error(
@@ -36,7 +36,7 @@ const getAuditById = async (req, res) => {
         return Response.success(
             res,
             'Lấy thông tin chi tiết của nhật ký thành công',
-            audit,
+            audit
         );
     } catch (error) {
         return Response.error(

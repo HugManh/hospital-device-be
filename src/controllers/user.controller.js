@@ -28,17 +28,16 @@ const createUser = async (req, res) => {
         const user = new User({ ...newUser, password });
         await user.save();
 
-        const auditData = auditService.formatCreateJSON({
-            resourceType: 'tài khoản',
+        const auditData = auditService.formatInfoJSON({
+            modelName: 'User',
             detail: newUser,
-            performedBy: req.user.name,
         });
 
         auditService.prepareAudit(
             req,
             auditAction.actionList.CREATE_USER,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã thêm tài khoản mới`,
+            auditData
         );
 
         return Response.success(
@@ -147,15 +146,14 @@ const updateUser = async (req, res) => {
         ]);
         // if (Object.keys(changes).length > 0) {
         const auditData = auditService.formatUpdateJSON({
-            resourceType: 'tài khoản',
+            modelName: 'User',
             detail: { changes },
-            performedBy: req.user.name,
         });
         auditService.prepareAudit(
             req,
             auditAction.actionList.UPDATE_USER,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã cập nhật tài khoản`,
+            auditData
         );
         // }
         // TODO: Có cần thiết phải trả data trong response không?
@@ -195,16 +193,15 @@ const deleteUser = async (req, res) => {
         ]);
 
         const auditData = auditService.formatDeleteJSON({
-            resourceType: 'tài khoản',
+            modelName: 'User',
             detail: deletedUser,
-            performedBy: req.user.name,
         });
 
         auditService.prepareAudit(
             req,
             auditAction.actionList.DELETE_USER,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã xoá tài khoản`,
+            auditData
         );
 
         return Response.success(res, 'Đã xoá tài khoản thành công');
@@ -241,17 +238,16 @@ const resetPassword = async (req, res) => {
             'isActive',
         ]);
 
-        const auditData = auditService.formatCreateJSON({
-            resourceType: 'mật khẩu mới',
+        const auditData = auditService.formatInfoJSON({
+            modelName: 'User',
             detail: updateUser,
-            performedBy: req.user.name,
         });
 
         auditService.prepareAudit(
             req,
             auditAction.actionList.RESET_PASSWORD,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã cấp mật khẩu mới cho "${updateUser.name}"`,
+            auditData
         );
 
         return Response.success(res, 'Đã tạo mới mật khẩu thành công', {

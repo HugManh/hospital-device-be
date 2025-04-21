@@ -7,9 +7,7 @@ const {
     updateDevice,
     deleteDevice,
 } = require('../../controllers/device.controller');
-const {
-    authorizeRoles,
-} = require('../../middleware/auth.middleware');
+const { authorizeRoles } = require('../../middleware/auth.middleware');
 const { ROLES } = require('../../config/constants');
 
 router.post('/', authorizeRoles([ROLES.ADMIN]), addDevice);

@@ -26,26 +26,26 @@ const DeviceBookingSchema = new BaseSchema({
     usageTime: {
         type: String,
         required: true,
-        description: 'Thời gian đăng ký sử dụng',
+        description: 'Thời gian đăng ký',
     },
     usageDay: {
         type: Date,
         required: true,
-        description: 'Ngày đăng ký sử dụng',
+        description: 'Ngày đăng ký',
     },
     priority: {
         type: String,
         required: true,
-        description: 'Mức độ ưu tiên',
+        description: 'Độ ưu tiên',
     },
     purpose: {
         type: String,
-        description: 'Mục đích sử dụng',
+        description: 'Mục đích',
     },
     status: {
         type: String,
         required: true,
-        description: 'Trạng thái đăng ký',
+        description: 'Trạng thái',
     },
     note: {
         type: String,

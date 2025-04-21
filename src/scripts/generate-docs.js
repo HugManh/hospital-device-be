@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const specs = require('../docs/swagger');  // Swagger object (JSON hoặc JS)
+const specs = require('../docs/swagger'); // Swagger object (JSON hoặc JS)
 
 // Tạo file openapi.json
 async function generateOpenApiJson() {
@@ -16,14 +16,18 @@ async function generateOpenApiJson() {
 // Hàm xử lý headers mặc định
 function getDefaultHeaders() {
     return {
-        'Accept': 'application/json',
+        Accept: 'application/json',
     };
 }
 
 // Hàm tạo request body nếu có
 function getRequestBody(requestBody) {
     if (requestBody && requestBody.content?.['application/json']?.example) {
-        return JSON.stringify(requestBody.content['application/json'].example, null, 2);
+        return JSON.stringify(
+            requestBody.content['application/json'].example,
+            null,
+            2
+        );
     }
     return null;
 }
@@ -31,8 +35,8 @@ function getRequestBody(requestBody) {
 // Hàm tạo query params từ Swagger specification
 function getQueryParams(parameters) {
     return parameters
-        .filter(param => param.in === 'query')
-        .map(param => `${param.name}=<value>`)
+        .filter((param) => param.in === 'query')
+        .map((param) => `${param.name}=<value>`)
         .join('\n');
 }
 

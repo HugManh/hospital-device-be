@@ -21,23 +21,22 @@ const addDevice = async (req, res) => {
         const device = new Device(newDevice);
         await device.save();
 
-        const auditData = auditService.formatCreateJSON({
-            resourceType: 'thiết bị',
+        const auditData = auditService.formatInfoJSON({
+            modelName: 'Device',
             detail: newDevice,
-            performedBy: req.user.name,
         });
 
         auditService.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã thêm thiết bị mới`,
+            auditData
         );
 
         return Response.success(
             res,
             'Thêm thiết bị mới thành công',
-            { newDevice },
+            device.toObject(),
             null,
             201
         );
@@ -145,15 +144,14 @@ const updateDevice = async (req, res) => {
         ]);
         // if (Object.keys(changes).length > 0) {
         const auditData = auditService.formatUpdateJSON({
-            resourceType: 'thiết bị',
+            modelName: 'Device',
             detail: { changes },
-            performedBy: req.user.name,
         });
         auditService.prepareAudit(
             req,
             auditAction.actionList.UPDATE_DEVICE,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã cập nhật thông tin thiết bị`,
+            auditData
         );
         // }
 
@@ -185,16 +183,15 @@ const deleteDevice = async (req, res) => {
         }
 
         const auditData = auditService.formatDeleteJSON({
-            resourceType: 'tài khoản',
+            modelName: 'Device',
             detail: device.toObject(),
-            performedBy: req.user.name,
         });
 
         auditService.prepareAudit(
             req,
             auditAction.actionList.DELETE_DEVICE,
-            auditData.message,
-            auditData.details
+            `"${req.user.name}" đã xoá thiết bị`,
+            auditData
         );
 
         return Response.success(res, 'Đã xóa thiết bị thành công');

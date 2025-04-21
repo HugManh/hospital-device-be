@@ -10,11 +10,11 @@ const DeviceSchema = new BaseSchema({
     location: {
         type: String,
         required: true,
-        description: 'Vị trí đặt thiết bị',
+        description: 'Vị trí',
     },
     description: {
         type: String,
-        description: 'Mô tả chi tiết về thiết bị',
+        description: 'Mô tả',
     },
     // specifications: {
     //     type: Map,
