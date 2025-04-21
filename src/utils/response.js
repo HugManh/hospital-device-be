@@ -12,10 +12,10 @@ class Response {
      */
     static success(
         res,
+        message = 'Success',
         data = null,
         meta = null,
-        message = 'Success',
-        statusCode = 200
+        statusCode = 200,
     ) {
         const response = {
             success: true,

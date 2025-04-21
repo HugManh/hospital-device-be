@@ -36,8 +36,9 @@ const addDevice = async (req, res) => {
 
         return Response.success(
             res,
-            { newDevice },
             'Thêm thiết bị mới thành công',
+            { newDevice },
+            null,
             201
         );
     } catch (error) {
@@ -59,11 +60,13 @@ const getDevices = async (req, res) => {
             .paginate()
             .exec();
 
+        const { data, meta } = devices;
+
         return Response.success(
             res,
-            devices.data,
-            devices.meta,
-            'Lấy danh sách thiết bị thành công'
+            'Lấy danh sách thiết bị thành công',
+            data,
+            meta
         );
     } catch (error) {
         return Response.error(
@@ -84,8 +87,8 @@ const getDeviceById = async (req, res) => {
         }
         return Response.success(
             res,
-            device,
-            'Lấy thông tin thiết bị thành công'
+            'Lấy thông tin thiết bị thành công',
+            device
         );
     } catch (error) {
         return Response.error(
@@ -155,11 +158,9 @@ const updateDevice = async (req, res) => {
         // }
 
         // TODO: Có cần thiết phải trả data trong response không?
-        return Response.success(
-            res,
-            { device: updatedDevice },
-            'Cập nhật thông tin thiết bị thành công'
-        );
+        return Response.success(res, 'Cập nhật thông tin thiết bị thành công', {
+            device: updatedDevice,
+        });
     } catch (error) {
         return Response.error(
             res,

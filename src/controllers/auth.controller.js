@@ -20,7 +20,13 @@ const register = async (req, res) => {
         const user = new User({ email, name, password, role });
         await user.save();
 
-        return Response.success(res, null, 'Đăng ký tài khoản thành công', 201);
+        return Response.success(
+            res,
+            'Đăng ký tài khoản thành công',
+            null,
+            null,
+            201
+        );
     } catch (error) {
         return Response.error(
             res,
@@ -97,19 +103,15 @@ const login = async (req, res) => {
             auditData.details
         );
 
-        return Response.success(
-            res,
-            {
-                accessToken,
-                refreshToken,
-                user: {
-                    name: user.name,
-                    email: user.email,
-                    role: user.role,
-                },
+        return Response.success(res, 'Đăng nhập thành công', {
+            accessToken,
+            refreshToken,
+            user: {
+                name: user.name,
+                email: user.email,
+                role: user.role,
             },
-            'Đăng nhập thành công'
-        );
+        });
     } catch (error) {
         return Response.error(
             res,
@@ -203,7 +205,7 @@ const refreshToken = async (req, res) => {
             { expiresIn: '2h' }
         );
 
-        return Response.success(res, { accessToken }, 'Lấy token thành công');
+        return Response.success(res, 'Lấy token thành công', { accessToken });
     } catch (error) {
         return Response.error(
             res,
@@ -226,18 +228,14 @@ const getProfile = async (req, res) => {
             return Response.notFound(res, 'Không tìm thấy tài khoản');
         }
 
-        return Response.success(
-            res,
-            {
-                profile: {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role,
-                },
+        return Response.success(res, 'Lấy thông tin hồ sơ thành công', {
+            profile: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
             },
-            'Lấy thông tin hồ sơ thành công'
-        );
+        });
     } catch (error) {
         return Response.error(
             res,
@@ -263,11 +261,10 @@ const updateProfile = async (req, res) => {
 
         await user.save();
 
-        return Response.success(
-            res,
-            { name, group },
-            'Cập nhật tài khoản thành công'
-        );
+        return Response.success(res, 'Cập nhật tài khoản thành công', {
+            name,
+            group,
+        });
     } catch (error) {
         return Response.error(
             res,
@@ -314,7 +311,7 @@ const updatePassword = async (req, res) => {
         user.password = newPassword;
         await user.save();
 
-        return Response.success(res, null, 'Cập nhật mật khẩu thành công');
+        return Response.success(res, 'Cập nhật mật khẩu thành công');
     } catch (error) {
         return Response.error(
             res,

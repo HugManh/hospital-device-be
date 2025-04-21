@@ -93,8 +93,9 @@ const createDeviceBooking = async (req, res) => {
 
         return Response.success(
             res,
-            { booking },
             'Tạo đơn đăng ký thiết bị thành công',
+            { booking },
+            null,
             201
         );
     } catch (error) {
@@ -120,11 +121,13 @@ const getDeviceBookings = async (req, res) => {
             .paginate()
             .exec();
 
+        const { data, meta } = bookings;
+
         return Response.success(
             res,
-            bookings.data,
-            bookings.meta,
-            'Lấy danh sách đơn đăng ký thành công'
+            'Lấy danh sách đơn đăng ký thành công',
+            data,
+            meta
         );
     } catch (error) {
         return Response.error(
@@ -145,8 +148,8 @@ const getDeviceBookingById = async (req, res) => {
         }
         return Response.success(
             res,
-            booking,
-            'Lấy thông tin đơn đăng ký thành công'
+            'Lấy thông tin đơn đăng ký thành công',
+            booking
         );
     } catch (error) {
         return Response.error(
@@ -236,7 +239,7 @@ const updateBooking = async (req, res) => {
             auditData.details
         );
 
-        return Response.success(res, { booking }, 'Đã xử lý đơn đăng ký');
+        return Response.success(res, 'Đã xử lý đơn đăng ký', { booking });
     } catch (error) {
         return Response.error(
             res,
@@ -270,9 +273,9 @@ const listDeviceBookings = async (req, res) => {
 
         return Response.success(
             res,
+            'Lấy danh sách đơn của thiết bị thành công',
             data,
-            meta,
-            'Lấy danh sách đơn của thiết bị thành công'
+            meta
         );
     } catch (error) {
         return Response.error(
@@ -307,9 +310,9 @@ const listUserBookings = async (req, res) => {
 
         return Response.success(
             res,
+            'Lấy lịch sử đăng ký của người dùng thành công',
             data,
-            meta,
-            'Lấy lịch sử đăng ký của người dùng thành công'
+            meta
         );
     } catch (error) {
         return Response.error(
@@ -352,7 +355,7 @@ const approverBooking = async (req, res) => {
             auditData.details
         );
 
-        return Response.success(res, `Đã ${status} đơn đăng ký`);
+        return Response.success(res, `Đã ${status} đơn đăng ký`, { note });
     } catch (error) {
         return Response.error(
             res,
@@ -413,11 +416,9 @@ const requestBookingEdit = async (req, res) => {
             auditData.details
         );
 
-        return Response.success(
-            res,
-            { editRequest: booking.editRequest },
-            'Edit request submitted successfully'
-        );
+        return Response.success(res, 'Edit request submitted successfully', {
+            editRequest: booking.editRequest,
+        });
     } catch (error) {
         return Response.error(
             res,
@@ -474,11 +475,9 @@ const processEditRequest = async (req, res) => {
             auditData.details
         );
 
-        return Response.success(
-            res,
-            { editRequest: booking.editRequest },
-            'Edit request processed successfully'
-        );
+        return Response.success(res, 'Edit request processed successfully', {
+            editRequest: booking.editRequest,
+        });
     } catch (error) {
         return Response.error(
             res,

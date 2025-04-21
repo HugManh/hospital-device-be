@@ -43,8 +43,9 @@ const createUser = async (req, res) => {
 
         return Response.success(
             res,
-            { ...newUser, password },
             'Tạo tài khoản thành công',
+            { ...newUser, password },
+            null,
             201
         );
     } catch (error) {
@@ -66,11 +67,13 @@ const getUsers = async (req, res) => {
             .select('-password -refreshToken')
             .paginate()
             .exec();
+
+        const { data, meta } = users;
         return Response.success(
             res,
-            users.data,
-            users.meta,
-            'Lấy danh sách tài khoản thành công'
+            'Lấy danh sách tài khoản thành công',
+            data,
+            meta
         );
     } catch (error) {
         return Response.error(
@@ -91,8 +94,8 @@ const getUserById = async (req, res) => {
         }
         return Response.success(
             res,
-            user,
-            'Lấy thông tin tài khoản thành công'
+            'Lấy thông tin tài khoản thành công',
+            user
         );
     } catch (error) {
         return Response.error(
@@ -158,14 +161,14 @@ const updateUser = async (req, res) => {
         // TODO: Có cần thiết phải trả data trong response không?
         return Response.success(
             res,
+            'Cập nhật thông tin tài khoản thành công',
             {
                 name: updatedUser.name,
                 email: updatedUser.email,
                 group: updatedUser.group,
                 role: updatedUser.role,
                 isActive: updatedUser.isActive,
-            },
-            'Cập nhật thông tin tài khoản thành công'
+            }
         );
     } catch (error) {
         return Response.error(
@@ -251,11 +254,9 @@ const resetPassword = async (req, res) => {
             auditData.details
         );
 
-        return Response.success(
-            res,
-            { password },
-            'Đã tạo mới mật khẩu thành công'
-        );
+        return Response.success(res, 'Đã tạo mới mật khẩu thành công', {
+            password,
+        });
     } catch (error) {
         return Response.error(
             res,
