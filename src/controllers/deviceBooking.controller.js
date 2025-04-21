@@ -138,8 +138,8 @@ const getDeviceBookings = async (req, res) => {
 
 const getDeviceBookingById = async (req, res) => {
     try {
-        const { bookingId } = req.params;
-        const booking = await DeviceBooking.findById(bookingId);
+        const { id } = req.params;
+        const booking = await DeviceBooking.findById(id);
         if (!booking) {
             return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
         }
@@ -161,7 +161,7 @@ const getDeviceBookingById = async (req, res) => {
 // Thay đổi đơn thông tin đăng ký thiết bị
 const updateBooking = async (req, res) => {
     try {
-        const { bookingId } = req.params;
+        const { id } = req.params;
         const userId = req.user?.sub;
         const {
             deviceId,
@@ -176,7 +176,7 @@ const updateBooking = async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return Response.notFound(res, 'Không tìm thấy người dùng');
 
-        const booking = await DeviceBooking.findById(bookingId);
+        const booking = await DeviceBooking.findById(id);
         if (!booking) {
             return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
         }

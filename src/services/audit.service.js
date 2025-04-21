@@ -36,7 +36,6 @@ auditEmitter.on(AUDIT_EVENT, async (auditData) => {
         }
 
         const { req, auditAction, message, detail } = auditData;
-        console.log(detail);
 
         const userData = req.user || {};
 
