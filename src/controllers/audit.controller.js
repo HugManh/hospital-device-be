@@ -3,7 +3,7 @@ const Response = require('../utils/response');
 const { isDevelopment } = require('../config/constants');
 const QueryBuilder = require('../utils/queryBuilder');
 
-const getAudit = async (req, res) => {
+const getAudits = async (req, res) => {
     try {
         const audit = await new QueryBuilder(AuditTrail, req.query)
             .filter()
@@ -49,6 +49,6 @@ const getAuditById = async (req, res) => {
 };
 
 module.exports = {
-    getAudit,
+    getAudits,
     getAuditById,
 };

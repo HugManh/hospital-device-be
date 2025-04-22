@@ -16,6 +16,15 @@ const AuditTrailSchema = new BaseSchema({
     },
     message: { type: String },
     detail: { type: Object },
+    occurredAt: {
+        type: Date,
+        required: true,
+        default: () => {
+            const now = new Date();
+            now.setUTCHours(0, 0, 0, 0); // Chỉ lấy ngày, không có giờ
+            return now;
+        },
+    },
 });
 
 AuditTrailSchema.index({ 'actor.id': 1 });
