@@ -81,7 +81,7 @@ const createDeviceBooking = async (req, res) => {
 
         const auditData = await auditService.formatInfoJSON({
             modelName: 'DeviceBooking',
-            detail: booking.toObject(),
+            detail: _.omit(booking.toObject(), ['deviceId', 'userId']),
         });
         auditService.prepareAudit(
             req,
@@ -178,13 +178,23 @@ const updateBooking = async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return Response.notFound(res, 'Không tìm thấy người dùng');
 
-        const booking = await DeviceBooking.findById(id);
+        const booking = await DeviceBooking.findById(id).populate([
+            { path: 'deviceId', select: 'name location' },
+        ]);
         if (!booking) {
             return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
         }
 
+        const device = await Device.findById(deviceId);
+        if (!device) {
+            return Response.notFound(res, 'Không tìm thấy thiết bị');
+        }
+
+        console.log('fdff', booking);
+
         const oldData = {
-            deviceId: booking.deviceId,
+            deviceId: booking.deviceId?.id,
+            deviceName: booking.deviceId?.name,
             codeBA: booking.codeBA,
             nameBA: booking.nameBA,
             usageTime: booking.usageTime,
@@ -199,6 +209,7 @@ const updateBooking = async (req, res) => {
                     deviceId && Types.ObjectId.isValid(deviceId)
                         ? new Types.ObjectId(deviceId)
                         : undefined,
+                deviceName: device.name,
                 codeBA,
                 nameBA,
                 usageTime,
@@ -213,7 +224,7 @@ const updateBooking = async (req, res) => {
         await booking.save();
 
         const changes = diffObjects(oldData, updates, [
-            'deviceId',
+            'deviceName',
             'codeBA',
             'nameBA',
             'usageTime',

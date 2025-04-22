@@ -6,9 +6,6 @@
         "name": {
             "vi": "Tên người dùng"
         },
-        "password": {
-            "vi": "Mật khẩu"
-        },
         "role": {
             "vi": "Vai trò"
         },
@@ -28,14 +25,20 @@
         },
         "description": {
             "vi": "Mô tả"
+        },
+        "createdAt": {
+            "vi": "Ngày tạo"
+        },
+        "updatedAt": {
+            "vi": "Ngày chỉnh sửa"
         }
     },
     "DeviceBooking": {
-        "deviceId": {
-            "vi": "Thiết bị"
+        "accountName": {
+            "vi": "Người tạo đơn"
         },
-        "userId": {
-            "vi": "Người dùng"
+        "deviceName": {
+            "vi": "Thiết bị đăng ký"
         },
         "codeBA": {
             "vi": "Mã bệnh án"
@@ -60,6 +63,12 @@
         },
         "note": {
             "vi": "Ghi chú"
+        },
+        "createdAt": {
+            "vi": "Ngày tạo"
+        },
+        "updatedAt": {
+            "vi": "Ngày chỉnh sửa"
         }
     },
     "editRequest": {

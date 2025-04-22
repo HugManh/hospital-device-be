@@ -8,10 +8,16 @@ const DeviceBookingSchema = new BaseSchema({
         ref: 'Device',
         required: true,
     },
+    deviceName: {
+        type: String,
+    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
+    },
+    accountName: {
+        type: String,
     },
     codeBA: {
         type: String,
