@@ -23,7 +23,7 @@ const createUser = async (req, res) => {
             email,
             group,
             role,
-            isActive,
+            isActive: isActive || true,
         };
 
         const user = new User({ ...newUser, password });
