@@ -63,6 +63,9 @@
         }
     },
     "editRequest": {
+        "requesterName": {
+            "vi": "Người yêu cầu chỉnh sửa"
+        },
         "status": {
             "vi": "Trạng thái yêu cầu chỉnh sửa"
         },
@@ -72,7 +75,7 @@
         "requestedAt": {
             "vi": "Thời gian yêu cầu chỉnh sửa"
         },
-        "processedBy": {
+        "approverName": {
             "vi": "Người xử lý yêu cầu chỉnh sửa"
         },
         "processedAt": {

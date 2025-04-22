@@ -65,9 +65,25 @@ const DeviceBookingSchema = new BaseSchema({
             type: Date,
             description: 'Thời gian yêu cầu chỉnh sửa',
         },
-        processedBy: {
+        // processedBy: {
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     ref: 'User',
+        //     description: 'Người xử lý yêu cầu chỉnh sửa',
+        // },
+        requesterId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
+        },
+        requesterName: {
+            type: String,
+            description: 'Người yêu cầu chỉnh sửa',
+        },
+        approverId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        approverName: {
+            type: String,
             description: 'Người xử lý yêu cầu chỉnh sửa',
         },
         processedAt: {

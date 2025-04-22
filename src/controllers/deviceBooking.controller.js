@@ -339,8 +339,10 @@ const approverBooking = async (req, res) => {
 
         const auditData = await auditService.formatInfoJSON({
             modelName: 'DeviceBooking',
-            detail: status,
+            detail: _.omit(booking.toObject(), ['editRequest']),
         });
+
+        console.log('PROCESS_DEVICE_BOOKING', auditData);
 
         auditService.prepareAudit(
             req,
@@ -365,15 +367,18 @@ const requestBookingEdit = async (req, res) => {
     try {
         const { bookingId } = req.params;
         const { reason } = req.body;
-        const userId = req.user.sub;
+        const { sub: id, name } = req.user;
+        console.log(id, name);
+        console.log(bookingId);
 
         const booking = await DeviceBooking.findById(bookingId);
         if (!booking) {
             return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
         }
 
+        console.log(id, name);
         // Kiểm tra xem người dùng có phải là người tạo đơn không
-        if (booking.userId.toString() !== userId) {
+        if (booking.userId.toString() !== id) {
             return Response.error(
                 res,
                 'Unauthorized to edit this booking',
@@ -390,18 +395,25 @@ const requestBookingEdit = async (req, res) => {
         }
 
         // Cập nhật thông tin chỉnh sửa
-        booking.editRequest = {
-            requestedBy: userId,
+        const editRequest = {
+            requesterId: id,
+            requesterName: name || '',
             status: EDIT_REQUEST_STATUS.PENDING,
             requestedAt: new Date(),
             reason: reason,
         };
+
+        console.log(editRequest);
+
+        booking.editRequest = editRequest;
+
         await booking.save();
 
         const auditData = await auditService.formatInfoJSON({
             modelName: 'editRequest',
-            detail: booking.editRequest,
+            detail: _.omit(editRequest, ['requesterId']),
         });
+        console.log('-- auditData ', auditData);
         auditService.prepareAudit(
             req,
             auditAction.actionList.REQUEST_BOOKING_EDIT,
@@ -427,7 +439,7 @@ const processEditRequest = async (req, res) => {
     try {
         const { bookingId } = req.params;
         const { action, approverNote } = req.body;
-        const approverId = req.user.sub;
+        const { sub: id, name } = req.user;
 
         const booking = await DeviceBooking.findById(bookingId);
         if (!booking) {
@@ -441,24 +453,32 @@ const processEditRequest = async (req, res) => {
             );
         }
 
-        if (action === 'accept') {
-            booking.editRequest.status = EDIT_REQUEST_STATUS.ACCEPTED;
-            booking.editRequest.processedBy = approverId;
-            booking.editRequest.processedAt = new Date();
-            booking.editRequest.approverNote = approverNote;
-        } else if (action === 'reject') {
-            booking.editRequest.status = EDIT_REQUEST_STATUS.REJECTED;
-            booking.editRequest.processedBy = approverId;
-            booking.editRequest.processedAt = new Date();
-            booking.editRequest.approverNote = approverNote;
-        }
+        console.log('booking.editRequest', booking.editRequest);
+
+        booking.editRequest = {
+            ...booking.editRequest, // giữ lại dữ liệu cũ
+            approverId: id,
+            approverName: name || '',
+            processedAt: new Date(),
+            approverNote,
+            status:
+                action === 'accept'
+                    ? EDIT_REQUEST_STATUS.ACCEPTED
+                    : EDIT_REQUEST_STATUS.REJECTED,
+        };
+
+        console.log(booking.editRequest);
 
         await booking.save();
 
         const auditData = await auditService.formatInfoJSON({
             modelName: 'editRequest',
-            detail: booking.editRequest,
+            detail: _.omit(booking.editRequest.toObject(), [
+                'approverId',
+                'requesterId',
+            ]),
         });
+        console.log('-- auditData ', auditData);
 
         auditService.prepareAudit(
             req,
