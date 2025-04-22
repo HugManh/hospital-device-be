@@ -11,7 +11,7 @@ const { diffObjects } = require('../utils/diffs');
 // Tạo mới user
 const createUser = async (req, res) => {
     try {
-        const { email, name, group, status } = req.body;
+        const { email, name, group, role, isActive } = req.body;
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return Response.error(res, 'Email đã tồn tại!', 400);
@@ -22,7 +22,8 @@ const createUser = async (req, res) => {
             name,
             email,
             group,
-            status: status || true,
+            role,
+            isActive,
         };
 
         const user = new User({ ...newUser, password });
