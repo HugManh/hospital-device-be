@@ -20,7 +20,7 @@ const getAudits = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -41,7 +41,7 @@ const getAuditById = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );

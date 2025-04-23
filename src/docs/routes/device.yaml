@@ -25,7 +25,7 @@
             '400':
                 description: Device code already exists or invalid input
             '500':
-                description: Đã xảy ra lỗi không xác định
+                description: Lỗi hệ thống
 
     get:
         tags:
@@ -37,7 +37,7 @@
             '200':
                 description: Lấy danh sách thiết bị thành công
             '500':
-                description: Đã xảy ra lỗi không xác định
+                description: Lỗi hệ thống
 
 /api/devices/{id}:
     get:
@@ -58,7 +58,7 @@
             '404':
                 description: Không tìm thấy thiết bị
             '500':
-                description: Đã xảy ra lỗi không xác định
+                description: Lỗi hệ thống
 
     put:
         tags:
@@ -89,7 +89,7 @@
             '404':
                 description: Không tìm thấy thiết bị
             '500':
-                description: Đã xảy ra lỗi không xác định
+                description: Lỗi hệ thống
 
     delete:
         tags:
@@ -109,4 +109,4 @@
             '404':
                 description: Không tìm thấy thiết bị
             '500':
-                description: Đã xảy ra lỗi không xác định
+                description: Lỗi hệ thống

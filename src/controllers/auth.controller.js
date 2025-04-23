@@ -30,7 +30,7 @@ const register = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -114,7 +114,7 @@ const login = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -123,34 +123,38 @@ const login = async (req, res) => {
 
 // Đăng xuất
 const logout = async (req, res) => {
+    const { sub: id } = req.user;
     const { refreshToken } = req.body;
-    if (!refreshToken) {
-        return Response.error(res, 'Token không hợp lệ', 400);
+    if (!id || !refreshToken) {
+        return Response.error(res, 'ID hoặc token không hợp lệ', 400);
     }
 
     try {
-        const user = await User.updateOne(
-            { refreshToken },
-            { $unset: { refreshToken: 1 } }
-        );
-
-        if (user.nModified === 0) {
+        const user = await User.findOne({ _id: id, refreshToken });
+        if (!user) {
             return Response.error(
                 res,
-                'Token không hợp lệ hoặc đã hết hạn',
+                'ID hoặc token không hợp lệ hoặc đã hết hạn',
                 401
             );
         }
 
-        res.clearCookie('accessToken', { httpOnly: true, secure: true });
-        res.clearCookie('refreshToken', { httpOnly: true, secure: true });
+        await User.updateOne(
+            { _id: id, refreshToken },
+            { $unset: { refreshToken: 1 } }
+        );
 
-        req.user = user;
+        if (req.cookies.accessToken) {
+            res.clearCookie('accessToken', { httpOnly: true, secure: true });
+        }
+        if (req.cookies.refreshToken) {
+            res.clearCookie('refreshToken', { httpOnly: true, secure: true });
+        }
+
         const updateUser = _.omit(user.toObject(), [
             'password',
             'refreshToken',
         ]);
-
         const auditData = await auditService.formatInfoJSON({
             modelName: 'User',
             detail: updateUser,
@@ -158,8 +162,8 @@ const logout = async (req, res) => {
 
         auditService.prepareAudit(
             req,
-            auditAction.actionList.LOGIN,
-            `${req.user.name} đã đăng xuất`,
+            auditAction.actionList.LOGOUT,
+            `${user.name} đã đăng xuất`,
             auditData
         );
 
@@ -167,7 +171,7 @@ const logout = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -207,7 +211,7 @@ const refreshToken = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -237,7 +241,7 @@ const getProfile = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -266,7 +270,7 @@ const updateProfile = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -313,7 +317,7 @@ const updatePassword = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );

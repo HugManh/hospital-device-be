@@ -43,7 +43,7 @@ const addDevice = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -70,7 +70,7 @@ const getDevices = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -92,7 +92,7 @@ const getDeviceById = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -162,7 +162,7 @@ const updateDevice = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -200,7 +200,7 @@ const deleteDevice = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );

@@ -44,7 +44,7 @@
                         "description": "Audits retrieved successfully"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -108,7 +108,7 @@
                         "description": "Email đã tồn tại"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -188,7 +188,7 @@
                         "description": "Thông tin đăng nhập không chính xác"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -233,7 +233,7 @@
                         }
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -293,7 +293,7 @@
                         "description": "Không có refresh token"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -352,7 +352,7 @@
                         "description": "Không tìm thấy người dùng"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -422,7 +422,7 @@
                         "description": "Không tìm thấy người dùng"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -463,7 +463,7 @@
                         "description": "Device code already exists or invalid input"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             },
@@ -480,7 +480,7 @@
                         "description": "Lấy danh sách thiết bị thành công"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -512,7 +512,7 @@
                         "description": "Không tìm thấy thiết bị"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             },
@@ -560,7 +560,7 @@
                         "description": "Không tìm thấy thiết bị"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             },
@@ -590,7 +590,7 @@
                         "description": "Không tìm thấy thiết bị"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -748,7 +748,7 @@
                         "description": "User or Không tìm thấy thiết bị"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             },
@@ -864,7 +864,7 @@
                         }
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -968,7 +968,7 @@
                         "description": "Không tìm thấy yêu cầu đăng ký"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             },
@@ -1021,7 +1021,7 @@
                         "description": "Không tìm thấy yêu cầu đăng ký"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -1167,7 +1167,7 @@
                         "description": "Không tìm thấy thiết bị"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -1285,7 +1285,7 @@
                         }
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -1381,7 +1381,7 @@
                         "description": "Không tìm thấy đơn đăng ký"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             },
@@ -1487,7 +1487,7 @@
                         "description": "Không tìm thấy đơn đăng ký"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -1564,7 +1564,7 @@
                         "description": "Email đã tồn tại"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             },
@@ -1622,7 +1622,7 @@
                         }
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -1693,7 +1693,7 @@
                         "description": "Không tìm thấy người dùng"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             },
@@ -1800,7 +1800,7 @@
                         "description": "Không tìm thấy người dùng"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             },
@@ -1831,7 +1831,7 @@
                         "description": "Không tìm thấy người dùng"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }
@@ -1887,7 +1887,7 @@
                         "description": "Không tìm thấy người dùng"
                     },
                     "500": {
-                        "description": "Đã xảy ra lỗi không xác định"
+                        "description": "Lỗi hệ thống"
                     }
                 }
             }

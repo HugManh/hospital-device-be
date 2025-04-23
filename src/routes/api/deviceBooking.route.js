@@ -45,17 +45,17 @@ router.get(
     listUserBookings
 );
 router.post(
-    '/approver',
+    '/:id/approver',
     authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]),
     approverBooking
 );
 router.post(
-    '/:bookingId/edit-request',
+    '/:id/edit-request',
     authorizeRoles([ROLES.USER]),
     requestBookingEdit
 );
 router.put(
-    '/:bookingId/edit-request',
+    '/:id/edit-request',
     authorizeRoles([ROLES.APPROVER, ROLES.ADMIN]),
     processEditRequest
 );

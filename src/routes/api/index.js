@@ -14,6 +14,6 @@ router.use('/auth', authRoute);
 router.use(authenticate);
 router.use('/users', userRoute);
 router.use('/devices', deviceRoute);
-router.use('/device-booking', deviceBookingRoute);
+router.use('/device-bookings', deviceBookingRoute);
 router.use('/audits', auditRoute);
 module.exports = router;

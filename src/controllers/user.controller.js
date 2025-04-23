@@ -51,7 +51,7 @@ const createUser = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -78,7 +78,7 @@ const getUsers = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -88,7 +88,8 @@ const getUsers = async (req, res) => {
 // Lấy thông tin user theo ID
 const getUserById = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const { id } = req.params;
+        const user = await User.findById(id).select('-password -refreshToken');
         if (!user) {
             return Response.notFound(res, 'Không tìm thấy tài khoản');
         }
@@ -100,7 +101,7 @@ const getUserById = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -172,7 +173,7 @@ const updateUser = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -209,7 +210,7 @@ const deleteUser = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -257,7 +258,7 @@ const resetPassword = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );

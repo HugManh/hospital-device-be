@@ -333,7 +333,7 @@ const listUserBookings = async (req, res) => {
 // Admin xử lý đơn đăng ký
 const approverBooking = async (req, res) => {
     try {
-        const { bookingId, status, note } = req.body;
+        const { id: bookingId, status, note } = req.body;
         const userId = req.user?.sub;
 
         const user = await User.findById(userId);
@@ -376,18 +376,15 @@ const approverBooking = async (req, res) => {
 // Yêu cầu chỉnh sửa đơn đăng ký của user
 const requestBookingEdit = async (req, res) => {
     try {
-        const { bookingId } = req.params;
+        const { id: bookingId } = req.params;
         const { reason } = req.body;
         const { sub: id, name } = req.user;
-        console.log(id, name);
-        console.log(bookingId);
 
         const booking = await DeviceBooking.findById(bookingId);
         if (!booking) {
             return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
         }
 
-        console.log(id, name);
         // Kiểm tra xem người dùng có phải là người tạo đơn không
         if (booking.userId.toString() !== id) {
             return Response.error(
@@ -448,7 +445,7 @@ const requestBookingEdit = async (req, res) => {
 // Xử lý yêu cầu chỉnh sửa của user, người cho phép: approver | admin
 const processEditRequest = async (req, res) => {
     try {
-        const { bookingId } = req.params;
+        const { id: bookingId } = req.params;
         const { action, approverNote } = req.body;
         const { sub: id, name } = req.user;
 
@@ -464,8 +461,6 @@ const processEditRequest = async (req, res) => {
             );
         }
 
-        console.log('booking.editRequest', booking.editRequest);
-
         booking.editRequest = {
             ...booking.editRequest, // giữ lại dữ liệu cũ
             approverId: id,
@@ -478,8 +473,6 @@ const processEditRequest = async (req, res) => {
                     : EDIT_REQUEST_STATUS.REJECTED,
         };
 
-        console.log(booking.editRequest);
-
         await booking.save();
 
         const auditData = await auditService.formatInfoJSON({
@@ -489,7 +482,6 @@ const processEditRequest = async (req, res) => {
                 'requesterId',
             ]),
         });
-        console.log('-- auditData ', auditData);
 
         auditService.prepareAudit(
             req,
