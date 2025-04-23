@@ -190,8 +190,6 @@ const updateBooking = async (req, res) => {
             return Response.notFound(res, 'Không tìm thấy thiết bị');
         }
 
-        console.log('fdff', booking);
-
         const oldData = {
             deviceId: booking.deviceId?.id,
             deviceName: booking.deviceId?.name,
@@ -333,7 +331,8 @@ const listUserBookings = async (req, res) => {
 // Admin xử lý đơn đăng ký
 const approverBooking = async (req, res) => {
     try {
-        const { id: bookingId, status, note } = req.body;
+        const { id: bookingId } = req.params;
+        const { status, note } = req.body;
         const userId = req.user?.sub;
 
         const user = await User.findById(userId);
@@ -352,8 +351,6 @@ const approverBooking = async (req, res) => {
             modelName: 'DeviceBooking',
             detail: _.omit(booking.toObject(), ['editRequest']),
         });
-
-        console.log('PROCESS_DEVICE_BOOKING', auditData);
 
         auditService.prepareAudit(
             req,
@@ -411,8 +408,6 @@ const requestBookingEdit = async (req, res) => {
             reason: reason,
         };
 
-        console.log(editRequest);
-
         booking.editRequest = editRequest;
 
         await booking.save();
@@ -421,7 +416,6 @@ const requestBookingEdit = async (req, res) => {
             modelName: 'editRequest',
             detail: _.omit(editRequest, ['requesterId']),
         });
-        console.log('-- auditData ', auditData);
         auditService.prepareAudit(
             req,
             auditAction.actionList.REQUEST_BOOKING_EDIT,

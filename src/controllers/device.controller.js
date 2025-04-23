@@ -187,8 +187,6 @@ const deleteDevice = async (req, res) => {
             detail: device.toObject(),
         });
 
-        console.log(auditData);
-
         auditService.prepareAudit(
             req,
             auditAction.actionList.DELETE_DEVICE,
