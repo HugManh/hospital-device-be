@@ -49,7 +49,7 @@ const createDeviceBooking = async (req, res) => {
             deviceId,
             usageDay,
             usageTime,
-            status: { $ne: REGISTER_STATUS.REJECT },
+            status: { $ne: REGISTER_STATUS.REJECTED },
         });
 
         // Nếu có đăng ký trùng thời gian và không phải là ưu tiên
@@ -61,7 +61,7 @@ const createDeviceBooking = async (req, res) => {
             );
         }
 
-        // Tạo đăng ký mới
+        // Tạo đơn đăng ký mới
         const booking = new DeviceBooking({
             deviceId,
             deviceName: device.name,
@@ -328,7 +328,7 @@ const listUserBookings = async (req, res) => {
     }
 };
 
-// Admin xử lý đơn đăng ký
+// Xử lý đơn đăng ký đang chờ duyệt
 const approverBooking = async (req, res) => {
     try {
         const { id: bookingId } = req.params;
