@@ -12,9 +12,7 @@ const addDevice = async (req, res) => {
     try {
         const { location, name } = req.body;
         if (!name || !location) {
-            return Response.validationError(res, [
-                'Name, location are required',
-            ]);
+            return Response.validationError(res);
         }
 
         const newDevice = { name, location };
@@ -29,13 +27,13 @@ const addDevice = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE,
-            `"${req.user.name}" đã thêm thiết bị mới`,
+            `"${req.user.name}" đã thêm thiết bị mới.`,
             auditData
         );
 
         return Response.success(
             res,
-            'Thêm thiết bị mới thành công',
+            'Đã thêm thiết bị mới.',
             device.toObject(),
             null,
             201
@@ -63,7 +61,7 @@ const getDevices = async (req, res) => {
 
         return Response.success(
             res,
-            'Lấy danh sách thiết bị thành công',
+            'Đã lấy danh sách thiết bị.',
             data,
             meta
         );
@@ -82,11 +80,11 @@ const getDeviceById = async (req, res) => {
     try {
         const device = await Device.findById(req.params.id);
         if (!device) {
-            return Response.notFound(res, 'Không tìm thấy thiết bị');
+            return Response.notFound(res, 'Thiết bị không tồn tại.');
         }
         return Response.success(
             res,
-            'Lấy thông tin thiết bị thành công',
+            'Đã lấy thông tin thiết bị.',
             device
         );
     } catch (error) {
@@ -111,15 +109,12 @@ const updateDevice = async (req, res) => {
         const { name, location } = req.body;
 
         if (!name && !location) {
-            return Response.validationError(
-                res,
-                'Phải có ít nhất một trường để cập nhật'
-            );
+            return Response.validationError(res);
         }
 
         const device = await Device.findById(id);
         if (!device) {
-            return Response.notFound(res, 'Không tìm thấy thiết bị');
+            return Response.notFound(res, 'Thiết bị không tồn tại.');
         }
 
         const oldData = {
@@ -150,13 +145,13 @@ const updateDevice = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.UPDATE_DEVICE,
-            `"${req.user.name}" đã cập nhật thông tin thiết bị`,
+            `"${req.user.name}" đã cập nhật thông tin thiết bị.`,
             auditData
         );
         // }
 
         // TODO: Có cần thiết phải trả data trong response không?
-        return Response.success(res, 'Cập nhật thông tin thiết bị thành công', {
+        return Response.success(res, 'Đã cập nhật thông tin thiết bị.', {
             device: updatedDevice,
         });
     } catch (error) {
@@ -179,7 +174,7 @@ const deleteDevice = async (req, res) => {
     try {
         const device = await Device.findByIdAndDelete(req.params.id);
         if (!device) {
-            return Response.notFound(res, 'Không tìm thấy thiết bị');
+            return Response.notFound(res, 'Thiết bị không tồn tại.');
         }
 
         const auditData = await auditService.formatInfoJSON({
@@ -190,11 +185,11 @@ const deleteDevice = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.DELETE_DEVICE,
-            `"${req.user.name}" đã xoá thiết bị`,
+            `"${req.user.name}" đã xoá thiết bị.`,
             auditData
         );
 
-        return Response.success(res, 'Đã xóa thiết bị thành công');
+        return Response.success(res, 'Đã xóa thiết bị.');
     } catch (error) {
         return Response.error(
             res,

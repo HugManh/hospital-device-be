@@ -14,7 +14,7 @@ const register = async (req, res) => {
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return Response.error(res, 'Email đã tồn tại!', 400);
+            return Response.error(res, 'Email đã tồn tại.', 400);
         }
 
         const user = new User({ email, name, password, role });
@@ -22,7 +22,7 @@ const register = async (req, res) => {
 
         return Response.success(
             res,
-            'Đăng ký tài khoản thành công',
+            'Đăng ký tài khoản thành công.',
             null,
             null,
             201
@@ -44,16 +44,16 @@ const login = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return Response.error(res, 'Thông tin đăng nhập không hợp lệ', 400);
+            return Response.error(res, 'Thông tin đăng nhập không hợp lệ.', 400);
         }
 
         if (!user.isActive) {
-            return Response.error(res, 'Tài khoản đã bị vô hiệu hóa', 400);
+            return Response.error(res, 'Tài khoản đã bị vô hiệu hóa.', 400);
         }
 
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return Response.error(res, 'Thông tin đăng nhập không hợp lệ', 400);
+            return Response.error(res, 'Thông tin đăng nhập không hợp lệ.', 400);
         }
 
         // Tạo access token
@@ -98,11 +98,11 @@ const login = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.LOGIN,
-            `${req.user.name} đã đăng nhập`,
+            `${req.user.name} đã đăng nhập.`,
             auditData
         );
 
-        return Response.success(res, 'Đăng nhập thành công', {
+        return Response.success(res, 'Đăng nhập thành công.', {
             accessToken,
             refreshToken,
             user: {
@@ -126,7 +126,7 @@ const logout = async (req, res) => {
     const { sub: id } = req.user;
     const { refreshToken } = req.body;
     if (!id || !refreshToken) {
-        return Response.error(res, 'ID hoặc token không hợp lệ', 400);
+        return Response.validationError(res);
     }
 
     try {
@@ -134,7 +134,7 @@ const logout = async (req, res) => {
         if (!user) {
             return Response.error(
                 res,
-                'ID hoặc token không hợp lệ hoặc đã hết hạn',
+                'ID hoặc token không hợp lệ hoặc đã hết hạn.',
                 401
             );
         }
@@ -163,11 +163,11 @@ const logout = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.LOGOUT,
-            `${user.name} đã đăng xuất`,
+            `${user.name} đã đăng xuất.`,
             auditData
         );
 
-        return Response.success(res, 'Đăng xuất thành công');
+        return Response.success(res, 'Đăng xuất thành công.');
     } catch (error) {
         return Response.error(
             res,
@@ -207,7 +207,7 @@ const refreshToken = async (req, res) => {
             { expiresIn: '2h' }
         );
 
-        return Response.success(res, 'Lấy token thành công', { accessToken });
+        return Response.success(res, 'Lấy mã thành công.', { accessToken });
     } catch (error) {
         return Response.error(
             res,
@@ -227,10 +227,10 @@ const getProfile = async (req, res) => {
         );
 
         if (!user) {
-            return Response.notFound(res, 'Không tìm thấy tài khoản');
+            return Response.notFound(res, 'Người dùng không tồn tại.');
         }
 
-        return Response.success(res, 'Lấy thông tin hồ sơ thành công', {
+        return Response.success(res, 'Lấy thông tin hồ sơ thành công.', {
             profile: {
                 id: user.id,
                 name: user.name,
@@ -256,14 +256,14 @@ const updateProfile = async (req, res) => {
 
         const user = await User.findById(userId);
         if (!user) {
-            return Response.notFound(res, 'Không tìm thấy tài khoản');
+            return Response.notFound(res, 'Người dùng không tồn tại.');
         }
 
         Object.assign(user, { name, group });
 
         await user.save();
 
-        return Response.success(res, 'Cập nhật tài khoản thành công', {
+        return Response.success(res, 'Cập nhật tài khoản thành công.', {
             name,
             group,
         });
@@ -284,19 +284,19 @@ const updatePassword = async (req, res) => {
 
         const user = await User.findById(userId);
         if (!user) {
-            return Response.notFound(res, 'Không tìm thấy tài khoản');
+            return Response.notFound(res, 'Người dùng không tồn tại.');
         }
 
         // Verify current password
         const isMatch = await user.comparePassword(currentPassword);
         if (!isMatch) {
-            return Response.error(res, 'Mật khẩu hiện tại không đúng', 400);
+            return Response.error(res, 'Mật khẩu hiện tại không đúng.', 400);
         }
 
         if (confirmPassword !== newPassword) {
             return Response.error(
                 res,
-                'Mật khẩu mới và xác nhận mật khẩu không khớp',
+                'Mật khẩu mới và xác nhận mật khẩu không khớp.',
                 400
             );
         }
@@ -305,7 +305,7 @@ const updatePassword = async (req, res) => {
         if (newPassword.length < 6) {
             return Response.error(
                 res,
-                'Mật khẩu mới phải có ít nhất 8 ký tự',
+                'Mật khẩu mới phải có ít nhất 8 ký tự.',
                 400
             );
         }
@@ -313,7 +313,7 @@ const updatePassword = async (req, res) => {
         user.password = newPassword;
         await user.save();
 
-        return Response.success(res, 'Cập nhật mật khẩu thành công');
+        return Response.success(res, 'Cập nhật mật khẩu thành công.');
     } catch (error) {
         return Response.error(
             res,

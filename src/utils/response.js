@@ -53,7 +53,7 @@ class Response {
      * @param {Object} res - Express response object
      * @param {Array} errors - Validation errors array
      */
-    static validationError(res, errors) {
+    static validationError(res, errors = null) {
         return res.status(400).json({
             success: false,
             message: 'Validation Error',

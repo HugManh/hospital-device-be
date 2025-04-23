@@ -35,13 +35,13 @@ const createDeviceBooking = async (req, res) => {
         // Kiểm tra user tồn tại
         const user = await User.findById(userId);
         if (!user) {
-            return Response.notFound(res, 'Không tìm thấy người dùng');
+            return Response.notFound(res, 'Người dùng không tồn tại.');
         }
 
         // Kiểm tra thiết bị tồn tại
         const device = await Device.findById(deviceId);
         if (!device) {
-            return Response.notFound(res, 'Không tìm thấy thiết bị');
+            return Response.notFound(res, 'Thiết bị không tồn tại');
         }
 
         // Kiểm tra xem có đăng ký nào trùng thời gian không
@@ -56,7 +56,7 @@ const createDeviceBooking = async (req, res) => {
         if (existingBooking && priority !== PRIORITY_STATUS.PRIORITY) {
             return Response.error(
                 res,
-                'Khung giờ này đã được đăng ký cho thiết bị này',
+                'Khung giờ cho thiết bị này đã được đăng ký, yêu cầu độ ưu tiên cao hơn.',
                 400
             );
         }
@@ -86,13 +86,13 @@ const createDeviceBooking = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE_BOOKING,
-            `"${req.user.name}" đã tạo đơn đăng ký thiết bị`,
+            `"${req.user.name}" đã tạo đơn đăng ký thiết bị.`,
             auditData
         );
 
         return Response.success(
             res,
-            'Tạo đơn đăng ký thiết bị thành công',
+            'Đã tạo đơn đăng ký.',
             { booking },
             null,
             201
@@ -100,7 +100,7 @@ const createDeviceBooking = async (req, res) => {
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -124,14 +124,14 @@ const getDeviceBookings = async (req, res) => {
 
         return Response.success(
             res,
-            'Lấy danh sách đơn đăng ký thành công',
+            'Đã lấy danh sách đơn đăng ký.',
             data,
             meta
         );
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -143,17 +143,17 @@ const getDeviceBookingById = async (req, res) => {
         const { id } = req.params;
         const booking = await DeviceBooking.findById(id);
         if (!booking) {
-            return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
+            return Response.notFound(res, 'Đơn đăng ký không tồn tại.');
         }
         return Response.success(
             res,
-            'Lấy thông tin đơn đăng ký thành công',
+            'Đã lấy thông tin chi tiết đơn đăng ký.',
             booking
         );
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -176,18 +176,18 @@ const updateBooking = async (req, res) => {
         } = req.body;
 
         const user = await User.findById(userId);
-        if (!user) return Response.notFound(res, 'Không tìm thấy người dùng');
+        if (!user) return Response.notFound(res, 'Người dùng không tồn tại');
 
         const booking = await DeviceBooking.findById(id).populate([
             { path: 'deviceId', select: 'name location' },
         ]);
         if (!booking) {
-            return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
+            return Response.notFound(res, 'Đơn đăng ký không tồn tại.');
         }
 
         const device = await Device.findById(deviceId);
         if (!device) {
-            return Response.notFound(res, 'Không tìm thấy thiết bị');
+            return Response.notFound(res, 'Thiết bị không tồn tại.');
         }
 
         const oldData = {
@@ -239,15 +239,15 @@ const updateBooking = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.UPDATE_DEVICE_BOOKING,
-            `"${req.user.name}" đã cập nhật đơn đăng ký thiết bị`,
+            `"${req.user.name}" đã cập nhật đơn đăng ký thiết bị.`,
             auditData
         );
 
-        return Response.success(res, 'Đã xử lý đơn đăng ký', { booking });
+        return Response.success(res, 'Đã cập nhật đơn đăng ký.', { booking });
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -277,14 +277,14 @@ const listDeviceBookings = async (req, res) => {
 
         return Response.success(
             res,
-            'Lấy danh sách đơn của thiết bị thành công',
+            'Lấy danh sách đơn của thiết bị thành công.',
             data,
             meta
         );
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -314,14 +314,14 @@ const listUserBookings = async (req, res) => {
 
         return Response.success(
             res,
-            'Lấy lịch sử đăng ký của người dùng thành công',
+            'Lấy lịch sử đăng ký của người dùng thành công.',
             data,
             meta
         );
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -336,11 +336,11 @@ const approverBooking = async (req, res) => {
         const userId = req.user?.sub;
 
         const user = await User.findById(userId);
-        if (!user) return Response.notFound(res, 'Không tìm thấy người dùng');
+        if (!user) return Response.notFound(res, 'Người dùng không tồn tại.');
 
         const booking = await DeviceBooking.findById(bookingId);
         if (!booking) {
-            return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
+            return Response.notFound(res, 'Đơn đăng ký không tồn tại.');
         }
 
         booking.status = status;
@@ -355,15 +355,15 @@ const approverBooking = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.PROCESS_DEVICE_BOOKING,
-            `"${req.user.name}" đã xử lý đơn đăng ký thiết bị`,
+            `"${req.user.name}" đã xử lý đơn đăng ký thiết bị.`,
             auditData
         );
 
-        return Response.success(res, `Đã ${status} đơn đăng ký`, { note });
+        return Response.success(res, `Đã ${status} đơn đăng ký.`, { note });
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -379,14 +379,14 @@ const requestBookingEdit = async (req, res) => {
 
         const booking = await DeviceBooking.findById(bookingId);
         if (!booking) {
-            return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
+            return Response.notFound(res, 'Đơn đăng ký không tồn tại.');
         }
 
         // Kiểm tra xem người dùng có phải là người tạo đơn không
         if (booking.userId.toString() !== id) {
             return Response.error(
                 res,
-                'Unauthorized to edit this booking',
+                'Bạn không có quyền hạn.',
                 403
             );
         }
@@ -394,7 +394,7 @@ const requestBookingEdit = async (req, res) => {
         if (booking.status !== REGISTER_STATUS.PENDING) {
             return Response.error(
                 res,
-                'Cannot edit booking that is not pending approval',
+                'Đơn đăng ký đã được duyệt.',
                 400
             );
         }
@@ -419,17 +419,17 @@ const requestBookingEdit = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.REQUEST_BOOKING_EDIT,
-            `"${req.user.name}" đã yêu cầu chỉnh sửa đơn đăng ký thiết bị`,
+            `"${req.user.name}" đã yêu cầu chỉnh sửa đơn đăng ký thiết bị.`,
             auditData
         );
 
-        return Response.success(res, 'Edit request submitted successfully', {
+        return Response.success(res, 'Đã gửi yêu cầu chỉnh sửa đơn.', {
             editRequest: booking.editRequest,
         });
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
@@ -445,14 +445,11 @@ const processEditRequest = async (req, res) => {
 
         const booking = await DeviceBooking.findById(bookingId);
         if (!booking) {
-            return Response.notFound(res, 'Không tìm thấy đơn đăng ký');
+            return Response.notFound(res, 'Đơn đăng ký không tồn tại.');
         }
 
         if (!booking.editRequest) {
-            return Response.error(
-                res,
-                'No edit request found for this booking'
-            );
+            return Response.error(res, 'Không có yêu cầu chỉnh sửa đơn.');
         }
 
         booking.editRequest = {
@@ -480,17 +477,17 @@ const processEditRequest = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.PROCESS_EDIT_REQUEST,
-            `"${req.user.name}" đã xử lý yêu cầu chỉnh sửa`,
+            `"${req.user.name}" đã xử lý yêu cầu chỉnh sửa.`,
             auditData
         );
 
-        return Response.success(res, 'Edit request processed successfully', {
+        return Response.success(res, 'Đã xử lý yêu cầu chỉnh sửa đơn.', {
             editRequest: booking.editRequest,
         });
     } catch (error) {
         return Response.error(
             res,
-            'Đã xảy ra lỗi không xác định',
+            'Lỗi hệ thống',
             500,
             isDevelopment ? error.message : null
         );
