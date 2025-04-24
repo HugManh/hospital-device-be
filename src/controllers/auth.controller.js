@@ -44,7 +44,11 @@ const login = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return Response.error(res, 'Thông tin đăng nhập không hợp lệ.', 400);
+            return Response.error(
+                res,
+                'Thông tin đăng nhập không hợp lệ.',
+                400
+            );
         }
 
         if (!user.isActive) {
@@ -53,7 +57,11 @@ const login = async (req, res) => {
 
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return Response.error(res, 'Thông tin đăng nhập không hợp lệ.', 400);
+            return Response.error(
+                res,
+                'Thông tin đăng nhập không hợp lệ.',
+                400
+            );
         }
 
         // Tạo access token
@@ -98,7 +106,7 @@ const login = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.LOGIN,
-            `${req.user.name} đã đăng nhập.`,
+            `[${req.user.name}] đã đăng nhập.`,
             auditData
         );
 
@@ -163,7 +171,7 @@ const logout = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.LOGOUT,
-            `${user.name} đã đăng xuất.`,
+            `[${user.name}] đã đăng xuất.`,
             auditData
         );
 

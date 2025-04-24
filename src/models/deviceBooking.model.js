@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const BaseSchema = require('./base.model');
-const { EDIT_REQUEST_STATUS } = require('../config/constants');
+const { EDIT_REQUEST_STATUS, REGISTER_STATUS } = require('../config/constants');
 
 const DeviceBookingSchema = new BaseSchema({
     deviceId: {
@@ -51,6 +51,7 @@ const DeviceBookingSchema = new BaseSchema({
     status: {
         type: String,
         required: true,
+        default: REGISTER_STATUS.PENDING,
         description: 'Trạng thái',
     },
     note: {

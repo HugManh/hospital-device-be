@@ -37,7 +37,7 @@ const createUser = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.CREATE_USER,
-            `"${req.user.name}" đã thêm tài khoản mới`,
+            `[${req.user.name}] đã thêm tài khoản mới`,
             auditData
         );
 
@@ -154,7 +154,7 @@ const updateUser = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.UPDATE_USER,
-            `"${req.user.name}" đã cập nhật tài khoản`,
+            `[${req.user.name}] đã cập nhật tài khoản`,
             auditData
         );
         // }
@@ -202,7 +202,7 @@ const deleteUser = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.DELETE_USER,
-            `"${req.user.name}" đã xoá tài khoản`,
+            `[${req.user.name}] đã xoá tài khoản`,
             auditData
         );
 
@@ -248,7 +248,7 @@ const resetPassword = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.RESET_PASSWORD,
-            `"${req.user.name}" đã cấp mật khẩu mới cho "${updateUser.name}"`,
+            `[${req.user.name}] đã cấp mật khẩu mới cho "${updateUser.name}"`,
             auditData
         );
 

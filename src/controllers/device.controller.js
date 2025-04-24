@@ -27,7 +27,7 @@ const addDevice = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE,
-            `"${req.user.name}" đã thêm thiết bị mới.`,
+            `[${req.user.name}] đã thêm thiết bị mới.`,
             auditData
         );
 
@@ -59,12 +59,7 @@ const getDevices = async (req, res) => {
 
         const { data, meta } = devices;
 
-        return Response.success(
-            res,
-            'Đã lấy danh sách thiết bị.',
-            data,
-            meta
-        );
+        return Response.success(res, 'Đã lấy danh sách thiết bị.', data, meta);
     } catch (error) {
         return Response.error(
             res,
@@ -82,11 +77,7 @@ const getDeviceById = async (req, res) => {
         if (!device) {
             return Response.notFound(res, 'Thiết bị không tồn tại.');
         }
-        return Response.success(
-            res,
-            'Đã lấy thông tin thiết bị.',
-            device
-        );
+        return Response.success(res, 'Đã lấy thông tin thiết bị.', device);
     } catch (error) {
         return Response.error(
             res,
@@ -145,7 +136,7 @@ const updateDevice = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.UPDATE_DEVICE,
-            `"${req.user.name}" đã cập nhật thông tin thiết bị.`,
+            `[${req.user.name}] đã cập nhật thông tin thiết bị.`,
             auditData
         );
         // }
@@ -185,7 +176,7 @@ const deleteDevice = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.DELETE_DEVICE,
-            `"${req.user.name}" đã xoá thiết bị.`,
+            `[${req.user.name}] đã xoá thiết bị.`,
             auditData
         );
 

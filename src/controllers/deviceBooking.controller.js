@@ -25,7 +25,6 @@ const createDeviceBooking = async (req, res) => {
             nameBA,
             usageTime,
             usageDay,
-            status,
             priority,
             purpose,
         } = req.body;
@@ -53,13 +52,13 @@ const createDeviceBooking = async (req, res) => {
         });
 
         // Nếu có đăng ký trùng thời gian và không phải là ưu tiên
-        if (existingBooking && priority !== PRIORITY_STATUS.PRIORITY) {
-            return Response.error(
-                res,
-                'Khung giờ cho thiết bị này đã được đăng ký, yêu cầu độ ưu tiên cao hơn.',
-                400
-            );
-        }
+        // if (existingBooking && priority !== PRIORITY_STATUS.PRIORITY) {
+        //     return Response.error(
+        //         res,
+        //         'Khung giờ cho thiết bị này đã được đăng ký, yêu cầu độ ưu tiên cao hơn.',
+        //         400
+        //     );
+        // }
 
         // Tạo đơn đăng ký mới
         const booking = new DeviceBooking({
@@ -74,7 +73,7 @@ const createDeviceBooking = async (req, res) => {
             usageDay,
             priority,
             purpose,
-            status,
+            status: REGISTER_STATUS.PENDING,
         });
 
         await booking.save();
@@ -86,7 +85,7 @@ const createDeviceBooking = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.CREATE_DEVICE_BOOKING,
-            `"${req.user.name}" đã tạo đơn đăng ký thiết bị.`,
+            `[${req.user.name}] đã tạo đơn đăng ký thiết bị.`,
             auditData
         );
 
@@ -165,15 +164,8 @@ const updateBooking = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user?.sub;
-        const {
-            deviceId,
-            codeBA,
-            nameBA,
-            usageTime,
-            usageDay,
-            priority,
-            status,
-        } = req.body;
+        const { deviceId, codeBA, nameBA, usageTime, usageDay, priority } =
+            req.body;
 
         const user = await User.findById(userId);
         if (!user) return Response.notFound(res, 'Người dùng không tồn tại');
@@ -198,7 +190,6 @@ const updateBooking = async (req, res) => {
             usageTime: booking.usageTime,
             usageDay: booking.usageDay,
             priority: booking.priority,
-            status: booking.status,
         };
 
         const updates = _.pickBy(
@@ -213,7 +204,6 @@ const updateBooking = async (req, res) => {
                 usageTime,
                 usageDay: usageDay ? new Date(usageDay) : undefined,
                 priority,
-                status: status || REGISTER_STATUS.PENDING,
                 ...(user.role === ROLES.USER && { editRequest: {} }),
             },
             (value) => !_.isUndefined(value) && !_.isNull(value)
@@ -228,7 +218,6 @@ const updateBooking = async (req, res) => {
             'usageTime',
             'usageDay',
             'priority',
-            'status',
         ]);
 
         const auditData = await auditService.formatUpdateJSON({
@@ -239,7 +228,7 @@ const updateBooking = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.UPDATE_DEVICE_BOOKING,
-            `"${req.user.name}" đã cập nhật đơn đăng ký thiết bị.`,
+            `[${req.user.name}] đã cập nhật đơn đăng ký thiết bị.`,
             auditData
         );
 
@@ -347,6 +336,24 @@ const approverBooking = async (req, res) => {
         if (note) booking.note = note;
         await booking.save();
 
+        if (status === REGISTER_STATUS.APPROVED) {
+            // Từ chối tất cả các đơn khác trùng thời gian và thiết bị
+            await DeviceBooking.updateMany(
+                {
+                    deviceId: booking.deviceId,
+                    usageTime: booking.usageTime,
+                    usageDay: booking.usageDay,
+                    _id: { $ne: booking.id }, // loại trừ đơn hiện tại
+                },
+                {
+                    $set: {
+                        status: REGISTER_STATUS.REJECTED,
+                        note: `Đơn đăng ký thiết bị [${booking.deviceName}] đã bị từ chối do trùng lịch với một đơn đã được duyệt.`,
+                    },
+                }
+            );
+        }
+
         const auditData = await auditService.formatInfoJSON({
             modelName: 'DeviceBooking',
             detail: _.omit(booking.toObject(), ['editRequest']),
@@ -355,7 +362,7 @@ const approverBooking = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.PROCESS_DEVICE_BOOKING,
-            `"${req.user.name}" đã xử lý đơn đăng ký thiết bị.`,
+            `[${req.user.name}] đã xử lý đơn đăng ký thiết bị.`,
             auditData
         );
 
@@ -384,19 +391,11 @@ const requestBookingEdit = async (req, res) => {
 
         // Kiểm tra xem người dùng có phải là người tạo đơn không
         if (booking.userId.toString() !== id) {
-            return Response.error(
-                res,
-                'Bạn không có quyền hạn.',
-                403
-            );
+            return Response.error(res, 'Bạn không có quyền hạn.', 403);
         }
         // Kiểm tra xem đơn có đang chờ duyệt không
         if (booking.status !== REGISTER_STATUS.PENDING) {
-            return Response.error(
-                res,
-                'Đơn đăng ký đã được duyệt.',
-                400
-            );
+            return Response.error(res, 'Đơn đăng ký đã được duyệt.', 400);
         }
 
         // Cập nhật thông tin chỉnh sửa
@@ -419,7 +418,7 @@ const requestBookingEdit = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.REQUEST_BOOKING_EDIT,
-            `"${req.user.name}" đã yêu cầu chỉnh sửa đơn đăng ký thiết bị.`,
+            `[${req.user.name}] đã yêu cầu chỉnh sửa đơn đăng ký thiết bị.`,
             auditData
         );
 
@@ -477,7 +476,7 @@ const processEditRequest = async (req, res) => {
         auditService.prepareAudit(
             req,
             auditAction.actionList.PROCESS_EDIT_REQUEST,
-            `"${req.user.name}" đã xử lý yêu cầu chỉnh sửa.`,
+            `[${req.user.name}] đã xử lý yêu cầu chỉnh sửa.`,
             auditData
         );
 
